@@ -19,7 +19,7 @@ public class QuestionaireController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
+    [HttpGet(Name = "GetQuestionaire")]
     public IEnumerable<Questionaire> Get()
     {
         return Enumerable.Range(1, 5).Select(index => new Questionaire

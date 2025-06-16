@@ -1,4 +1,5 @@
 using LifeTracker.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSqlite<LifeTrackerContext>("Data Source=LifeTrackerContext.db");
+builder.Services.AddDbContext<LifeTrackerContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -18,6 +20,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<LifeTrackerContext>();
+
+    if (await dbContext.Database.CanConnectAsync())
+    {
+        Console.WriteLine("✅ Successfully connected to Postgres.");
+    }
+    else
+    {
+        Console.WriteLine("❌ Failed to connect to Postgres.");
+    }
+}
+
 
 app.UseHttpsRedirection();
 

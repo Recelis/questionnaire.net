@@ -20,28 +20,31 @@ public class TemplateController : ControllerBase
     }
 
     [HttpGet(Name = "GetTemplate")]
-    public IEnumerable<Questionaire> Get()
+    public IEnumerable<Template> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new Questionaire
+        return Enumerable.Range(1, 5).Select(index => new Template
         {
+            Name = $"{index}",
         })
         .ToArray();
     }
 
     [HttpPost(Name = "PostTemplate")]
-    public IEnumerable<Questionaire> Post()
+    public IEnumerable<Template> Post()
     {
-        return Enumerable.Range(1, 5).Select(index => new Questionaire
+        return Enumerable.Range(1, 5).Select(index => new Template
         {
+            Name = $"{index}",
         })
         .ToArray();
     }
 
     [HttpPut(Name = "PutTemplate")]
-    public IEnumerable<Questionaire> Put()
+    public IEnumerable<Template> Put()
     {
-        return Enumerable.Range(1, 5).Select(index => new Questionaire
+        return Enumerable.Range(1, 5).Select(index => new Template
         {
+            Name = $"{index}",
         })
         .ToArray();
     }

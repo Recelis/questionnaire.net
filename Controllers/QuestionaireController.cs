@@ -24,7 +24,8 @@ public class QuestionaireController : ControllerBase
     {
         return Enumerable.Range(1, 5).Select(index => new Questionaire
         {
-            
+            Name = $"{index}",
+            CreatedBy = "",
         })
         .ToArray();
     }
@@ -34,6 +35,8 @@ public class QuestionaireController : ControllerBase
     {
         return Enumerable.Range(1, 5).Select(index => new Questionaire
         {
+            Name = $"{index}",
+            CreatedBy = "",
         })
         .ToArray();
     }
@@ -43,6 +46,8 @@ public class QuestionaireController : ControllerBase
     {
         return Enumerable.Range(1, 5).Select(index => new Questionaire
         {
+            Name = $"{index}",
+            CreatedBy = "",
         })
         .ToArray();
     }
@@ -52,7 +57,8 @@ public class QuestionaireController : ControllerBase
     {
         return Enumerable.Range(1, 5).Select(index => new Questionaire
         {
-
+            Name = $"{index}",
+            CreatedBy = "",
         })
         .ToArray();
     }

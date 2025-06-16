@@ -12,5 +12,5 @@ public class LifeTrackerContext : DbContext
     }
 
     public DbSet<Questionaire> Questionaire => Set<Questionaire>();
-    public DbSet<QuestionaireTemplate> QuestionaireTemplate => Set<QuestionaireTemplate>();
+    public DbSet<Template> Template => Set<Template>();
 }

@@ -1,10 +1,10 @@
 namespace LifeTracker.Models;
 
-public class Questionaire
+public class User
 {
     public int Id { get; set; }
 
     public required string Name { get; set; }
 
-    public required string CreatedBy { get; set; }
+    public required string Email { get; set; }
 }

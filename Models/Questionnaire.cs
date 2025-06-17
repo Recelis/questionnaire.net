@@ -1,6 +1,6 @@
 namespace LifeTracker.Models;
 
-public class Questionaire
+public class Questionnaire
 {
     public int Id { get; set; }
 

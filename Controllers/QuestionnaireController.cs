@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using LifeTracker.Models;
+using LifeTracker.Services;
 
 namespace Controllers;
 
@@ -7,59 +8,60 @@ namespace Controllers;
 [Route("[controller]")]
 public class QuestionnaireController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+
+    private readonly QuestionnaireService _questionnaireService;
 
     private readonly ILogger<QuestionnaireController> _logger;
 
-    public QuestionnaireController(ILogger<QuestionnaireController> logger)
+    public QuestionnaireController(QuestionnaireService questionnaireService, ILogger<QuestionnaireController> logger)
     {
+        _questionnaireService = questionnaireService;
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetQuestionnaire")]
-    public IEnumerable<Questionnaire> Get()
+    [HttpGet(Name = "questionnaire")]
+    public ActionResult<IEnumerable<Questionnaire>> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new Questionnaire
+        IEnumerable<Questionnaire> questionnaires = _questionnaireService.GetAll();
+        if (questionnaires == null)
         {
-            Name = $"{index}",
-            CreatedBy = "",
-        })
-        .ToArray();
+            return NoContent();
+        }
+        return Ok(questionnaires);
     }
 
-    [HttpPost(Name = "PostQuestionnaire")]
-    public IEnumerable<Questionnaire> Post()
+    [HttpPost(Name = "questionnaire")]
+    public ActionResult<Questionnaire> Post(Questionnaire newQuestionnaire)
     {
-        return Enumerable.Range(1, 5).Select(index => new Questionnaire
+
+        Questionnaire? questionnaire = _questionnaireService.Post(newQuestionnaire);
+        if (questionnaire == null)
         {
-            Name = $"{index}",
-            CreatedBy = "",
-        })
-        .ToArray();
+            return Conflict("Already exists");
+        }
+        return Ok(questionnaire);
     }
 
-    [HttpPut(Name = "PutQuestionnaire")]
-    public IEnumerable<Questionnaire> Put()
+    [HttpPut(Name = "questionnaire")]
+    public ActionResult<Questionnaire?> Put(Questionnaire newQuestionnaire)
     {
-        return Enumerable.Range(1, 5).Select(index => new Questionnaire
+        Questionnaire? questionnaire = _questionnaireService.Put(newQuestionnaire);
+        if (questionnaire == null)
         {
-            Name = $"{index}",
-            CreatedBy = "",
-        })
-        .ToArray();
+            return NotFound();
+        }
+        return Ok(questionnaire);
     }
 
-    [HttpDelete(Name = "DeleteQuestionnaire")]
-    public IEnumerable<Questionnaire> Delete()
+    [HttpDelete(Name = "questionnaire")]
+    public IActionResult Delete(int questionnaireId)
     {
-        return Enumerable.Range(1, 5).Select(index => new Questionnaire
+        bool deleted = _questionnaireService.Delete(questionnaireId);
+        if (deleted)
         {
-            Name = $"{index}",
-            CreatedBy = "",
-        })
-        .ToArray();
+            return NoContent();
+        }
+        return NotFound();
+
     }
 }

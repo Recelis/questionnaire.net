@@ -12,7 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<LifeTrackerContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddSingleton<QuestionnaireService>();
+
+builder.Services.AddSingleton<IQuestionnaireService, InMemoryQuestionnaireService>();
 
 var app = builder.Build();
 

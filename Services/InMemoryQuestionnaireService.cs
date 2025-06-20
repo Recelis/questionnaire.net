@@ -2,10 +2,10 @@ using LifeTracker.Models;
 
 namespace LifeTracker.Services;
 
-public class QuestionnaireService
+public class InMemoryQuestionnaireService : IQuestionnaireService
 {
     List<Questionnaire> _questionnaires { get; } = new List<Questionnaire>();
-    public QuestionnaireService()
+    public InMemoryQuestionnaireService()
     {
     }
 

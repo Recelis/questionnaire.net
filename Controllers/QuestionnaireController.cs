@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using LifeTracker.Models;
 using LifeTracker.Services;
+using System.Threading.Tasks;
 
 namespace Controllers;
 
@@ -27,9 +28,9 @@ public class QuestionnaireController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Questionnaire>), StatusCodes.Status200OK)]
     [Produces("application/json")]
-    public ActionResult<IEnumerable<Questionnaire>> Get()
+    public async Task<ActionResult<IEnumerable<Questionnaire>>> Get()
     {
-        IEnumerable<Questionnaire> questionnaires = _questionnaireService.GetAll();
+        IEnumerable<Questionnaire> questionnaires = await _questionnaireService.GetAll();
         return Ok(questionnaires);
     }
 
@@ -47,9 +48,9 @@ public class QuestionnaireController : ControllerBase
     [ProducesResponseType(typeof(Questionnaire), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]
-    public ActionResult<IEnumerable<Questionnaire>> Get(int questionnaireId)
+    public async Task<ActionResult<IEnumerable<Questionnaire>>> Get(int questionnaireId)
     {
-        Questionnaire? questionnaire = _questionnaireService.Get(questionnaireId);
+        Questionnaire? questionnaire = await _questionnaireService.Get(questionnaireId);
         if (questionnaire == null)
         {
             return NotFound();
@@ -58,10 +59,10 @@ public class QuestionnaireController : ControllerBase
     }
 
     [HttpPost(Name = "questionnaire")]
-    public ActionResult<Questionnaire> Post(Questionnaire newQuestionnaire)
+    public async Task<ActionResult<Questionnaire>> Post(Questionnaire newQuestionnaire)
     {
 
-        Questionnaire? questionnaire = _questionnaireService.Post(newQuestionnaire);
+        Questionnaire? questionnaire = await _questionnaireService.Post(newQuestionnaire);
         if (questionnaire == null)
         {
             return Conflict("Already exists");
@@ -70,9 +71,9 @@ public class QuestionnaireController : ControllerBase
     }
 
     [HttpPut(Name = "questionnaire")]
-    public ActionResult<Questionnaire?> Put(Questionnaire newQuestionnaire)
+    public async Task<ActionResult<Questionnaire?>> Put(Questionnaire newQuestionnaire)
     {
-        Questionnaire? questionnaire = _questionnaireService.Put(newQuestionnaire);
+        Questionnaire? questionnaire = await _questionnaireService.Put(newQuestionnaire);
         if (questionnaire == null)
         {
             return NotFound();
@@ -81,9 +82,9 @@ public class QuestionnaireController : ControllerBase
     }
 
     [HttpDelete(Name = "questionnaire")]
-    public IActionResult Delete(int questionnaireId)
+    public async Task<IActionResult> Delete(int questionnaireId)
     {
-        bool deleted = _questionnaireService.Delete(questionnaireId);
+        bool deleted = await _questionnaireService.Delete(questionnaireId);
         if (deleted)
         {
             return NoContent();

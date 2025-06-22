@@ -4,9 +4,9 @@ namespace LifeTracker.Services;
 
 public interface IQuestionnaireService
 {
-    public List<Questionnaire> GetAll();
-    public Questionnaire? Get(int questionnaireId);
-    public Questionnaire? Post(Questionnaire newQuestionnaire);
-    public Questionnaire? Put(Questionnaire newQuestionnaire);
-    public bool Delete(int questionnaireId);
+    Task<List<Questionnaire>> GetAll();
+    Task<Questionnaire?> Get(int questionnaireId);
+    Task<Questionnaire?> Post(Questionnaire newQuestionnaire);
+    Task<Questionnaire?> Put(Questionnaire newQuestionnaire);
+    Task<bool> Delete(int questionnaireId);
 }

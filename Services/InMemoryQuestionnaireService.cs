@@ -9,55 +9,58 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
     {
     }
 
-    public List<Questionnaire> GetAll() => _questionnaires.ToList();
+    public Task<List<Questionnaire>> GetAll()
+    {
+        return Task.FromResult(_questionnaires.ToList());
+    }
 
-    public Questionnaire? Get(int questionnaireId) => _questionnaires.FirstOrDefault(x => x.Id == questionnaireId);
+    public Task<Questionnaire?> Get(int questionnaireId) => Task.FromResult(_questionnaires.FirstOrDefault(x => x.Id == questionnaireId));
 
-    public Questionnaire? Post(Questionnaire newQuestionnaire)
+    public Task<Questionnaire?> Post(Questionnaire newQuestionnaire)
     {
         int newQuestionnaireId = newQuestionnaire.Id;
         int index = _questionnaires.FindIndex(questionnaire => newQuestionnaireId == questionnaire.Id);
         if (index == -1)
         {
             _questionnaires.Add(newQuestionnaire);
-            return newQuestionnaire;
+            return Task.FromResult<Questionnaire?>(newQuestionnaire);
         }
         else
         {
-            return null;
+            return Task.FromResult<Questionnaire?>(null);
         }
     }
 
-    public Questionnaire? Put(Questionnaire newQuestionnaire)
+    public Task<Questionnaire?> Put(Questionnaire newQuestionnaire)
     {
         int newQuestionnaireId = newQuestionnaire.Id;
         int index = _questionnaires.FindIndex(questionnaire => newQuestionnaireId == questionnaire.Id);
         if (index > -1)
         {
             _questionnaires[index] = newQuestionnaire;
-            return newQuestionnaire;
+            return Task.FromResult<Questionnaire?>(newQuestionnaire);
         }
         else
         {
             Console.WriteLine("Failed to find the questionnaire");
-            return null;
+            return Task.FromResult<Questionnaire?>(null);
         }
 
 
     }
 
-    public bool Delete(int questionnaireId)
+    public Task<bool> Delete(int questionnaireId)
     {
         Questionnaire? questionnaire = _questionnaires.Find(questionnaire => questionnaire.Id == questionnaireId);
         if (questionnaire != null)
         {
             _questionnaires.Remove(questionnaire);
-            return true;
+            return Task.FromResult(true);
         }
         else
         {
             Console.WriteLine("Failed to find the questionnaire");
-            return false;
+            return Task.FromResult(false);
         }
     }
 }

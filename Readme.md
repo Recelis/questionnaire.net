@@ -2,9 +2,18 @@
 
 ## Tasks
 
-- Create app
-- Look into MVC pattern
-- Connect to Postgres Database
+- [x] - Create app
+- [x] - Look into MVC pattern
+- [x] - Connect to Postgres Database
+- [x] - Design models
+- [x] - CRUD Questionnaire model
+- [ ] - CRUD Template model
+- [ ] - Setup NUnit tests
+- [ ] - Create User model + add to Questionnaire created_by field.
+- [ ] - Seed User
+- [ ] - CRUD Question
+- [ ] - CRUD Submission
+- [ ] - CRUD Answer
 
 ## Migrations
 

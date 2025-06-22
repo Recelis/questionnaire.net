@@ -14,7 +14,7 @@ builder.Services.AddDbContext<LifeTrackerContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     .UseSnakeCaseNamingConvention());
 
-builder.Services.AddSingleton<IQuestionnaireService, InMemoryQuestionnaireService>();
+builder.Services.AddScoped<IQuestionnaireService, EFQuestionnaireService>();
 
 var app = builder.Build();
 

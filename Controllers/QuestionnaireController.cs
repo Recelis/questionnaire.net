@@ -58,7 +58,7 @@ public class QuestionnaireController : ControllerBase
         return Ok(questionnaire);
     }
 
-    [HttpPost(Name = "questionnaire")]
+    [HttpPost()]
     public async Task<ActionResult<Questionnaire>> Post(Questionnaire newQuestionnaire)
     {
 
@@ -70,7 +70,7 @@ public class QuestionnaireController : ControllerBase
         return Ok(questionnaire);
     }
 
-    [HttpPut(Name = "questionnaire")]
+    [HttpPut()]
     public async Task<ActionResult<Questionnaire?>> Put(Questionnaire newQuestionnaire)
     {
         Questionnaire? questionnaire = await _questionnaireService.Put(newQuestionnaire);
@@ -81,15 +81,12 @@ public class QuestionnaireController : ControllerBase
         return Ok(questionnaire);
     }
 
-    [HttpDelete(Name = "questionnaire")]
+    [HttpDelete("{questionnaireId:int}")]
     public async Task<IActionResult> Delete(int questionnaireId)
     {
+        Console.WriteLine(questionnaireId);
         bool deleted = await _questionnaireService.Delete(questionnaireId);
-        if (deleted)
-        {
-            return NoContent();
-        }
-        return NotFound();
+        return deleted ? NoContent() : NotFound();
 
     }
 }

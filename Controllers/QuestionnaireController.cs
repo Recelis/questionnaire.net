@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using LifeTracker.Models;
 using LifeTracker.Services;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Controllers;
 
@@ -30,6 +30,7 @@ public class QuestionnaireController : ControllerBase
     [Produces("application/json")]
     public async Task<ActionResult<IEnumerable<Questionnaire>>> Get()
     {
+        _logger.LogInformation("Getting all questionnaires");
         IEnumerable<Questionnaire> questionnaires = await _questionnaireService.GetAll();
         return Ok(questionnaires);
     }
@@ -48,8 +49,9 @@ public class QuestionnaireController : ControllerBase
     [ProducesResponseType(typeof(Questionnaire), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]
-    public async Task<ActionResult<IEnumerable<Questionnaire>>> Get(int questionnaireId)
+    public async Task<ActionResult<Questionnaire>> GetById(int questionnaireId)
     {
+        _logger.LogInformation("Getting all questionnaires: {Id}", questionnaireId);
         Questionnaire? questionnaire = await _questionnaireService.Get(questionnaireId);
         if (questionnaire == null)
         {
@@ -58,24 +60,47 @@ public class QuestionnaireController : ControllerBase
         return Ok(questionnaire);
     }
 
+    /// <summary>
+    /// Creates a new questionnaire.
+    /// </summary>
+    /// <param name="newQuestionnaire"></param>
+    /// <response code="201">Returns the created questionnaire</response>
+    /// <response code="409">If the questionnaire already exists</response>
     [HttpPost()]
+    [ProducesResponseType(typeof(Questionnaire), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     public async Task<ActionResult<Questionnaire>> Post(Questionnaire newQuestionnaire)
     {
-
+        _logger.LogInformation("Creating new questionnaire: {Questionnaire}", JsonSerializer.Serialize(newQuestionnaire));
         Questionnaire? questionnaire = await _questionnaireService.Post(newQuestionnaire);
         if (questionnaire == null)
         {
+            _logger.LogInformation("questionnaire already exists: {Id}", newQuestionnaire.Id);
             return Conflict("Already exists");
         }
-        return Ok(questionnaire);
+        return CreatedAtAction(nameof(GetById), new { questionnaireId = questionnaire.Id }, questionnaire);
     }
 
+    /// <summary>
+    /// Updates a questionnaire.
+    /// </summary>
+    /// <param name="newQuestionnaire"></param>
+    /// <response code="200">Returns the created questionnaire</response>
+    /// <response code="409">If the questionnaire already exists</response>
     [HttpPut()]
+    [ProducesResponseType(typeof(Questionnaire), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     public async Task<ActionResult<Questionnaire?>> Put(Questionnaire newQuestionnaire)
     {
+        _logger.LogInformation("Updating questionnaire: {Questionnaire}", newQuestionnaire);
         Questionnaire? questionnaire = await _questionnaireService.Put(newQuestionnaire);
         if (questionnaire == null)
         {
+            _logger.LogInformation("questionnaire could not be found: {Id}", newQuestionnaire.Id);
             return NotFound();
         }
         return Ok(questionnaire);
@@ -84,7 +109,8 @@ public class QuestionnaireController : ControllerBase
     [HttpDelete("{questionnaireId:int}")]
     public async Task<IActionResult> Delete(int questionnaireId)
     {
-        Console.WriteLine(questionnaireId);
+        _logger.LogInformation("Deleting questionnaire: {Id}", questionnaireId);
+
         bool deleted = await _questionnaireService.Delete(questionnaireId);
         return deleted ? NoContent() : NotFound();
 

@@ -1,5 +1,6 @@
 using LifeTracker.Data;
 using LifeTracker.Services;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +41,32 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        ILogger logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+
+        IExceptionHandlerFeature? exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+        if (exceptionHandlerFeature != null)
+        {
+            Exception? ex = exceptionHandlerFeature.Error;
+
+            // Log the exception here or inject ILogger
+            logger.LogError(ex, "Unhandled exception caught in global exception handler.");
+
+
+            object errorResponse = app.Environment.IsDevelopment()
+                ? new { Message = "An unexpected error occurred.", Detail = ex.Message }
+                : new { Message = "An unexpected error occurred." };
+            await context.Response.WriteAsJsonAsync(errorResponse);
+
+        }
+    });
+});
 
 app.UseHttpsRedirection();
 

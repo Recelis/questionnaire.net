@@ -39,7 +39,12 @@ public class EFQuestionnaireService : IQuestionnaireService
     {
         try
         {
-            _lifeTrackerContext.Questionnaire.Update(newQuestionnaire);
+            var questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(newQuestionnaire.Id);
+            if (questionnaire == null)
+                return null;
+
+            // Update only allowed fields — don't touch Id or createdBy
+            questionnaire.Name = newQuestionnaire.Name;
             await _lifeTrackerContext.SaveChangesAsync();
             return newQuestionnaire;
         }

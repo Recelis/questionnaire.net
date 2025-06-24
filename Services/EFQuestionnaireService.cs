@@ -1,17 +1,19 @@
-using System.Threading.Tasks;
 using LifeTracker.Data;
 using LifeTracker.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LifeTracker.Services;
 
 public class EFQuestionnaireService : IQuestionnaireService
 {
     private readonly LifeTrackerContext _lifeTrackerContext;
+    private readonly ILogger<EFQuestionnaireService> _logger;
 
-    public EFQuestionnaireService(LifeTrackerContext context)
+    public EFQuestionnaireService(LifeTrackerContext context, ILogger<EFQuestionnaireService> logger)
     {
         _lifeTrackerContext = context;
+        _logger = logger;
     }
     public async Task<List<Questionnaire>> GetAll()
     {
@@ -25,13 +27,19 @@ public class EFQuestionnaireService : IQuestionnaireService
     {
         try
         {
+            bool exists = await _lifeTrackerContext.Questionnaire.AnyAsync(q => q.Id == newQuestionnaire.Id);
+            if (exists)
+            {
+                _logger.LogWarning("Questionnaire exists");
+                // Return Conflict or validation error immediately
+                return null;
+            }
             _lifeTrackerContext.Questionnaire.Add(newQuestionnaire);
             await _lifeTrackerContext.SaveChangesAsync();
             return newQuestionnaire;
         }
-        catch (Exception ex)
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
         {
-            Console.WriteLine(ex.Message);
             return null;
         }
     }
@@ -50,7 +58,7 @@ public class EFQuestionnaireService : IQuestionnaireService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Questionnaire Put exception");
             return null;
         }
     }
@@ -59,6 +67,7 @@ public class EFQuestionnaireService : IQuestionnaireService
         Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(questionnaireId);
         if (questionnaire == null)
         {
+            _logger.LogWarning("Questionnaire could not be found");
             return false;
         }
         else

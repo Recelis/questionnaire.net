@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using LifeTracker.Models;
 using LifeTracker.Services;
 using System.Text.Json;
+using LifeTracker.Dto;
 
 namespace Controllers;
 
@@ -31,7 +32,7 @@ public class QuestionnaireController : ControllerBase
     public async Task<ActionResult<IEnumerable<Questionnaire>>> Get()
     {
         _logger.LogInformation("Getting all questionnaires");
-        IEnumerable<Questionnaire> questionnaires = await _questionnaireService.GetAll();
+        IEnumerable<Questionnaire> questionnaires = await _questionnaireService.GetAllAsync();
         return Ok(questionnaires);
     }
 
@@ -52,7 +53,7 @@ public class QuestionnaireController : ControllerBase
     public async Task<ActionResult<Questionnaire>> GetById(int questionnaireId)
     {
         _logger.LogInformation("Getting all questionnaires: {Id}", questionnaireId);
-        Questionnaire? questionnaire = await _questionnaireService.Get(questionnaireId);
+        Questionnaire? questionnaire = await _questionnaireService.GetAsync(questionnaireId);
         if (questionnaire == null)
         {
             return NotFound();
@@ -65,21 +66,14 @@ public class QuestionnaireController : ControllerBase
     /// </summary>
     /// <param name="newQuestionnaire"></param>
     /// <response code="201">Returns the created questionnaire</response>
-    /// <response code="409">If the questionnaire already exists</response>
     [HttpPost()]
     [ProducesResponseType(typeof(Questionnaire), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Consumes("application/json")]
     [Produces("application/json")]
-    public async Task<ActionResult<Questionnaire>> Post(Questionnaire newQuestionnaire)
+    public async Task<ActionResult<Questionnaire>> Post(CreateQuestionnaireDto createQuestionnaireDto)
     {
-        _logger.LogInformation("Creating new questionnaire: {Questionnaire}", JsonSerializer.Serialize(newQuestionnaire));
-        Questionnaire? questionnaire = await _questionnaireService.Post(newQuestionnaire);
-        if (questionnaire == null)
-        {
-            _logger.LogInformation("questionnaire already exists: {Id}", newQuestionnaire.Id);
-            return Conflict("Already exists");
-        }
+        _logger.LogInformation("Creating new questionnaire: {Questionnaire}", JsonSerializer.Serialize(createQuestionnaireDto));
+        Questionnaire? questionnaire = await _questionnaireService.CreateAsync(createQuestionnaireDto);
         return CreatedAtAction(nameof(GetById), new { questionnaireId = questionnaire.Id }, questionnaire);
     }
 
@@ -88,19 +82,19 @@ public class QuestionnaireController : ControllerBase
     /// </summary>
     /// <param name="newQuestionnaire"></param>
     /// <response code="200">Returns the created questionnaire</response>
-    /// <response code="409">If the questionnaire already exists</response>
-    [HttpPut()]
+    /// <response code="404">If the questionnaire doesn't exists</response>
+    [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(Questionnaire), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Consumes("application/json")]
     [Produces("application/json")]
-    public async Task<ActionResult<Questionnaire?>> Put(Questionnaire newQuestionnaire)
+    public async Task<ActionResult<Questionnaire?>> Put(int id, [FromBody] UpdateQuestionnaireDto newQuestionnaire)
     {
         _logger.LogInformation("Updating questionnaire: {Questionnaire}", newQuestionnaire);
-        Questionnaire? questionnaire = await _questionnaireService.Put(newQuestionnaire);
+        Questionnaire? questionnaire = await _questionnaireService.UpdateAsync(id, newQuestionnaire);
         if (questionnaire == null)
         {
-            _logger.LogInformation("questionnaire could not be found: {Id}", newQuestionnaire.Id);
+            _logger.LogInformation("questionnaire could not be found: {Id}", id);
             return NotFound();
         }
         return Ok(questionnaire);
@@ -111,7 +105,7 @@ public class QuestionnaireController : ControllerBase
     {
         _logger.LogInformation("Deleting questionnaire: {Id}", questionnaireId);
 
-        bool deleted = await _questionnaireService.Delete(questionnaireId);
+        bool deleted = await _questionnaireService.DeleteAsync(questionnaireId);
         return deleted ? NoContent() : NotFound();
 
     }

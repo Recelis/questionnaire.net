@@ -20,7 +20,8 @@ public class LifeTrackerContext : DbContext
         modelBuilder.Entity<Questionnaire>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(250);
@@ -32,6 +33,8 @@ public class LifeTrackerContext : DbContext
         modelBuilder.Entity<Template>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(250);

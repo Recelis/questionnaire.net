@@ -1,3 +1,4 @@
+using LifeTracker.Dto;
 using LifeTracker.Models;
 
 namespace LifeTracker.Services;
@@ -9,36 +10,39 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
     {
     }
 
-    public Task<List<Questionnaire>> GetAll()
+    public Task<List<Questionnaire>> GetAllAsync()
     {
         return Task.FromResult(_questionnaires.ToList());
     }
 
-    public Task<Questionnaire?> Get(int questionnaireId) => Task.FromResult(_questionnaires.FirstOrDefault(x => x.Id == questionnaireId));
+    public Task<Questionnaire?> GetAsync(int questionnaireId) => Task.FromResult(_questionnaires.FirstOrDefault(x => x.Id == questionnaireId));
 
-    public Task<Questionnaire?> Post(Questionnaire newQuestionnaire)
+    public Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
     {
-        int newQuestionnaireId = newQuestionnaire.Id;
-        int index = _questionnaires.FindIndex(questionnaire => newQuestionnaireId == questionnaire.Id);
-        if (index == -1)
+        List<Questionnaire> questionnaires = _questionnaires.ToList();
+        int maxId = questionnaires.Any() ? questionnaires.Max(q => q.Id) : 0;
+        Questionnaire questionnaire = new Questionnaire
         {
-            _questionnaires.Add(newQuestionnaire);
-            return Task.FromResult<Questionnaire?>(newQuestionnaire);
-        }
-        else
-        {
-            return Task.FromResult<Questionnaire?>(null);
-        }
+            Id = maxId,
+            Name = createQuestionnaireDto.Name,
+            CreatedBy = createQuestionnaireDto.CreatedBy,
+        };
+        _questionnaires.Add(questionnaire);
+        return Task.FromResult<Questionnaire>(questionnaire);
     }
 
-    public Task<Questionnaire?> Put(Questionnaire newQuestionnaire)
+    public Task<Questionnaire?> UpdateAsync(int id, UpdateQuestionnaireDto updateQuestionnaireDto)
     {
-        int newQuestionnaireId = newQuestionnaire.Id;
-        int index = _questionnaires.FindIndex(questionnaire => newQuestionnaireId == questionnaire.Id);
+        int index = _questionnaires.FindIndex(questionnaire => id == questionnaire.Id);
         if (index > -1)
         {
-            _questionnaires[index] = newQuestionnaire;
-            return Task.FromResult<Questionnaire?>(newQuestionnaire);
+            _questionnaires[index] = new Questionnaire
+            {
+                Id = id,
+                Name = updateQuestionnaireDto.Name,
+                CreatedBy = _questionnaires[index].CreatedBy
+            };
+            return Task.FromResult<Questionnaire?>(_questionnaires[index]);
         }
         else
         {
@@ -49,7 +53,7 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
 
     }
 
-    public Task<bool> Delete(int questionnaireId)
+    public Task<bool> DeleteAsync(int questionnaireId)
     {
         Questionnaire? questionnaire = _questionnaires.Find(questionnaire => questionnaire.Id == questionnaireId);
         if (questionnaire != null)

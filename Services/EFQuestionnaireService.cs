@@ -1,4 +1,5 @@
 using LifeTracker.Data;
+using LifeTracker.Dto;
 using LifeTracker.Models;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -15,46 +16,41 @@ public class EFQuestionnaireService : IQuestionnaireService
         _lifeTrackerContext = context;
         _logger = logger;
     }
-    public async Task<List<Questionnaire>> GetAll()
+
+    public async Task<List<Questionnaire>> GetAllAsync()
     {
         return await _lifeTrackerContext.Questionnaire.ToListAsync();
     }
-    public async Task<Questionnaire?> Get(int questionnaireId)
+
+    public async Task<Questionnaire?> GetAsync(int questionnaireId)
     {
         return await _lifeTrackerContext.Questionnaire.FindAsync(questionnaireId);
     }
-    public async Task<Questionnaire?> Post(Questionnaire newQuestionnaire)
+
+    public async Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
     {
-        try
+        Questionnaire newQuestionnaire = new Questionnaire
         {
-            bool exists = await _lifeTrackerContext.Questionnaire.AnyAsync(q => q.Id == newQuestionnaire.Id);
-            if (exists)
-            {
-                _logger.LogWarning("Questionnaire exists");
-                // Return Conflict or validation error immediately
-                return null;
-            }
-            _lifeTrackerContext.Questionnaire.Add(newQuestionnaire);
-            await _lifeTrackerContext.SaveChangesAsync();
-            return newQuestionnaire;
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
-        {
-            return null;
-        }
+            Name = createQuestionnaireDto.Name,
+            CreatedBy = createQuestionnaireDto.CreatedBy
+        };
+        _logger.LogDebug(newQuestionnaire.ToString());
+        _lifeTrackerContext.Questionnaire.Add(newQuestionnaire);
+        await _lifeTrackerContext.SaveChangesAsync();
+        return newQuestionnaire;
     }
-    public async Task<Questionnaire?> Put(Questionnaire newQuestionnaire)
+
+    public async Task<Questionnaire?> UpdateAsync(int id, UpdateQuestionnaireDto updateQuestionnaireDto)
     {
         try
         {
-            var questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(newQuestionnaire.Id);
+            Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(id);
             if (questionnaire == null)
                 return null;
 
-            // Update only allowed fields — don't touch Id or createdBy
-            questionnaire.Name = newQuestionnaire.Name;
+            questionnaire.Name = updateQuestionnaireDto.Name;
             await _lifeTrackerContext.SaveChangesAsync();
-            return newQuestionnaire;
+            return questionnaire;
         }
         catch (Exception ex)
         {
@@ -62,7 +58,8 @@ public class EFQuestionnaireService : IQuestionnaireService
             return null;
         }
     }
-    public async Task<bool> Delete(int questionnaireId)
+
+    public async Task<bool> DeleteAsync(int questionnaireId)
     {
         Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(questionnaireId);
         if (questionnaire == null)

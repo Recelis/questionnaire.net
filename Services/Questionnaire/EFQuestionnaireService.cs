@@ -46,7 +46,10 @@ public class EFQuestionnaireService : IQuestionnaireService
         {
             Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(id);
             if (questionnaire == null)
+            {
+                _logger.LogError("Questionnaire of id {questionnaire} could not be found", id);
                 return null;
+            }
 
             questionnaire.Name = updateQuestionnaireDto.Name;
             await _lifeTrackerContext.SaveChangesAsync();

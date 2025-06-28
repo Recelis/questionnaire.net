@@ -31,6 +31,17 @@ Update Entity Framework Core migrations.
 dotnet ef database update
 ```
 
+### Testing Migrations
+
+If you want to just create a test migration without applying it, you can use the `--output-dir` command.
+
+```bash
+dotnet ef migrations add TempMigrationPreview --output-dir Migrations/Temp
+
+# To remove unapplied migrations
+dotnet ef migrations remove
+```
+
 # Tutorials This was Built From
 
 https://learn.microsoft.com/en-us/training/modules/build-web-api-aspnet-core/

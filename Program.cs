@@ -16,6 +16,7 @@ builder.Services.AddDbContext<LifeTrackerContext>(options =>
     .UseSnakeCaseNamingConvention());
 
 builder.Services.AddScoped<IQuestionnaireService, EFQuestionnaireService>();
+builder.Services.AddScoped<ITemplateService, EFTemplateService>();
 
 var app = builder.Build();
 

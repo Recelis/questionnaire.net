@@ -24,7 +24,9 @@ public class EFQuestionnaireService : IQuestionnaireService
 
     public async Task<Questionnaire?> GetAsync(int questionnaireId)
     {
-        return await _lifeTrackerContext.Questionnaire.FindAsync(questionnaireId);
+        return await _lifeTrackerContext.Questionnaire
+            .Include(q => q.Templates)
+            .FirstOrDefaultAsync(q => q.Id == questionnaireId);
     }
 
     public async Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)

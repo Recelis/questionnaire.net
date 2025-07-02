@@ -18,7 +18,7 @@ public class EFTemplateService : ITemplateService
 
     public async Task<List<Template>> GetByQuestionnaireId(int questionnaireId)
     {
-        return await _lifeTrackerContext.Template.Where(template => template.Questionnaire.Id == questionnaireId).ToListAsync();
+        return await _lifeTrackerContext.Template.Where(template => template.QuestionnaireId == questionnaireId).ToListAsync();
     }
 
     public async Task<Template?> GetAsync(int templateId)
@@ -35,7 +35,7 @@ public class EFTemplateService : ITemplateService
             _logger.LogError("No Questionnaire of id {questionnaire}", createTemplateDto.QuestionnaireId);
             return null;
         }
-
+        _logger.LogInformation("Getting here");
         Template newTemplate = new Template
         {
             Name = createTemplateDto.Name,
@@ -46,6 +46,7 @@ public class EFTemplateService : ITemplateService
 
         await _lifeTrackerContext.SaveChangesAsync();
         return newTemplate;
+
     }
 
     public async Task<Template?> UpdateAsync(int id, UpdateTemplateDto updateTemplateDto)

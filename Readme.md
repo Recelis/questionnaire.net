@@ -7,13 +7,14 @@
 - [x] - Connect to Postgres Database
 - [x] - Design models
 - [x] - CRUD Questionnaire model
-- [ ] - CRUD Template model
+- [x] - CRUD Template model
 - [ ] - Setup NUnit tests
 - [ ] - Create User model + add to Questionnaire created_by field.
 - [ ] - Seed User
+- [ ] - CRUD TemplateQuestionLink + Question
 - [ ] - CRUD Question
-- [ ] - CRUD Submission
 - [ ] - CRUD Answer
+- [ ] - CRUD Submission
 
 ## Migrations
 

@@ -36,6 +36,7 @@ public class TemplateController : ControllerBase
 
         IEnumerable<TemplateDto> templateDtos = templates.Select(template => new TemplateDto
         {
+            Id = template.Id,
             Version = template.Version,
             Name = template.Name,
             QuestionnaireId = template.QuestionnaireId,
@@ -49,24 +50,25 @@ public class TemplateController : ControllerBase
     /// <remarks>
     /// Returns a 404 No Content if template could not be found.
     /// </remarks>
-    /// <param name="templateVersion">The Version of the template</param>
+    /// <param name="templateId">The id of the template</param>
     /// <returns>A template.</returns>
     /// <response code="200">Returns the TemplateDto</response>
     /// <response code="404">No template found</response>
-    [HttpGet("{templateVersion:int}")]
+    [HttpGet("{templateId:int}")]
     [ProducesResponseType(typeof(TemplateDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]
-    public async Task<ActionResult<TemplateDto>> GetByVersion(int templateVersion)
+    public async Task<ActionResult<TemplateDto>> GetById(int templateId)
     {
-        _logger.LogInformation("Getting template by version: {Version}", templateVersion);
-        Template? template = await _templateService.GetAsync(templateVersion);
+        _logger.LogInformation("Getting template by id: {Id}", templateId);
+        Template? template = await _templateService.GetAsync(templateId);
         if (template == null)
         {
             return NotFound();
         }
         TemplateDto templateDto = new TemplateDto
         {
+            Id = template.Id,
             Version = template.Version,
             Name = template.Name,
             QuestionnaireId = template.QuestionnaireId
@@ -97,11 +99,12 @@ public class TemplateController : ControllerBase
         }
         TemplateDto templateDto = new TemplateDto
         {
+            Id = template.Id,
             Version = template.Version,
             Name = template.Name,
             QuestionnaireId = template.QuestionnaireId
         };
-        return CreatedAtAction(nameof(GetByVersion), new { templateVersion = template.Version }, templateDto);
+        return CreatedAtAction(nameof(GetById), new { templateId = template.Id }, templateDto);
     }
 
     /// <summary>
@@ -126,6 +129,7 @@ public class TemplateController : ControllerBase
         }
         TemplateDto templateDto = new TemplateDto
         {
+            Id = template.Id,
             Version = template.Version,
             Name = template.Name,
             QuestionnaireId = template.QuestionnaireId
@@ -133,12 +137,12 @@ public class TemplateController : ControllerBase
         return Ok(templateDto);
     }
 
-    [HttpDelete("{templateVersion:int}")]
-    public async Task<ActionResult> DeleteAsync(int templateVersion)
+    [HttpDelete("{templateId:int}")]
+    public async Task<ActionResult> DeleteAsync(int templateId)
     {
-        _logger.LogInformation("Deleting template: {Version}", templateVersion);
+        _logger.LogInformation("Deleting template: {Id}", templateId);
 
-        bool deleted = await _templateService.DeleteAsync(templateVersion);
+        bool deleted = await _templateService.DeleteAsync(templateId);
         return deleted ? NoContent() : NotFound();
     }
 }

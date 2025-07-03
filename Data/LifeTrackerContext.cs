@@ -32,9 +32,13 @@ public class LifeTrackerContext : DbContext
 
         modelBuilder.Entity<Template>(entity =>
         {
-            entity.HasKey(e => e.Version);
-            entity.Property(e => e.Version)
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
+            entity
+                .HasIndex(t => new { t.QuestionnaireId, t.Version })
+                .IsUnique();
+
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(250);

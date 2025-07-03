@@ -50,12 +50,12 @@ namespace LifeTracker.Migrations
 
             modelBuilder.Entity("LifeTracker.Models.Template", b =>
                 {
-                    b.Property<int>("Version")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("version");
+                        .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Version"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -67,11 +67,16 @@ namespace LifeTracker.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("questionnaire_id");
 
-                    b.HasKey("Version")
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
+                    b.HasKey("Id")
                         .HasName("pk_template");
 
-                    b.HasIndex("QuestionnaireId")
-                        .HasDatabaseName("ix_template_questionnaire_id");
+                    b.HasIndex("QuestionnaireId", "Version")
+                        .IsUnique()
+                        .HasDatabaseName("ix_template_questionnaire_id_version");
 
                     b.ToTable("template", (string)null);
                 });

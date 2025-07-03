@@ -2,8 +2,10 @@ namespace LifeTracker.Models;
 
 public class Template
 {
+    public int Id { get; set; }
+
     /// <summary>
-    /// The Version acts as the Id of the Template and is always incremented by 1.
+    /// The Version is an int and scoped by the Questionnaire.
     /// </summary>
     public int Version { get; set; }
 

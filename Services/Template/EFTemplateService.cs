@@ -35,16 +35,27 @@ public class EFTemplateService : ITemplateService
             _logger.LogError("No Questionnaire of id {questionnaire}", createTemplateDto.QuestionnaireId);
             return null;
         }
-        _logger.LogInformation("Getting here");
+
+        using var transaction = await _lifeTrackerContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+        // get latest version of template scoped to the questionnaire 
+        int latestVersion = await _lifeTrackerContext.Template
+            .Where(t => t.QuestionnaireId == createTemplateDto.QuestionnaireId)
+            .OrderByDescending(t => t.Version)
+            .Select(t => t.Version)
+            .FirstOrDefaultAsync();
+
         Template newTemplate = new Template
         {
             Name = createTemplateDto.Name,
             QuestionnaireId = createTemplateDto.QuestionnaireId,
+            Version = latestVersion + 1
         };
         _logger.LogDebug(newTemplate.ToString());
         _lifeTrackerContext.Template.Add(newTemplate);
 
         await _lifeTrackerContext.SaveChangesAsync();
+        await transaction.CommitAsync();
         return newTemplate;
 
     }

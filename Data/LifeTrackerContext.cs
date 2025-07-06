@@ -35,9 +35,23 @@ public class LifeTrackerContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
+            entity
+                .HasIndex(t => new { t.QuestionnaireId, t.Version })
+                .IsUnique();
+
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(250);
+
+            entity.HasOne(t => t.Questionnaire)
+                .WithMany(q => q.Templates)
+                .HasForeignKey(t => t.QuestionnaireId)
+                .HasConstraintName("fk_template_questionnaire")
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            entity.Property(t => t.QuestionnaireId)
+                  .HasColumnName("questionnaire_id");
         });
     }
 }

@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LifeTracker.Migrations
 {
     [DbContext(typeof(LifeTrackerContext))]
-    [Migration("20250620043413_TemplateQuestionnaireColumnRequiments")]
-    partial class TemplateQuestionnaireColumnRequiments
+    [Migration("20250703100914_DatabaseMigrationReset")]
+    partial class DatabaseMigrationReset
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,6 +66,10 @@ namespace LifeTracker.Migrations
                         .HasColumnType("character varying(250)")
                         .HasColumnName("name");
 
+                    b.Property<int>("QuestionnaireId")
+                        .HasColumnType("integer")
+                        .HasColumnName("questionnaire_id");
+
                     b.Property<int>("Version")
                         .HasColumnType("integer")
                         .HasColumnName("version");
@@ -73,7 +77,28 @@ namespace LifeTracker.Migrations
                     b.HasKey("Id")
                         .HasName("pk_template");
 
+                    b.HasIndex("QuestionnaireId", "Version")
+                        .IsUnique()
+                        .HasDatabaseName("ix_template_questionnaire_id_version");
+
                     b.ToTable("template", (string)null);
+                });
+
+            modelBuilder.Entity("LifeTracker.Models.Template", b =>
+                {
+                    b.HasOne("LifeTracker.Models.Questionnaire", "Questionnaire")
+                        .WithMany("Templates")
+                        .HasForeignKey("QuestionnaireId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_template_questionnaire");
+
+                    b.Navigation("Questionnaire");
+                });
+
+            modelBuilder.Entity("LifeTracker.Models.Questionnaire", b =>
+                {
+                    b.Navigation("Templates");
                 });
 #pragma warning restore 612, 618
         }

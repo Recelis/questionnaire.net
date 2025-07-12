@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using LifeTracker.Models;
 
 
 namespace LifeTracker.Tests.Services
@@ -51,6 +52,47 @@ namespace LifeTracker.Tests.Services
 
             var questionnaireInDb = await _context.Questionnaire.FindAsync(result.Id);
             Assert.That(questionnaireInDb, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task UpdateAsync_ShouldUpdateQuestionnaireToDb()
+        {
+
+            CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
+            {
+                Name = "Test Questionnaire",
+                CreatedBy = "UnitTester"
+            };
+            Questionnaire questionnaire = await _service.CreateAsync(createDto);
+
+            UpdateQuestionnaireDto updateDto = new UpdateQuestionnaireDto
+            {
+                Name = "Updated Questionnaire",
+            };
+            Questionnaire updatedQuestionnaire = await _service.UpdateAsync(questionnaire.Id, updateDto);
+
+            Assert.That(updatedQuestionnaire, Is.Not.Null);
+            Assert.That(updatedQuestionnaire.Name, Is.EqualTo(updateDto.Name));
+
+            var questionnaireInDb = await _context.Questionnaire.FindAsync(updatedQuestionnaire.Id);
+            Assert.That(questionnaireInDb, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task DeleteAsync_ShouldDeleteQuestionnaireToDb()
+        {
+
+            CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
+            {
+                Name = "Test Questionnaire",
+                CreatedBy = "UnitTester"
+            };
+            Questionnaire questionnaire = await _service.CreateAsync(createDto);
+
+            await _service.DeleteAsync(questionnaire.Id);
+
+            var questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
+            Assert.That(questionnaireInDb, Is.Null);
         }
     }
 }

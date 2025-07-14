@@ -8,6 +8,8 @@ using NUnit.Framework.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using LifeTracker.Models;
+using Microsoft.Data.Sqlite;
+
 
 
 namespace LifeTracker.Tests.Services
@@ -15,6 +17,8 @@ namespace LifeTracker.Tests.Services
     [TestFixture]
     public class QuestionnaireTests
     {
+        private SqliteConnection _connection;
+
         private IQuestionnaireService? _service;
         private LifeTrackerContext? _context;
         private ILogger<EFQuestionnaireService>? _logger;
@@ -22,9 +26,11 @@ namespace LifeTracker.Tests.Services
         [SetUp]
         public void Setup()
         {
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
             var options = new DbContextOptionsBuilder<LifeTrackerContext>()
-                                .UseInMemoryDatabase(databaseName: "LifeTrackerTestDb")
-                                .Options;
+                .UseSqlite(_connection)
+                .Options;
             _context = new LifeTrackerContext(options);
 
             _context.Database.EnsureDeleted();
@@ -34,6 +40,13 @@ namespace LifeTracker.Tests.Services
             _logger = loggerMock.Object;
 
             _service = new EFQuestionnaireService(_context, _logger);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _context.Dispose();
+            _connection.Close();
         }
 
         [Test]

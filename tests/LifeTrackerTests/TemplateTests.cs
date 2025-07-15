@@ -15,12 +15,25 @@ namespace LifeTracker.Tests.Services
     [TestFixture]
     public class TemplateTests
     {
-        private SqliteConnection _connection;
+        private SqliteConnection? _connection;
         private IQuestionnaireService? _questionnaireService;
         private ITemplateService? _templateService;
         private LifeTrackerContext? _context;
         private ILogger<EFQuestionnaireService>? _questionnaireLogger;
         private ILogger<EFTemplateService>? _templateLogger;
+
+        // Helper functions
+        private async Task<Questionnaire> CreateTestQuestionnaire(string name = "Test Questionnaire", string createdBy = "UnitTester")
+        {
+            var dto = new CreateQuestionnaireDto { Name = name, CreatedBy = createdBy };
+            return await _questionnaireService.CreateAsync(dto);
+        }
+
+        private async Task<Template> CreateTestTemplate(int questionnaireId, string name = "Test Template")
+        {
+            var dto = new CreateTemplateDto { Name = name, QuestionnaireId = questionnaireId };
+            return await _templateService!.CreateAsync(dto);
+        }
 
         [SetUp]
         public void Setup()
@@ -54,12 +67,7 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task CreateAsync_ShouldAddTemplateToDb()
         {
-            CreateQuestionnaireDto createQuestionnaireDto = new CreateQuestionnaireDto
-            {
-                Name = "Test Questionnaire",
-                CreatedBy = "UnitTester"
-            };
-            Questionnaire questionnaire = await _questionnaireService.CreateAsync(createQuestionnaireDto);
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
 
             CreateTemplateDto createTemplateDto = new CreateTemplateDto
             {
@@ -67,55 +75,53 @@ namespace LifeTracker.Tests.Services
                 QuestionnaireId = questionnaire.Id
             };
 
-            Template template = await _templateService.CreateAsync(createTemplateDto);
+            Template template = await CreateTestTemplate(questionnaireId: questionnaire.Id);
 
             Assert.That(createTemplateDto, Is.Not.Null);
             Assert.That(createTemplateDto.Name, Is.EqualTo(template.Name));
             Assert.That(createTemplateDto.QuestionnaireId, Is.EqualTo(questionnaire.Id));
 
+            Questionnaire? questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
+            Assert.That(questionnaireInDb?.Templates, Has.Some.Matches<Template>(t => t.Name == "Test Template"));
+            Assert.That(questionnaireInDb?.Templates, Has.Exactly(1).Items);
+        }
+
+        [Test]
+        public async Task UpdateAsync_ShouldUpdateTemplateToDb()
+        {
+
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
+
+            Template template = await CreateTestTemplate(questionnaireId: questionnaire.Id);
+
+            UpdateTemplateDto updateDto = new UpdateTemplateDto
+            {
+                Name = "Updated Template",
+            };
+            Template updateTemplate = await _templateService.UpdateAsync(template.Id, updateDto);
+
+            Assert.That(updateTemplate, Is.Not.Null);
+            Assert.That(updateTemplate.Name, Is.EqualTo(updateDto.Name));
+
             var questionnaireInDb = await _context.Questionnaire.FindAsync(template.Id);
             Assert.That(questionnaireInDb, Is.Not.Null);
         }
 
-        // [Test]
-        // public async Task UpdateAsync_ShouldUpdateQuestionnaireToDb()
-        // {
+        [Test]
+        public async Task DeleteAsync_ShouldDeleteTemplateToDb()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
 
-        //     CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
-        //     {
-        //         Name = "Test Questionnaire",
-        //         CreatedBy = "UnitTester"
-        //     };
-        //     Questionnaire questionnaire = await _service.CreateAsync(createDto);
+            Template template = await CreateTestTemplate(questionnaireId: questionnaire.Id);
 
-        //     UpdateQuestionnaireDto updateDto = new UpdateQuestionnaireDto
-        //     {
-        //         Name = "Updated Questionnaire",
-        //     };
-        //     Questionnaire updatedQuestionnaire = await _service.UpdateAsync(questionnaire.Id, updateDto);
+            await _templateService.DeleteAsync(template.Id);
 
-        //     Assert.That(updatedQuestionnaire, Is.Not.Null);
-        //     Assert.That(updatedQuestionnaire.Name, Is.EqualTo(updateDto.Name));
+            Template templateInDb = await _context.Template.FindAsync(template.Id);
 
-        //     var questionnaireInDb = await _context.Questionnaire.FindAsync(updatedQuestionnaire.Id);
-        //     Assert.That(questionnaireInDb, Is.Not.Null);
-        // }
+            Assert.That(templateInDb, Is.Null);
 
-        // [Test]
-        // public async Task DeleteAsync_ShouldDeleteQuestionnaireToDb()
-        // {
-
-        //     CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
-        //     {
-        //         Name = "Test Questionnaire",
-        //         CreatedBy = "UnitTester"
-        //     };
-        //     Questionnaire questionnaire = await _service.CreateAsync(createDto);
-
-        //     await _service.DeleteAsync(questionnaire.Id);
-
-        //     var questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
-        //     Assert.That(questionnaireInDb, Is.Null);
-        // }
+            Questionnaire? questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
+            Assert.That(questionnaireInDb?.Templates, Has.Exactly(0).Items);
+        }
     }
 }

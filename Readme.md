@@ -8,13 +8,13 @@
 - [x] - Design models
 - [x] - CRUD Questionnaire model
 - [x] - CRUD Template model
-- [ ] - Setup NUnit tests
-- [ ] - Create User model + add to Questionnaire created_by field.
-- [ ] - Seed User
+- [x] - Setup NUnit tests
 - [ ] - CRUD TemplateQuestionLink + Question
 - [ ] - CRUD Question
 - [ ] - CRUD Answer
 - [ ] - CRUD Submission
+- [ ] - Create User model + add to Questionnaire created_by field.
+- [ ] - Seed User
 
 ## Migrations
 

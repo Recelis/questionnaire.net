@@ -8,5 +8,5 @@ public class Question
 
     public required string Text { get; set; }
 
-    public int TemplateQuestionLink { get; set; }
+    public int TemplateQuestionLinkId { get; set; }
 }

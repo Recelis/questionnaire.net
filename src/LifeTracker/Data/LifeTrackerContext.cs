@@ -74,8 +74,8 @@ public class LifeTrackerContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(e => e.Question)
-                .WithOne()
-                .HasForeignKey<TemplateQuestionLink>(e => e.QuestionId)
+                .WithMany()
+                .HasForeignKey(e => e.QuestionId)
                 .HasConstraintName("fk_templatequestionlink_question")
                 .OnDelete(DeleteBehavior.Cascade);
         });

@@ -71,7 +71,7 @@ You can also cd into the LifeTracker project folder and run:
 dotnet run
 ```
 
-To run the tests
+To run the tests, go to the root.
 
 ```bash
 dotnet test

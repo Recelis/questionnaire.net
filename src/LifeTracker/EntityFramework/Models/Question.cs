@@ -7,6 +7,4 @@ public class Question
     public required int QuestionNumber { get; set; }
 
     public required string Text { get; set; }
-
-    public int TemplateQuestionLinkId { get; set; }
 }

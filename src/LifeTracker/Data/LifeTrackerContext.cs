@@ -67,6 +67,10 @@ public class LifeTrackerContext : DbContext
                 .HasIndex(e => new { e.TemplateId, e.QuestionId })
                 .IsUnique();
 
+            entity.Property(t => t.QuestionNumber)
+                .IsRequired()
+                .HasDefaultValue(0);
+
             entity.HasOne<Template>()
                 .WithMany(e => e.TemplateQuestionLinks)
                 .HasForeignKey(e => e.TemplateId)
@@ -90,9 +94,6 @@ public class LifeTrackerContext : DbContext
                 .IsRequired()
                 .HasMaxLength(1000);
 
-            entity.Property(t => t.QuestionNumber)
-                .IsRequired()
-                .HasDefaultValue(0);
         });
     }
 }

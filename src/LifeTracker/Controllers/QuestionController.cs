@@ -143,13 +143,13 @@ public class QuestionController : ControllerBase
     //     return Ok(questionnaireDto);
     // }
 
-    [HttpDelete("{questionnaireId:int}")]
-    public async Task<IActionResult> Delete(int questionnaireId)
-    {
-        _logger.LogInformation("Deleting questionnaire: {Id}", questionnaireId);
+    // [HttpDelete("{questionnaireId:int}")]
+    // public async Task<IActionResult> Delete(int questionnaireId)
+    // {
+    //     _logger.LogInformation("Deleting questionnaire: {Id}", questionnaireId);
 
-        bool deleted = await _questionService.DeleteAsync(questionnaireId);
-        return deleted ? NoContent() : NotFound();
+    //     bool deleted = await _questionService.DeleteAsync(questionnaireId);
+    //     return deleted ? NoContent() : NotFound();
 
-    }
+    // }
 }

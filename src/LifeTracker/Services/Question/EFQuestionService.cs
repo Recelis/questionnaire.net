@@ -1,110 +1,122 @@
-// using LifeTracker.Data;
-// using LifeTracker.Dto;
-// using LifeTracker.Models;
-// using Microsoft.EntityFrameworkCore;
+using LifeTracker.Data;
+using LifeTracker.Dto;
+using LifeTracker.Models;
+using Microsoft.EntityFrameworkCore;
 
-// namespace LifeTracker.Services;
+namespace LifeTracker.Services;
 
-// public class EFQuestionService //: IQuestionService
-// {
-//     private readonly LifeTrackerContext _lifeTrackerContext;
-//     private readonly ILogger<EFQuestionService> _logger;
+public class EFQuestionService : IQuestionService
+{
+    private readonly LifeTrackerContext _lifeTrackerContext;
+    private readonly ILogger<EFQuestionService> _logger;
 
-//     public EFQuestionService(LifeTrackerContext context, ILogger<EFQuestionService> logger)
-//     {
-//         _lifeTrackerContext = context;
-//         _logger = logger;
-//     }
+    public EFQuestionService(LifeTrackerContext context, ILogger<EFQuestionService> logger)
+    {
+        _lifeTrackerContext = context;
+        _logger = logger;
+    }
 
-//     public async Task<List<Question>> GetByTemplateAsync(int templateId)
-//     {
-//         return await _lifeTrackerContext.Question.Where(template => template.QuestionnaireId == questionnaireId).ToListAsync();
-//     }
+    //     public async Task<List<Question>> GetByTemplateAsync(int templateId)
+    //     {
+    //         return await _lifeTrackerContext.Question.Where(template => template.QuestionnaireId == questionnaireId).ToListAsync();
+    //     }
 
-//     public async Task<Template?> GetAsync(int templateId)
-//     {
-//         return await _lifeTrackerContext.Template.FindAsync(templateId);
-//     }
+    public async Task<Question?> GetAsync(int questionId)
+    {
+        return await _lifeTrackerContext.Question.FindAsync(questionId);
+    }
 
-//     public async Task<Template?> CreateAsync(CreateTemplateDto createTemplateDto)
-//     {
-//         // find the Questionnaire first
-//         Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(createTemplateDto.QuestionnaireId);
-//         if (questionnaire == null)
-//         {
-//             _logger.LogError("No Questionnaire of id {questionnaire}", createTemplateDto.QuestionnaireId);
-//             return null;
-//         }
+    public async Task<Question?> CreateAsync(CreateQuestionDto createQuestionDto)
+    {
+        // find the Template first
+        Template? template = await _lifeTrackerContext.Template.FindAsync(createQuestionDto.TemplateId);
+        if (template == null)
+        {
+            _logger.LogError("No Template of id {questionnaire}", createQuestionDto.TemplateId);
+            return null;
+        }
 
-//         using var transaction = await _lifeTrackerContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+        using var transaction = await _lifeTrackerContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
-//         // get latest version of template scoped to the questionnaire 
-//         int latestVersion = await _lifeTrackerContext.Template
-//             .Where(t => t.QuestionnaireId == createTemplateDto.QuestionnaireId)
-//             .OrderByDescending(t => t.Version)
-//             .Select(t => t.Version)
-//             .FirstOrDefaultAsync();
+        // create question with the questionNumber the next highest questionNumber value within the questions returned from the templateQuestionLinks
 
-//         Template newTemplate = new Template
-//         {
-//             Name = createTemplateDto.Name,
-//             QuestionnaireId = createTemplateDto.QuestionnaireId,
-//             Version = latestVersion + 1
-//         };
-//         _logger.LogDebug(newTemplate.ToString());
-//         _lifeTrackerContext.Template.Add(newTemplate);
+        // find the latest QuestionNumber scoped to the Template. 
+        int latestQuestionScopedToTemplate = await _lifeTrackerContext.TemplateQuestionLink
+            .Where(t => t.TemplateId == createQuestionDto.TemplateId)
+            .MaxAsync(tql => (int?)tql.QuestionNumber) ?? 0;
 
-//         await _lifeTrackerContext.SaveChangesAsync();
-//         await transaction.CommitAsync();
-//         return newTemplate;
+        Question newQuestion = new Question
+        {
+            Text = createQuestionDto.Text,
+        };
 
-//     }
+        _lifeTrackerContext.Question.Add(newQuestion);
+        await _lifeTrackerContext.SaveChangesAsync();
 
-//     public async Task<Template?> UpdateAsync(int id, UpdateTemplateDto updateTemplateDto)
-//     {
-//         try
-//         {
-//             Template? template = await _lifeTrackerContext.Template.FindAsync(id);
-//             if (template == null)
-//             {
-//                 _logger.LogError("Could not find template of id {template}", id);
-//                 return null;
-//             }
+        // create a new templateQuestionLink
+        TemplateQuestionLink newTemplateQuestionLink = new TemplateQuestionLink
+        {
+            TemplateId = createQuestionDto.TemplateId,
+            QuestionNumber = latestQuestionScopedToTemplate + 1,
+            QuestionId = newQuestion.Id
+        };
 
-//             template.Name = updateTemplateDto.Name;
-//             await _lifeTrackerContext.SaveChangesAsync();
-//             return template;
-//         }
-//         catch (Exception ex)
-//         {
-//             _logger.LogError(ex, "Questionnaire Put exception");
-//             return null;
-//         }
-//     }
 
-//     public async Task<bool> DeleteAsync(int templateId)
-//     {
-//         Template? template = await _lifeTrackerContext.Template.FindAsync(templateId);
-//         if (template == null)
-//         {
-//             _logger.LogWarning("Template could not be found");
-//             return false;
-//         }
-//         else
-//         {
-//             _lifeTrackerContext.Remove(template);
-//             // remove from template from Questionnaire
-//             Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(template.QuestionnaireId);
-//             if (questionnaire == null)
-//             {
-//                 _logger.LogError("Questionnaire of id {questionnaire} could not be deleted", template.QuestionnaireId);
-//             }
-//             else
-//             {
-//                 questionnaire.Templates.Remove(template);
-//             }
-//             await _lifeTrackerContext.SaveChangesAsync();
-//             return true;
-//         }
-//     }
-// }
+        _logger.LogDebug("Created new Question", newQuestion.ToString());
+        _logger.LogDebug("Created new TemplateQuestionLink", newTemplateQuestionLink.ToString());
+
+        _lifeTrackerContext.TemplateQuestionLink.Add(newTemplateQuestionLink);
+        await _lifeTrackerContext.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+        return newQuestion;
+    }
+
+    //     public async Task<Template?> UpdateAsync(int id, UpdateTemplateDto updateTemplateDto)
+    //     {
+    //         try
+    //         {
+    //             Template? template = await _lifeTrackerContext.Template.FindAsync(id);
+    //             if (template == null)
+    //             {
+    //                 _logger.LogError("Could not find template of id {template}", id);
+    //                 return null;
+    //             }
+
+    //             template.Name = updateTemplateDto.Name;
+    //             await _lifeTrackerContext.SaveChangesAsync();
+    //             return template;
+    //         }
+    //         catch (Exception ex)
+    //         {
+    //             _logger.LogError(ex, "Questionnaire Put exception");
+    //             return null;
+    //         }
+    //     }
+
+    //     public async Task<bool> DeleteAsync(int templateId)
+    //     {
+    //         Template? template = await _lifeTrackerContext.Template.FindAsync(templateId);
+    //         if (template == null)
+    //         {
+    //             _logger.LogWarning("Template could not be found");
+    //             return false;
+    //         }
+    //         else
+    //         {
+    //             _lifeTrackerContext.Remove(template);
+    //             // remove from template from Questionnaire
+    //             Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(template.QuestionnaireId);
+    //             if (questionnaire == null)
+    //             {
+    //                 _logger.LogError("Questionnaire of id {questionnaire} could not be deleted", template.QuestionnaireId);
+    //             }
+    //             else
+    //             {
+    //                 questionnaire.Templates.Remove(template);
+    //             }
+    //             await _lifeTrackerContext.SaveChangesAsync();
+    //             return true;
+    //         }
+    //     }
+}

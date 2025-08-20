@@ -29,31 +29,18 @@ public class QuestionController : ControllerBase
     /// </summary>
     /// <returns>A list of Questions.</returns>
     /// <response code="200">Returns the list of Questions</response>
-    // [HttpGet("templateId/{templateId:int}")]
-    // [ProducesResponseType(typeof(IEnumerable<Question>), StatusCodes.Status200OK)]
-    // [Produces("application/json")]
-    // public async Task<ActionResult<IEnumerable<Question>>> Get(int templateId)
-    // {
-    //     _logger.LogInformation("Getting all questions");
-    //     // get all templateQuestionLinks
-    //     // for each templateQuestionLink get the Question
-    //     IEnumerable<Question> questionnaires = await _questionService.GetByTemplateAsync(templateId);
+    [HttpGet("templateId/{templateId:int}")]
+    [ProducesResponseType(typeof(IEnumerable<Question>), StatusCodes.Status200OK)]
+    [Produces("application/json")]
+    public async Task<ActionResult<IEnumerable<Question>>> Get(int templateId)
+    {
+        _logger.LogInformation("Getting all questions under a template");
+        // get all templateQuestionLinks
+        // for each templateQuestionLink get the Question
+        IEnumerable<Question> questions = await _questionService.GetByTemplateAsync(templateId);
 
-    //     IEnumerable<Question> questionnaireDtos = questionnaires.Select(q => new QuestionDto
-    //     {
-    //         Id = q.Id,
-    //         Name = q.Name,
-    //         CreatedBy = q.CreatedBy,
-    //         Templates = q.Templates.Select(t => new TemplateDto
-    //         {
-    //             Version = t.Version,
-    //             Name = t.Name,
-    //             QuestionnaireId = t.QuestionnaireId
-    //         }).ToList()
-    //     });
-
-    //     return Ok(questionnaireDtos);
-    // }
+        return Ok(questions);
+    }
 
     /// <summary>
     /// Gets a question.

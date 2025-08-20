@@ -74,6 +74,26 @@ namespace LifeTracker.Tests.Services
         }
 
         [Test]
+        public async Task GetTaskAsync()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
+
+            Template template1 = await CreateTestTemplate(questionnaire.Id);
+
+            Template template2 = await CreateTestTemplate(questionnaire.Id);
+
+            Question question1 = await CreateTestQuestion(template1.Id);
+
+            Question question2 = await CreateTestQuestion(template2.Id);
+
+            IList<Question> questionsInDb = await _questionService.GetByTemplateAsync(template1.Id);
+
+            Assert.That(questionsInDb.Count(), Is.EqualTo(1));
+            Assert.That(questionsInDb.First().Id, Is.EqualTo(question1.Id));
+
+        }
+
+        [Test]
         public async Task CreateAsync_ShouldAddQuestionToDb()
         {
             Questionnaire questionnaire = await CreateTestQuestionnaire();
@@ -85,8 +105,6 @@ namespace LifeTracker.Tests.Services
             // question is created
             Assert.That(question, Is.Not.Null);
             Assert.That(question.Text, Is.EqualTo("test question"));
-
-
 
             // templateQuestionLink is created
             ICollection<TemplateQuestionLink> templateQuestionLinksInDb = template.TemplateQuestionLinks;

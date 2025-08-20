@@ -16,10 +16,15 @@ public class EFQuestionService : IQuestionService
         _logger = logger;
     }
 
-    //     public async Task<List<Question>> GetByTemplateAsync(int templateId)
-    //     {
-    //         return await _lifeTrackerContext.Question.Where(template => template.QuestionnaireId == questionnaireId).ToListAsync();
-    //     }
+    public async Task<List<Question>> GetByTemplateAsync(int templateId)
+    {
+        return await _lifeTrackerContext.Template
+                .Where(t => t.Id == templateId)
+                .Include(t => t.TemplateQuestionLinks)
+                .ThenInclude(tql => tql.Question)
+                .SelectMany(t => t.TemplateQuestionLinks.Select(tql => tql.Question))
+                .ToListAsync();
+    }
 
     public async Task<Question?> GetAsync(int questionId)
     {

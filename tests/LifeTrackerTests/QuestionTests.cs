@@ -112,26 +112,25 @@ namespace LifeTracker.Tests.Services
             Assert.That(templateQuestionLinksInDb.First().QuestionId, Is.EqualTo(question.Id));
         }
 
-        // [Test]
-        // public async Task UpdateAsync_ShouldUpdateQuestionToDb()
-        // {
+        [Test]
+        public async Task UpdateAsync_ShouldUpdateQuestionToDb()
+        {
+            // NOTE: this should only be used when the template has not been used.
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
 
-        //     Questionnaire questionnaire = await CreateTestQuestionnaire();
+            Template template = await CreateTestTemplate(questionnaire.Id);
 
-        //     Question Question = await CreateTestQuestion(questionnaireId: questionnaire.Id);
+            Question question = await CreateTestQuestion(template.Id);
 
-        //     UpdateQuestionDto updateDto = new UpdateQuestionDto
-        //     {
-        //         Name = "Updated Question",
-        //     };
-        //     Question updateQuestion = await _questionService.UpdateAsync(Question.Id, updateDto);
+            UpdateQuestionDto updateDto = new UpdateQuestionDto
+            {
+                Text = "Updated Question",
+            };
+            Question updateQuestion = await _questionService.UpdateAsync(question.Id, updateDto);
 
-        //     Assert.That(updateQuestion, Is.Not.Null);
-        //     Assert.That(updateQuestion.Name, Is.EqualTo(updateDto.Name));
-
-        //     var questionnaireInDb = await _context.Questionnaire.FindAsync(Question.Id);
-        //     Assert.That(questionnaireInDb, Is.Not.Null);
-        // }
+            Assert.That(updateQuestion, Is.Not.Null);
+            Assert.That(updateQuestion.Text, Is.EqualTo(updateDto.Text));
+        }
 
         // [Test]
         // public async Task DeleteAsync_ShouldDeleteQuestionToDb()

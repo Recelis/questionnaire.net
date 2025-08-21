@@ -95,40 +95,28 @@ public class QuestionController : ControllerBase
     }
 
     /// <summary>
-    /// Updates a questionnaire.
+    /// Updates a question.
     /// </summary>
-    /// <param name="newQuestionnaire"></param>
-    /// <response code="200">Returns the created QuestionnaireDto</response>
-    /// <response code="404">If the questionnaire doesn't exists</response>
-    // [HttpPut("{id:int}")]
-    // [ProducesResponseType(typeof(QuestionnaireDto), StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // [Consumes("application/json")]
-    // [Produces("application/json")]
-    // public async Task<ActionResult<QuestionnaireDto?>> Put(int id, [FromBody] UpdateQuestionnaireDto newQuestionnaire)
-    // {
-    //     _logger.LogInformation("Updating questionnaire: {Questionnaire}", newQuestionnaire);
-    //     Questionnaire? questionnaire = await _questionService.UpdateAsync(id, newQuestionnaire);
-    //     if (questionnaire == null)
-    //     {
-    //         _logger.LogInformation("questionnaire could not be found: {Id}", id);
-    //         return NotFound();
-    //     }
+    /// <param name="newQuestion"></param>
+    /// <response code="200">Returns the updated Question</response>
+    /// <response code="404">If the question doesn't exists</response>
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(typeof(Question), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    public async Task<ActionResult<Question?>> Put(int id, [FromBody] UpdateQuestionDto newQuestion)
+    {
+        _logger.LogInformation("Updating question: {Question}", newQuestion);
+        Question? question = await _questionService.UpdateAsync(id, newQuestion);
+        if (question == null)
+        {
+            _logger.LogInformation("question could not be found: {Id}", id);
+            return NotFound();
+        }
 
-    //     QuestionnaireDto questionnaireDto = new QuestionnaireDto
-    //     {
-    //         Id = questionnaire.Id,
-    //         Name = questionnaire.Name,
-    //         CreatedBy = questionnaire.CreatedBy,
-    //         Templates = questionnaire.Templates.Select(t => new TemplateDto
-    //         {
-    //             Version = t.Version,
-    //             Name = t.Name,
-    //             QuestionnaireId = t.QuestionnaireId
-    //         }).ToList()
-    //     };
-    //     return Ok(questionnaireDto);
-    // }
+        return Ok(question);
+    }
 
     // [HttpDelete("{questionnaireId:int}")]
     // public async Task<IActionResult> Delete(int questionnaireId)

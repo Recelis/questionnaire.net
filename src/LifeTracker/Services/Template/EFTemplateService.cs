@@ -77,7 +77,7 @@ public class EFTemplateService : ITemplateService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Questionnaire Put exception");
+            _logger.LogError(ex, "Template Put exception");
             return null;
         }
     }

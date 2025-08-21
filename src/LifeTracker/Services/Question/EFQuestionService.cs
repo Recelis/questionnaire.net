@@ -77,27 +77,27 @@ public class EFQuestionService : IQuestionService
         return newQuestion;
     }
 
-    //     public async Task<Template?> UpdateAsync(int id, UpdateTemplateDto updateTemplateDto)
-    //     {
-    //         try
-    //         {
-    //             Template? template = await _lifeTrackerContext.Template.FindAsync(id);
-    //             if (template == null)
-    //             {
-    //                 _logger.LogError("Could not find template of id {template}", id);
-    //                 return null;
-    //             }
+    public async Task<Question?> UpdateAsync(int id, UpdateQuestionDto updateQuestionDto)
+    {
+        try
+        {
+            Question? question = await _lifeTrackerContext.Question.FindAsync(id);
+            if (question == null)
+            {
+                _logger.LogError("Could not find question of id {question}", id);
+                return null;
+            }
 
-    //             template.Name = updateTemplateDto.Name;
-    //             await _lifeTrackerContext.SaveChangesAsync();
-    //             return template;
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             _logger.LogError(ex, "Questionnaire Put exception");
-    //             return null;
-    //         }
-    //     }
+            question.Text = updateQuestionDto.Text;
+            await _lifeTrackerContext.SaveChangesAsync();
+            return question;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Question Put exception");
+            return null;
+        }
+    }
 
     //     public async Task<bool> DeleteAsync(int templateId)
     //     {

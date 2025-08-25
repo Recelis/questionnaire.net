@@ -6,7 +6,7 @@ public class Submission
 
     public required string Date { get; set; } = string.Empty;
 
-    public int UserId { get; set; }
+    // public int UserId { get; set; }
 
     public int TotalPoints { get; set; }
 

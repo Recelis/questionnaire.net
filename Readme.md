@@ -9,10 +9,9 @@
 - [x] - CRUD Questionnaire model
 - [x] - CRUD Template model
 - [x] - Setup NUnit tests
-- [ ] - CRUD TemplateQuestionLink + Question
-- [ ] - CRUD Question
-- [ ] - CRUD Answer
+- [x] - CRUD TemplateQuestionLink + Question
 - [ ] - CRUD Submission
+- [ ] - CRUD Answer
 - [ ] - Create User model + add to Questionnaire created_by field.
 - [ ] - Seed User
 

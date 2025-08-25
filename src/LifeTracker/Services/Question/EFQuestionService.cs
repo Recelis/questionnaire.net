@@ -99,6 +99,11 @@ public class EFQuestionService : IQuestionService
         }
     }
 
+    /// <summary>
+    /// Deletes Question in its entirety
+    /// </summary>
+    /// <param name="questionId"></param>
+    /// <returns></returns>
     public async Task<bool> DeleteAsync(int questionId)
     {
         Question? question = await _lifeTrackerContext.Question.FindAsync(questionId);
@@ -114,11 +119,12 @@ public class EFQuestionService : IQuestionService
             _lifeTrackerContext.Remove(question);
 
             await _lifeTrackerContext.SaveChangesAsync();
-            // remove template from Questionnaire
+            // remove template from Question
             int numDeleted = await _lifeTrackerContext.TemplateQuestionLink
                 .Where(tql => tql.QuestionId == question.Id)
                 .ExecuteDeleteAsync();
             await transaction.CommitAsync();
+
             if (numDeleted == 0)
             {
                 _logger.LogError("No templateQuestionLinks with {id} could be found", question.Id);

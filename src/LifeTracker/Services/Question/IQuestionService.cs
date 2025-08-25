@@ -9,5 +9,5 @@ public interface IQuestionService
     Task<Question?> GetAsync(int questionId);
     Task<Question> CreateAsync(CreateQuestionDto newQuestion);
     Task<Question?> UpdateAsync(int id, UpdateQuestionDto newQuestion);
-    // Task<bool> DeleteAsync(int questionId);
+    Task<bool> DeleteAsync(int questionId);
 }

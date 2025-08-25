@@ -99,29 +99,36 @@ public class EFQuestionService : IQuestionService
         }
     }
 
-    //     public async Task<bool> DeleteAsync(int templateId)
-    //     {
-    //         Template? template = await _lifeTrackerContext.Template.FindAsync(templateId);
-    //         if (template == null)
-    //         {
-    //             _logger.LogWarning("Template could not be found");
-    //             return false;
-    //         }
-    //         else
-    //         {
-    //             _lifeTrackerContext.Remove(template);
-    //             // remove from template from Questionnaire
-    //             Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(template.QuestionnaireId);
-    //             if (questionnaire == null)
-    //             {
-    //                 _logger.LogError("Questionnaire of id {questionnaire} could not be deleted", template.QuestionnaireId);
-    //             }
-    //             else
-    //             {
-    //                 questionnaire.Templates.Remove(template);
-    //             }
-    //             await _lifeTrackerContext.SaveChangesAsync();
-    //             return true;
-    //         }
-    //     }
+    public async Task<bool> DeleteAsync(int questionId)
+    {
+        Question? question = await _lifeTrackerContext.Question.FindAsync(questionId);
+        if (question == null)
+        {
+            _logger.LogWarning("Question could not be found");
+            return false;
+        }
+        else
+        {
+            using var transaction = await _lifeTrackerContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+            _lifeTrackerContext.Remove(question);
+
+            await _lifeTrackerContext.SaveChangesAsync();
+            // remove template from Questionnaire
+            int numDeleted = await _lifeTrackerContext.TemplateQuestionLink
+                .Where(tql => tql.QuestionId == question.Id)
+                .ExecuteDeleteAsync();
+            await transaction.CommitAsync();
+            if (numDeleted == 0)
+            {
+                _logger.LogError("No templateQuestionLinks with {id} could be found", question.Id);
+            }
+            else
+            {
+                _logger.LogInformation("Deleted {numDeleted} templateQuestionLinks", numDeleted);
+            }
+
+            return true;
+        }
+    }
 }

@@ -59,10 +59,11 @@ namespace LifeTracker.Tests.Services
             _context.Database.EnsureCreated();
 
             _questionnaireLogger = new Mock<ILogger<EFQuestionnaireService>>().Object;
+            _templateLogger = new Mock<ILogger<EFTemplateService>>().Object;
             _questionLogger = new Mock<ILogger<EFQuestionService>>().Object;
 
             _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger);
-
+            _templateService = new EFTemplateService(_context, _templateLogger);
             _questionService = new EFQuestionService(_context, _questionLogger);
         }
 
@@ -132,21 +133,28 @@ namespace LifeTracker.Tests.Services
             Assert.That(updateQuestion.Text, Is.EqualTo(updateDto.Text));
         }
 
-        // [Test]
-        // public async Task DeleteAsync_ShouldDeleteQuestionToDb()
-        // {
-        //     Questionnaire questionnaire = await CreateTestQuestionnaire();
+        [Test]
+        public async Task DeleteAsync_ShouldDeleteQuestionToDb()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
 
-        //     Question Question = await CreateTestQuestion(questionnaireId: questionnaire.Id);
+            Template template = await CreateTestTemplate(questionnaire.Id);
 
-        //     await _questionService.DeleteAsync(Question.Id);
+            Question question = await CreateTestQuestion(template.Id);
 
-        //     Question QuestionInDb = await _context.Question.FindAsync(Question.Id);
+            Question questionInDb = await _context.Question.FindAsync(question.Id);
 
-        //     Assert.That(QuestionInDb, Is.Null);
+            Assert.That(questionInDb, Is.Not.Null);
 
-        //     Questionnaire? questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
-        //     Assert.That(questionnaireInDb?.Questions, Has.Exactly(0).Items);
-        // }
+            await _questionService.DeleteAsync(question.Id);
+
+            Question deletedQuestionInDb = await _context.Question.FindAsync(question.Id);
+
+            Assert.That(deletedQuestionInDb, Is.Null);
+
+            List<Question> questionsInDb = await _questionService.GetByTemplateAsync(template.Id);
+
+            Assert.That(questionsInDb, Has.Exactly(0).Items);
+        }
     }
 }

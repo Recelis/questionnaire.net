@@ -12,8 +12,31 @@
 - [x] - CRUD TemplateQuestionLink + Question
 - [ ] - CRUD Submission
 - [ ] - CRUD Answer
+- [ ] - Locking templates
+- [ ] - duplicating templates
 - [ ] - Create User model + add to Questionnaire created_by field.
 - [ ] - Seed User
+
+### Future
+
+#### Electron Project
+
+- - [ ] - Setup Electron project
+- - [ ] - Users can log in
+- - [ ] - Users can create their own Questionnaires
+- - [ ] - Users can create their own Templates
+- - [ ] - Users can add questions to their templates
+- - [ ] - Users can duplicate their templates
+- - [ ] - Users can create submissions
+- - [ ] - Users can add answers to their submissions
+- - [ ] - Export electron project
+
+#### Deployments
+
+- [ ] - Setup CI on GitHub Actions
+- [ ] - Put Electron Project onto Lambda
+- [ ] - Connect to Postgres Database online
+- [ ] - Setup CD on GitHub Actions
 
 ## Migrations
 

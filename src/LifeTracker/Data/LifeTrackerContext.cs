@@ -13,6 +13,9 @@ public class LifeTrackerContext : DbContext
     public DbSet<Questionnaire> Questionnaire => Set<Questionnaire>();
     public DbSet<Template> Template => Set<Template>();
 
+    public DbSet<TemplateQuestionLink> TemplateQuestionLink { get; set; }
+    public DbSet<Question> Question { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -52,6 +55,45 @@ public class LifeTrackerContext : DbContext
 
             entity.Property(t => t.QuestionnaireId)
                   .HasColumnName("questionnaire_id");
+        });
+
+        modelBuilder.Entity<TemplateQuestionLink>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity
+                .HasIndex(e => new { e.TemplateId, e.QuestionId })
+                .IsUnique();
+
+            entity.Property(t => t.QuestionNumber)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            entity.HasOne<Template>()
+                .WithMany(e => e.TemplateQuestionLinks)
+                .HasForeignKey(e => e.TemplateId)
+                .HasConstraintName("fk_templatequestionlink_template")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Question)
+                .WithMany()
+                .HasForeignKey(e => e.QuestionId)
+                .HasConstraintName("fk_templatequestionlink_question")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Question>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Text)
+                .IsRequired()
+                .HasMaxLength(1000);
+
         });
     }
 }

@@ -9,10 +9,9 @@
 - [x] - CRUD Questionnaire model
 - [x] - CRUD Template model
 - [x] - Setup NUnit tests
-- [ ] - CRUD TemplateQuestionLink + Question
-- [ ] - CRUD Question
-- [ ] - CRUD Answer
+- [x] - CRUD TemplateQuestionLink + Question
 - [ ] - CRUD Submission
+- [ ] - CRUD Answer
 - [ ] - Create User model + add to Questionnaire created_by field.
 - [ ] - Seed User
 
@@ -43,6 +42,26 @@ dotnet ef migrations add TempMigrationPreview --output-dir Migrations/Temp
 dotnet ef migrations remove
 ```
 
+You have to make sure that your Snapshot also reverted.
+
+### to restart from scratch
+
+Only do this if you are not in production.
+
+```bash
+dotnet ef database drop
+dotnet ef database update
+```
+
+Otherwise, you can unapply the latest migration with:
+
+```bash
+dotnet ef database update <PreviousMigrationName>
+
+# then remove your latest migration
+dotnet ef database remove <PreviousMigrationName>
+```
+
 # Tutorials This was Built From
 
 https://learn.microsoft.com/en-us/training/modules/build-web-api-aspnet-core/
@@ -71,7 +90,7 @@ You can also cd into the LifeTracker project folder and run:
 dotnet run
 ```
 
-To run the tests
+To run the tests, go to the root.
 
 ```bash
 dotnet test

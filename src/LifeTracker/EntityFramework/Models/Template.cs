@@ -13,4 +13,6 @@ public class Template
 
     public int QuestionnaireId { get; set; }
     public Questionnaire? Questionnaire { get; set; }
+
+    public ICollection<TemplateQuestionLink> TemplateQuestionLinks { get; set; } = new List<TemplateQuestionLink>();
 }

@@ -2,6 +2,7 @@
 using LifeTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LifeTracker.Migrations
 {
     [DbContext(typeof(LifeTrackerContext))]
-    partial class LifeTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20250730202640_TemplateQuestionLink")]
+    partial class TemplateQuestionLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,6 +32,12 @@ namespace LifeTracker.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("QuestionNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("question_number");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -114,12 +123,6 @@ namespace LifeTracker.Migrations
                     b.Property<int>("QuestionId")
                         .HasColumnType("integer")
                         .HasColumnName("question_id");
-
-                    b.Property<int>("QuestionNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("question_number");
 
                     b.Property<int>("TemplateId")
                         .HasColumnType("integer")

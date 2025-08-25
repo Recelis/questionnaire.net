@@ -77,7 +77,7 @@ public class EFTemplateService : ITemplateService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Questionnaire Put exception");
+            _logger.LogError(ex, "Template Put exception");
             return null;
         }
     }
@@ -93,7 +93,7 @@ public class EFTemplateService : ITemplateService
         else
         {
             _lifeTrackerContext.Remove(template);
-            // remove from template from Questionnaire
+            // remove template from Questionnaire
             Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(template.QuestionnaireId);
             if (questionnaire == null)
             {

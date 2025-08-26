@@ -35,8 +35,6 @@ public class QuestionController : ControllerBase
     public async Task<ActionResult<IEnumerable<Question>>> Get(int templateId)
     {
         _logger.LogInformation("Getting all questions under a template");
-        // get all templateQuestionLinks
-        // for each templateQuestionLink get the Question
         IEnumerable<Question> questions = await _questionService.GetByTemplateAsync(templateId);
 
         return Ok(questions);
@@ -53,12 +51,12 @@ public class QuestionController : ControllerBase
     /// <response code="200">Returns the Question</response>
     /// <response code="404">No question found</response>
     [HttpGet("{questionId:int}")]
-    [ProducesResponseType(typeof(QuestionnaireDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Question), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]
-    public async Task<ActionResult<QuestionnaireDto>> GetById(int questionId)
+    public async Task<ActionResult<Question>> GetById(int questionId)
     {
-        _logger.LogInformation("Getting questionnaire: {Id}", questionId);
+        _logger.LogInformation("Getting question: {Id}", questionId);
         Question? question = await _questionService.GetAsync(questionId);
 
         if (question == null)
@@ -70,15 +68,15 @@ public class QuestionController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new questionnaire.
+    /// Creates a new question.
     /// </summary>
-    /// <param name="createQuestionnaireDto"></param>
-    /// <response code="201">Returns the created questionnaire</response>
+    /// <param name="createQuestionDto"></param>
+    /// <response code="201">Returns the created question</response>
     [HttpPost()]
-    [ProducesResponseType(typeof(QuestionnaireDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Question), StatusCodes.Status201Created)]
     [Consumes("application/json")]
     [Produces("application/json")]
-    public async Task<ActionResult<Questionnaire>> Post(CreateQuestionDto createQuestionDto)
+    public async Task<ActionResult<Question>> Post(CreateQuestionDto createQuestionDto)
     {
         _logger.LogInformation("Creating new question: {Question}", JsonSerializer.Serialize(createQuestionDto));
         // find template
@@ -118,13 +116,19 @@ public class QuestionController : ControllerBase
         return Ok(question);
     }
 
-    // [HttpDelete("{questionnaireId:int}")]
-    // public async Task<IActionResult> Delete(int questionnaireId)
-    // {
-    //     _logger.LogInformation("Deleting questionnaire: {Id}", questionnaireId);
+    /// <summary>
+    /// Deletes a question across all templates.
+    /// </summary>
+    /// <param name="questionId"></param>
+    /// <response code="200">Returns NoContent if success</response>
+    /// <response code="404">If the question doesn't exist</response>
+    [HttpDelete("{questionId:int}")]
+    public async Task<IActionResult> Delete(int questionId)
+    {
+        _logger.LogInformation("Deleting question: {Id}", questionId);
 
-    //     bool deleted = await _questionService.DeleteAsync(questionnaireId);
-    //     return deleted ? NoContent() : NotFound();
+        bool deleted = await _questionService.DeleteAsync(questionId);
+        return deleted ? NoContent() : NotFound();
 
-    // }
+    }
 }

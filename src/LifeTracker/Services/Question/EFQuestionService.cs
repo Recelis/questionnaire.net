@@ -37,7 +37,7 @@ public class EFQuestionService : IQuestionService
         Template? template = await _lifeTrackerContext.Template.FindAsync(createQuestionDto.TemplateId);
         if (template == null)
         {
-            _logger.LogError("No Template of id {questionnaire}", createQuestionDto.TemplateId);
+            _logger.LogError("No Template of id {templateId}", createQuestionDto.TemplateId);
             return null;
         }
 

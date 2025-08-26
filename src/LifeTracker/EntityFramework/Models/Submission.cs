@@ -4,7 +4,7 @@ public class Submission
 {
     public int Id { get; set; }
 
-    public required string Date { get; set; } = string.Empty;
+    // public DateTimeOffset Date { get; set; } = DateTimeOffset.UtcNow;
 
     // public int UserId { get; set; }
 

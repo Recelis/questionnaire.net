@@ -44,6 +44,7 @@ public class EFSubmissionService : ISubmissionService
         Submission newSubmission = new Submission
         {
             TemplateId = createSubmissionDto.TemplateId,
+            CreatedBy = createSubmissionDto.CreatedBy
         };
 
         _lifeTrackerContext.Submission.Add(newSubmission);

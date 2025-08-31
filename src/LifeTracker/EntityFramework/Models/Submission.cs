@@ -6,7 +6,8 @@ public class Submission
 
     public DateTimeOffset Date { get; set; } = DateTimeOffset.UtcNow;
 
-    // public int UserId { get; set; }
+    // Convert to User Id in the future.
+    public string CreatedBy { get; set; }
 
     public int TotalPoints { get; set; }
 

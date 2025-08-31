@@ -111,8 +111,9 @@ public class LifeTrackerContext : DbContext
                 .HasMaxLength(250);
 
             // Change this to be User Id in the future
-            // entity.Property(t => t.UserId)
-            //       .HasColumnName("user_id");
+            entity.Property(e => e.CreatedBy)
+                .IsRequired()
+                .HasMaxLength(250);
 
             entity.Property(e => e.TotalPoints)
                 .IsRequired()

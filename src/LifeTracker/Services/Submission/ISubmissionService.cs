@@ -1,0 +1,13 @@
+using LifeTracker.Dto;
+using LifeTracker.Models;
+
+namespace LifeTracker.Services;
+
+public interface ISubmissionService
+{
+    // Task<List<Submission>> GetByUserAsync(int userId);
+    Task<Submission?> GetAsync(int submissionId);
+    Task<Submission> CreateAsync(CreateSubmissionDto newSubmission);
+    // Task<Submission?> UpdateAsync(int id, UpdateSubmissionDto newSubmission);
+    // Task<bool> DeleteAsync(int submissionId);
+}

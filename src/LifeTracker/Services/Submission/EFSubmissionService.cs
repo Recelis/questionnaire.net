@@ -57,64 +57,42 @@ public class EFSubmissionService : ISubmissionService
         return newSubmission;
     }
 
-    // public async Task<Submission?> UpdateAsync(int id, UpdateSubmissionDto updateSubmissionDto)
-    // {
-    //     try
-    //     {
-    //         Submission? submission = await _lifeTrackerContext.Submission.FindAsync(id);
-    //         if (submission == null)
-    //         {
-    //             _logger.LogError("Could not find submission of id {submission}", id);
-    //             return null;
-    //         }
-
-    //         submission.Text = updateSubmissionDto.Text;
-    //         await _lifeTrackerContext.SaveChangesAsync();
-    //         return submission;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Submission Put exception");
-    //         return null;
-    //     }
-    // }
-
     /// <summary>
     /// Deletes Submission in its entirety
     /// </summary>
     /// <param name="submissionId"></param>
-    /// <returns></returns>
-    // public async Task<bool> DeleteAsync(int submissionId)
-    // {
-    //     Submission? submission = await _lifeTrackerContext.Submission.FindAsync(submissionId);
-    //     if (submission == null)
-    //     {
-    //         _logger.LogWarning("Submission could not be found");
-    //         return false;
-    //     }
-    //     else
-    //     {
-    //         using var transaction = await _lifeTrackerContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+    /// <returns>boolean, true if success</returns>
+    public async Task<bool> DeleteAsync(int submissionId)
+    {
+        Submission? submission = await _lifeTrackerContext.Submission.FindAsync(submissionId);
+        if (submission == null)
+        {
+            _logger.LogWarning("Submission could not be found");
+            return false;
+        }
+        else
+        {
+            using var transaction = await _lifeTrackerContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
-    //         _lifeTrackerContext.Remove(submission);
+            _lifeTrackerContext.Remove(submission);
 
-    //         await _lifeTrackerContext.SaveChangesAsync();
-    //         // remove template from Submission
-    //         int numDeleted = await _lifeTrackerContext.TemplateSubmissionLink
-    //             .Where(tql => tql.SubmissionId == submission.Id)
-    //             .ExecuteDeleteAsync();
-    //         await transaction.CommitAsync();
+            await _lifeTrackerContext.SaveChangesAsync();
+            // remove answers from Submission
+            // int numDeleted = await _lifeTrackerContext.Answers
+            //     .Where(tql => tql.SubmissionId == submission.Id)
+            //     .ExecuteDeleteAsync();
+            await transaction.CommitAsync();
 
-    //         if (numDeleted == 0)
-    //         {
-    //             _logger.LogError("No templateSubmissionLinks with {id} could be found", submission.Id);
-    //         }
-    //         else
-    //         {
-    //             _logger.LogInformation("Deleted {numDeleted} templateSubmissionLinks", numDeleted);
-    //         }
+            // if (numDeleted == 0)
+            // {
+            //     _logger.LogError("No Answers with {id} could be found", submission.Id);
+            // }
+            // else
+            // {
+            //     _logger.LogInformation("Deleted {numDeleted} answers", numDeleted);
+            // }
 
-    //         return true;
-    //     }
-    // }
+            return true;
+        }
+    }
 }

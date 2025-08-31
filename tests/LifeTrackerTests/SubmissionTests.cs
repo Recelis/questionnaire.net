@@ -92,42 +92,25 @@ namespace LifeTracker.Tests.Services
             Assert.That(createSubmissionDto.TemplateId, Is.EqualTo(submission.TemplateId));
         }
 
-        //     [Test]
-        //     public async Task UpdateAsync_ShouldUpdateSubmissionToDb()
-        //     {
+        [Test]
+        public async Task DeleteAsync_ShouldDeleteSubmissionToDb()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
 
-        //         Questionnaire questionnaire = await CreateTestQuestionnaire();
+            Template template = await CreateTestTemplate(questionnaire.Id);
 
-        //         Submission submission = await CreateTestSubmission(questionnaireId: questionnaire.Id);
+            CreateSubmissionDto createSubmissionDto = new CreateSubmissionDto
+            {
+                TemplateId = template.Id
+            };
 
-        //         UpdateSubmissionDto updateDto = new UpdateSubmissionDto
-        //         {
-        //             Name = "Updated Submission",
-        //         };
-        //         Submission updateSubmission = await _submissionService.UpdateAsync(submission.Id, updateDto);
+            Submission submission = await CreateTestSubmission(template.Id);
 
-        //         Assert.That(updateSubmission, Is.Not.Null);
-        //         Assert.That(updateSubmission.Name, Is.EqualTo(updateDto.Name));
+            await _submissionService.DeleteAsync(submission.Id);
 
-        //         var questionnaireInDb = await _context.Questionnaire.FindAsync(submission.Id);
-        //         Assert.That(questionnaireInDb, Is.Not.Null);
-        //     }
+            Submission submissionInDb = await _context.Submission.FindAsync(submission.Id);
 
-        //     [Test]
-        //     public async Task DeleteAsync_ShouldDeleteSubmissionToDb()
-        //     {
-        //         Questionnaire questionnaire = await CreateTestQuestionnaire();
-
-        //         Submission submission = await CreateTestSubmission(questionnaireId: questionnaire.Id);
-
-        //         await _submissionService.DeleteAsync(submission.Id);
-
-        //         Submission submissionInDb = await _context.Submission.FindAsync(submission.Id);
-
-        //         Assert.That(submissionInDb, Is.Null);
-
-        //         Questionnaire? questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
-        //         Assert.That(questionnaireInDb?.Submissions, Has.Exactly(0).Items);
-        //     }
+            Assert.That(submissionInDb, Is.Null);
+        }
     }
 }

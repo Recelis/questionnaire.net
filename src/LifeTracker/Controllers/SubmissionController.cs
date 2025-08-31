@@ -96,37 +96,13 @@ public class SubmissionController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { submissionId = submission.Id }, submission);
     }
 
-    /// <summary>
-    /// Updates a submission.
-    /// </summary>
-    /// <param name="newSubmission"></param>
-    /// <response code="200">Returns the updated Submission</response>
-    /// <response code="404">If the submission doesn't exists</response>
-    // [HttpPut("{id:int}")]
-    // [ProducesResponseType(typeof(Submission), StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // [Consumes("application/json")]
-    // [Produces("application/json")]
-    // public async Task<ActionResult<Submission?>> Put(int id, [FromBody] UpdateSubmissionDto newSubmission)
-    // {
-    //     _logger.LogInformation("Updating submission: {Submission}", newSubmission);
-    //     Submission? submission = await _submissionService.UpdateAsync(id, newSubmission);
-    //     if (submission == null)
-    //     {
-    //         _logger.LogInformation("submission could not be found: {Id}", id);
-    //         return NotFound();
-    //     }
+    [HttpDelete("{submissionId:int}")]
+    public async Task<IActionResult> Delete(int submissionId)
+    {
+        _logger.LogInformation("Deleting submission: {Id}", submissionId);
 
-    //     return Ok(submission);
-    // }
+        bool deleted = await _submissionService.DeleteAsync(submissionId);
+        return deleted ? NoContent() : NotFound();
 
-    // [HttpDelete("{submissionId:int}")]
-    // public async Task<IActionResult> Delete(int submissionId)
-    // {
-    //     _logger.LogInformation("Deleting submission: {Id}", submissionId);
-
-    //     bool deleted = await _submissionService.DeleteAsync(submissionId);
-    //     return deleted ? NoContent() : NotFound();
-
-    // }
+    }
 }

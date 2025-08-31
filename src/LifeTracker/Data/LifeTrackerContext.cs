@@ -106,9 +106,9 @@ public class LifeTrackerContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
 
-            // entity.Property(e => e.Date)
-            //     .IsRequired()
-            //     .HasMaxLength(250);
+            entity.Property(e => e.Date)
+                .IsRequired()
+                .HasMaxLength(250);
 
             // Change this to be User Id in the future
             // entity.Property(t => t.UserId)

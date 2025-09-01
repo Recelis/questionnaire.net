@@ -98,6 +98,10 @@ public class LifeTrackerContext : DbContext
                 .IsRequired()
                 .HasMaxLength(1000);
 
+            entity.Property(e => e.Points)
+                .IsRequired()
+                .HasDefaultValue(0);
+
         });
 
         modelBuilder.Entity<Submission>(entity =>

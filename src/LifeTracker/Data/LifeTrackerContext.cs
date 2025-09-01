@@ -56,7 +56,6 @@ public class LifeTrackerContext : DbContext
                 .HasConstraintName("fk_template_questionnaire")
                 .OnDelete(DeleteBehavior.Cascade);
 
-
             entity.Property(t => t.QuestionnaireId)
                   .HasColumnName("questionnaire_id");
         });
@@ -125,6 +124,33 @@ public class LifeTrackerContext : DbContext
 
             entity.Property(t => t.TemplateId)
                   .HasColumnName("template_id");
+        });
+
+        modelBuilder.Entity<Answer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(t => t.SubmissionId)
+                .HasColumnName("submission_id");
+
+            entity.Property(t => t.QuestionId)
+                .HasColumnName("question_id");
+
+            entity.Property(t => t.Points)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            entity.Property(t => t.Text)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            entity.HasOne<Submission>()
+                .WithMany(e => e.Answer)
+                .HasForeignKey(e => e.SubmissionId)
+                .HasConstraintName("fk_answer_submission")
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

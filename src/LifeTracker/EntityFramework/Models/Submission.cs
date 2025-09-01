@@ -12,4 +12,6 @@ public class Submission
     public int TotalPoints { get; set; }
 
     public int TemplateId { get; set; }
+
+    public ICollection<Answer> Answer { get; set; } = new List<Answer>();
 }

@@ -10,7 +10,7 @@
 - [x] - CRUD Template model
 - [x] - Setup NUnit tests
 - [x] - CRUD TemplateQuestionLink + Question
-- [ ] - CRUD Submission
+- [x] - CRUD Submission
 - [ ] - CRUD Answer
 - [ ] - Locking templates
 - [ ] - duplicating templates

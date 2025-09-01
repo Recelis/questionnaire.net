@@ -16,6 +16,8 @@ public class LifeTrackerContext : DbContext
     public DbSet<TemplateQuestionLink> TemplateQuestionLink { get; set; }
     public DbSet<Question> Question { get; set; }
 
+    public DbSet<Submission> Submission { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -28,6 +30,8 @@ public class LifeTrackerContext : DbContext
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(250);
+
+            // Change this to be User Id in the future
             entity.Property(e => e.CreatedBy)
                 .IsRequired()
                 .HasMaxLength(250);
@@ -94,6 +98,29 @@ public class LifeTrackerContext : DbContext
                 .IsRequired()
                 .HasMaxLength(1000);
 
+        });
+
+        modelBuilder.Entity<Submission>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Date)
+                .IsRequired()
+                .HasMaxLength(250);
+
+            // Change this to be User Id in the future
+            entity.Property(e => e.CreatedBy)
+                .IsRequired()
+                .HasMaxLength(250);
+
+            entity.Property(e => e.TotalPoints)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            entity.Property(t => t.TemplateId)
+                  .HasColumnName("template_id");
         });
     }
 }

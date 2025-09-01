@@ -29,7 +29,7 @@ public class QuestionController : ControllerBase
     /// </summary>
     /// <returns>A list of Questions.</returns>
     /// <response code="200">Returns the list of Questions</response>
-    [HttpGet("templateId/{templateId:int}")]
+    [HttpGet("question/{templateId:int}")]
     [ProducesResponseType(typeof(IEnumerable<Question>), StatusCodes.Status200OK)]
     [Produces("application/json")]
     public async Task<ActionResult<IEnumerable<Question>>> Get(int templateId)

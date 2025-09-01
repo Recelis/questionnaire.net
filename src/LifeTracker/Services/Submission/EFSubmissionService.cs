@@ -16,15 +16,12 @@ public class EFSubmissionService : ISubmissionService
         _logger = logger;
     }
 
-    // public async Task<List<Submission>> GetByTemplateAsync(int templateId)
-    // {
-    //     return await _lifeTrackerContext.Template
-    //             .Where(t => t.Id == templateId)
-    //             .Include(t => t.TemplateSubmissionLinks)
-    //             .ThenInclude(tql => tql.Submission)
-    //             .SelectMany(t => t.TemplateSubmissionLinks.Select(tql => tql.Submission))
-    //             .ToListAsync();
-    // }
+    public async Task<List<Submission>> GetByUserAsync(string userId)
+    {
+        return await _lifeTrackerContext.Submission
+                .Where(t => t.CreatedBy == userId)
+                .ToListAsync();
+    }
 
     public async Task<Submission?> GetAsync(int submissionId)
     {

@@ -87,9 +87,28 @@ namespace LifeTracker.Tests.Services
 
             Submission submission = await CreateTestSubmission(template.Id);
 
-            Assert.That(createSubmissionDto, Is.Not.Null);
+            Assert.That(submission, Is.Not.Null);
 
             Assert.That(createSubmissionDto.TemplateId, Is.EqualTo(submission.TemplateId));
+        }
+
+        [Test]
+        public async Task GetByUserAsync_ShouldGetOnlyUserOwnedSubmissions()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
+
+            Template template = await CreateTestTemplate(questionnaire.Id);
+
+            string CreatedBy0 = "UnitTester";
+            string CreatedBy1 = "NonUnitTester";
+
+            await CreateTestSubmission(template.Id, CreatedBy0);
+            await CreateTestSubmission(template.Id, CreatedBy0);
+            await CreateTestSubmission(template.Id, CreatedBy1);
+
+            List<Submission> submissionsInDb = await _submissionService.GetByUserAsync(CreatedBy0);
+
+            Assert.That(submissionsInDb, Has.Exactly(2).Items);
         }
 
         [Test]

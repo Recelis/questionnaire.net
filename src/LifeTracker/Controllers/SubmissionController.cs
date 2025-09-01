@@ -31,18 +31,18 @@ public class SubmissionController : ControllerBase
     /// </summary>
     /// <returns>A list of Submissions.</returns>
     /// <response code="200">Returns the list of Submissions</response>
-    // [HttpGet("templateId/{templateId:int}")]
-    // [ProducesResponseType(typeof(IEnumerable<Submission>), StatusCodes.Status200OK)]
-    // [Produces("application/json")]
-    // public async Task<ActionResult<IEnumerable<Submission>>> Get(int templateId)
-    // {
-    //     _logger.LogInformation("Getting all submissions under a template");
-    //     // get all templateSubmissionLinks
-    //     // for each templateSubmissionLink get the Submission
-    //     IEnumerable<Submission> submissions = await _submissionService.GetByTemplateAsync(templateId);
+    [HttpGet("submission/{userId:string}")]
+    [ProducesResponseType(typeof(IEnumerable<Submission>), StatusCodes.Status200OK)]
+    [Produces("application/json")]
+    public async Task<ActionResult<IEnumerable<Submission>>> Get(string userId)
+    {
+        _logger.LogInformation("Getting all submissions under a template");
+        // get all templateSubmissionLinks
+        // for each templateSubmissionLink get the Submission
+        IEnumerable<Submission> submissions = await _submissionService.GetByUserAsync(userId);
 
-    //     return Ok(submissions);
-    // }
+        return Ok(submissions);
+    }
 
     /// <summary>
     /// Gets a submission.

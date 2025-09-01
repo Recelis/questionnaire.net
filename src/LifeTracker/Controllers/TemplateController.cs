@@ -25,7 +25,7 @@ public class TemplateController : ControllerBase
     /// <param name="templateId">The ID of the questionnaire</param>
     /// <returns>A TemplateDto.</returns>
     /// <response code="200">Returns a list of templates</response>
-    [HttpGet("questionnaireId/{questionnaireId:int}")]
+    [HttpGet("template/{questionnaireId:int}")]
     [ProducesResponseType(typeof(TemplateDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]

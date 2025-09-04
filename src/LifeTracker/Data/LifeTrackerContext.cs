@@ -147,7 +147,7 @@ public class LifeTrackerContext : DbContext
                 .HasMaxLength(1000);
 
             entity.HasOne<Submission>()
-                .WithMany(e => e.Answer)
+                .WithMany(e => e.Answers)
                 .HasForeignKey(e => e.SubmissionId)
                 .HasConstraintName("fk_answer_submission")
                 .OnDelete(DeleteBehavior.Cascade);

@@ -93,16 +93,6 @@ public class EFTemplateService : ITemplateService
         else
         {
             _lifeTrackerContext.Remove(template);
-            // remove template from Questionnaire
-            Questionnaire? questionnaire = await _lifeTrackerContext.Questionnaire.FindAsync(template.QuestionnaireId);
-            if (questionnaire == null)
-            {
-                _logger.LogError("Questionnaire of id {questionnaire} could not be deleted", template.QuestionnaireId);
-            }
-            else
-            {
-                questionnaire.Templates.Remove(template);
-            }
             await _lifeTrackerContext.SaveChangesAsync();
             return true;
         }

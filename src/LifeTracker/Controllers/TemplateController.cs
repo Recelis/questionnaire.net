@@ -91,7 +91,7 @@ public class TemplateController : ControllerBase
     [Produces("application/json")]
     public async Task<ActionResult<TemplateDto>> Post(CreateTemplateDto createTemplateDto)
     {
-        _logger.LogInformation("Creating new questionnaire: {Questionnaire}", JsonSerializer.Serialize(createTemplateDto));
+        _logger.LogInformation("Creating new template: {Template}", JsonSerializer.Serialize(createTemplateDto));
         Template? template = await _templateService.CreateAsync(createTemplateDto);
         if (template == null)
         {

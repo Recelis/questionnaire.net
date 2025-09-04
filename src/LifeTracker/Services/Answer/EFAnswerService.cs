@@ -59,7 +59,7 @@ public class EFAnswerService : IAnswerService
         _lifeTrackerContext.Answer.Add(newAnswer);
         await _lifeTrackerContext.SaveChangesAsync();
 
-        _logger.LogDebug("Created new Answer", newAnswer.ToString());
+        _logger.LogDebug("Created new Answer ${Answer}", newAnswer.ToString());
 
         return newAnswer;
     }

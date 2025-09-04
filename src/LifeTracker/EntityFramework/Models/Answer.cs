@@ -10,5 +10,5 @@ public class Answer
 
     public int Points { get; set; }
 
-    public int Text { get; set; }
+    public string Text { get; set; }
 }

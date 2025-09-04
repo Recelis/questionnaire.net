@@ -15,8 +15,8 @@ public class LifeTrackerContext : DbContext
 
     public DbSet<TemplateQuestionLink> TemplateQuestionLink { get; set; }
     public DbSet<Question> Question { get; set; }
-
     public DbSet<Submission> Submission { get; set; }
+    public DbSet<Answer> Answer { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -144,7 +144,7 @@ public class LifeTrackerContext : DbContext
 
             entity.Property(t => t.Text)
                 .IsRequired()
-                .HasDefaultValue(0);
+                .HasMaxLength(1000);
 
             entity.HasOne<Submission>()
                 .WithMany(e => e.Answer)

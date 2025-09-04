@@ -120,6 +120,9 @@ namespace LifeTracker.Tests.Services
             Assert.That(createAnswerDto.QuestionId, Is.EqualTo(answer.QuestionId));
             Assert.That(createAnswerDto.Text, Is.EqualTo(answer.Text));
             Assert.That(createAnswerDto.Points, Is.EqualTo(answer.Points));
+
+            Submission? submissionInDb = await _context.Submission.FindAsync(questionnaire.Id);
+            Assert.That(submissionInDb?.Answers, Has.Exactly(1).Items);
         }
 
         [Test]
@@ -148,9 +151,6 @@ namespace LifeTracker.Tests.Services
                 Text = "My New Answer",
                 Points = 2
             };
-
-            string CreatedBy0 = "UnitTester";
-            string CreatedBy1 = "NonUnitTester";
 
             Answer updatedAnswer = await _answerService!.UpdateAsync(answer.Id, updateAnswerDto);
 
@@ -181,25 +181,32 @@ namespace LifeTracker.Tests.Services
         //     Assert.That(answersInDb, Has.Exactly(2).Items);
         // }
 
-        // [Test]
-        // public async Task DeleteAsync_ShouldDeleteAnswerToDb()
-        // {
-        //     Questionnaire questionnaire = await CreateTestQuestionnaire();
+        [Test]
+        public async Task DeleteAsync_ShouldDeleteAnswerToDb()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
 
-        //     Template template = await CreateTestTemplate(questionnaire.Id);
+            Template template = await CreateTestTemplate(questionnaire.Id);
 
-        //     CreateAnswerDto createAnswerDto = new CreateAnswerDto
-        //     {
-        //         TemplateId = template.Id
-        //     };
+            Question question = await CreateTestQuestion(template.Id);
 
-        //     Answer answer = await CreateTestAnswer(template.Id);
+            Submission submission = await CreateTestSubmission(template.Id);
 
-        //     await _answerService.DeleteAsync(answer.Id);
+            CreateAnswerDto createAnswerDto = new CreateAnswerDto
+            {
+                QuestionId = question.Id,
+                SubmissionId = submission.Id,
+                Text = "My Answer",
+                Points = 1
+            };
 
-        //     Answer answerInDb = await _context.Answer.FindAsync(answer.Id);
+            Answer answer = await CreateTestAnswer(createAnswerDto);
 
-        //     Assert.That(answerInDb, Is.Null);
-        // }
+            await _answerService.DeleteAsync(answer.Id);
+
+            Assert.That(answer, Is.Not.Null);
+            Submission? submissionInDb = await _context.Submission.FindAsync(questionnaire.Id);
+            Assert.That(submissionInDb?.Answers, Has.Exactly(0).Items);
+        }
     }
 }

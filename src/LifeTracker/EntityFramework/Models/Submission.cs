@@ -13,5 +13,5 @@ public class Submission
 
     public int TemplateId { get; set; }
 
-    public ICollection<Answer> Answer { get; set; } = new List<Answer>();
+    public ICollection<Answer> Answers { get; set; } = new List<Answer>();
 }

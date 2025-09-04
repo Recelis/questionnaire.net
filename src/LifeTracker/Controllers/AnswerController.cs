@@ -117,12 +117,12 @@ public class AnswerController : ControllerBase
         return Ok(answer);
     }
 
-    // [HttpDelete("{answerId:int}")]
-    // public async Task<ActionResult> DeleteAsync(int answerId)
-    // {
-    //     _logger.LogInformation("Deleting answer: {Id}", answerId);
+    [HttpDelete("{answerId:int}")]
+    public async Task<ActionResult> DeleteAsync(int answerId)
+    {
+        _logger.LogInformation("Deleting answer: {Id}", answerId);
 
-    //     bool deleted = await _answerService.DeleteAsync(answerId);
-    //     return deleted ? NoContent() : NotFound();
-    // }
+        bool deleted = await _answerService.DeleteAsync(answerId);
+        return deleted ? NoContent() : NotFound();
+    }
 }

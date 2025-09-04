@@ -87,42 +87,28 @@ public class EFAnswerService : IAnswerService
         }
     }
 
-    // /// <summary>
-    // /// Deletes Answer in its entirety
-    // /// </summary>
-    // /// <param name="answerId"></param>
-    // /// <returns></returns>
-    // public async Task<bool> DeleteAsync(int answerId)
-    // {
-    //     Answer? answer = await _lifeTrackerContext.Answer.FindAsync(answerId);
-    //     if (answer == null)
-    //     {
-    //         _logger.LogWarning("Answer could not be found");
-    //         return false;
-    //     }
-    //     else
-    //     {
-    //         using var transaction = await _lifeTrackerContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+    /// <summary>
+    /// Deletes Answer in its entirety
+    /// </summary>
+    /// <param name="answerId"></param>
+    /// <returns></returns>
+    public async Task<bool> DeleteAsync(int answerId)
+    {
+        Answer? answer = await _lifeTrackerContext.Answer.FindAsync(answerId);
+        if (answer == null)
+        {
+            _logger.LogWarning("Answer could not be found");
+            return false;
+        }
+        else
+        {
+            _lifeTrackerContext.Remove(answer);
 
-    //         _lifeTrackerContext.Remove(answer);
+            await _lifeTrackerContext.SaveChangesAsync();
 
-    //         await _lifeTrackerContext.SaveChangesAsync();
-    //         // remove template from Answer
-    //         int numDeleted = await _lifeTrackerContext.TemplateAnswerLink
-    //             .Where(tql => tql.AnswerId == answer.Id)
-    //             .ExecuteDeleteAsync();
-    //         await transaction.CommitAsync();
+            _logger.LogInformation("Deleted {answer} Answer", answer.ToString());
 
-    //         if (numDeleted == 0)
-    //         {
-    //             _logger.LogError("No templateAnswerLinks with {id} could be found", answer.Id);
-    //         }
-    //         else
-    //         {
-    //             _logger.LogInformation("Deleted {numDeleted} templateAnswerLinks", numDeleted);
-    //         }
-
-    //         return true;
-    //     }
-    // }
+            return true;
+        }
+    }
 }

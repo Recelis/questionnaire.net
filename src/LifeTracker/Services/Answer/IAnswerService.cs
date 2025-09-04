@@ -9,5 +9,5 @@ public interface IAnswerService
     Task<Answer?> GetAsync(int answerId);
     Task<Answer> CreateAsync(CreateAnswerDto newAnswer);
     Task<Answer?> UpdateAsync(int id, UpdateAnswerDto newAnswer);
-    // Task<bool> DeleteAsync(int answerId);
+    Task<bool> DeleteAsync(int answerId);
 }

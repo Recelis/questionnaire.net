@@ -64,27 +64,28 @@ public class EFAnswerService : IAnswerService
         return newAnswer;
     }
 
-    // public async Task<Answer?> UpdateAsync(int id, UpdateAnswerDto updateAnswerDto)
-    // {
-    //     try
-    //     {
-    //         Answer? answer = await _lifeTrackerContext.Answer.FindAsync(id);
-    //         if (answer == null)
-    //         {
-    //             _logger.LogError("Could not find answer of id {answer}", id);
-    //             return null;
-    //         }
+    public async Task<Answer?> UpdateAsync(int id, UpdateAnswerDto updateAnswerDto)
+    {
+        try
+        {
+            Answer? answer = await _lifeTrackerContext.Answer.FindAsync(id);
+            if (answer == null)
+            {
+                _logger.LogError("Could not find answer of id {answer}", id);
+                return null;
+            }
 
-    //         answer.Text = updateAnswerDto.Text;
-    //         await _lifeTrackerContext.SaveChangesAsync();
-    //         return answer;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Answer Put exception");
-    //         return null;
-    //     }
-    // }
+            answer.Text = updateAnswerDto.Text;
+            answer.Points = updateAnswerDto.Points;
+            await _lifeTrackerContext.SaveChangesAsync();
+            return answer;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Answer Put exception");
+            return null;
+        }
+    }
 
     // /// <summary>
     // /// Deletes Answer in its entirety

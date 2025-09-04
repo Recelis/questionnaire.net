@@ -122,6 +122,46 @@ namespace LifeTracker.Tests.Services
             Assert.That(createAnswerDto.Points, Is.EqualTo(answer.Points));
         }
 
+        [Test]
+        public async Task UpdateAsync_ShouldUpdateAnswer()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
+
+            Template template = await CreateTestTemplate(questionnaire.Id);
+
+            Question question = await CreateTestQuestion(template.Id);
+
+            Submission submission = await CreateTestSubmission(template.Id);
+
+            CreateAnswerDto createAnswerDto = new CreateAnswerDto
+            {
+                QuestionId = question.Id,
+                SubmissionId = submission.Id,
+                Text = "My Answer",
+                Points = 1
+            };
+
+            Answer answer = await CreateTestAnswer(createAnswerDto);
+
+            UpdateAnswerDto updateAnswerDto = new UpdateAnswerDto
+            {
+                Text = "My New Answer",
+                Points = 2
+            };
+
+            string CreatedBy0 = "UnitTester";
+            string CreatedBy1 = "NonUnitTester";
+
+            Answer updatedAnswer = await _answerService!.UpdateAsync(answer.Id, updateAnswerDto);
+
+            Assert.That(answer, Is.Not.Null);
+
+            Assert.That(createAnswerDto.SubmissionId, Is.EqualTo(updatedAnswer.SubmissionId));
+            Assert.That(createAnswerDto.QuestionId, Is.EqualTo(updatedAnswer.QuestionId));
+            Assert.That(updateAnswerDto.Text, Is.EqualTo(updatedAnswer.Text));
+            Assert.That(updateAnswerDto.Points, Is.EqualTo(updatedAnswer.Points));
+        }
+
         // [Test]
         // public async Task GetByUserAsync_ShouldGetOnlySubmissionAnswers()
         // {

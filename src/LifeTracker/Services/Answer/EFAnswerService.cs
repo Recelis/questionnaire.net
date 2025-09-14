@@ -16,15 +16,12 @@ public class EFAnswerService : IAnswerService
         _logger = logger;
     }
 
-    // public async Task<List<Answer>> GetBySubmissionAsync(int templateId)
-    // {
-    //     return await _lifeTrackerContext.Template
-    //             .Where(t => t.Id == templateId)
-    //             .Include(t => t.TemplateAnswerLinks)
-    //             .ThenInclude(tql => tql.Answer)
-    //             .SelectMany(t => t.TemplateAnswerLinks.Select(tql => tql.Answer))
-    //             .ToListAsync();
-    // }
+    public async Task<List<Answer>> GetBySubmissionAsync(int submissionId)
+    {
+        return await _lifeTrackerContext.Answer
+                .Where(t => t.SubmissionId == submissionId)
+                .ToListAsync();
+    }
 
     public async Task<Answer?> GetAsync(int answerId)
     {

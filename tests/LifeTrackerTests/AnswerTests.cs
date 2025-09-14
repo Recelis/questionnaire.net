@@ -122,7 +122,7 @@ namespace LifeTracker.Tests.Services
             Assert.That(createAnswerDto.Points, Is.EqualTo(answer.Points));
 
             Submission? submissionInDb = await _context.Submission.FindAsync(questionnaire.Id);
-            Assert.That(submissionInDb?.Answers, Has.Exactly(1).Items);
+            Assert.That(submissionInDb?.Answers.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -163,23 +163,52 @@ namespace LifeTracker.Tests.Services
         }
 
         // [Test]
-        // public async Task GetByUserAsync_ShouldGetOnlySubmissionAnswers()
-        // {
-        //     Questionnaire questionnaire = await CreateTestQuestionnaire();
+        public async Task GetByUserAsync_ShouldGetOnlySubmissionAnswers()
+        {
+            Questionnaire questionnaire = await CreateTestQuestionnaire();
 
-        //     Template template = await CreateTestTemplate(questionnaire.Id);
+            Template template = await CreateTestTemplate(questionnaire.Id);
 
-        //     string CreatedBy0 = "UnitTester";
-        //     string CreatedBy1 = "NonUnitTester";
+            Question question0 = await CreateTestQuestion(template.Id, "Question 0");
 
-        //     await CreateTestAnswer(template.Id, CreatedBy0);
-        //     await CreateTestAnswer(template.Id, CreatedBy0);
-        //     await CreateTestAnswer(template.Id, CreatedBy1);
+            Question question1 = await CreateTestQuestion(template.Id, "Question 1");
 
-        //     List<Answer> answersInDb = await _answerService.GetByUserAsync(CreatedBy0);
+            Submission submission0 = await CreateTestSubmission(template.Id);
 
-        //     Assert.That(answersInDb, Has.Exactly(2).Items);
-        // }
+            Submission submission1 = await CreateTestSubmission(template.Id);
+
+            CreateAnswerDto createAnswerDto0 = new CreateAnswerDto
+            {
+                QuestionId = question0.Id,
+                SubmissionId = submission0.Id,
+                Text = "My Answer 0",
+                Points = 1
+            };
+
+            CreateAnswerDto createAnswerDto1 = new CreateAnswerDto
+            {
+                QuestionId = question1.Id,
+                SubmissionId = submission0.Id,
+                Text = "My Answer 1",
+                Points = 1
+            };
+
+            CreateAnswerDto createOtherSubmissionAnswerDto0 = new CreateAnswerDto
+            {
+                QuestionId = question0.Id,
+                SubmissionId = submission1.Id,
+                Text = "My Answer 1",
+                Points = 1
+            };
+
+            await CreateTestAnswer(createAnswerDto0);
+            await CreateTestAnswer(createAnswerDto1);
+            await CreateTestAnswer(createOtherSubmissionAnswerDto0);
+
+            List<Answer> answersInDb = await _answerService.GetBySubmissionAsync(submission0.Id);
+
+            Assert.That(answersInDb, Has.Exactly(1).Items);
+        }
 
         [Test]
         public async Task DeleteAsync_ShouldDeleteAnswerToDb()

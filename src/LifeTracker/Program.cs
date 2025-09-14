@@ -17,6 +17,9 @@ builder.Services.AddDbContext<LifeTrackerContext>(options =>
 
 builder.Services.AddScoped<IQuestionnaireService, EFQuestionnaireService>();
 builder.Services.AddScoped<ITemplateService, EFTemplateService>();
+builder.Services.AddScoped<IQuestionService, EFQuestionService>();
+builder.Services.AddScoped<ISubmissionService, EFSubmissionService>();
+builder.Services.AddScoped<IAnswerService, EFAnswerService>();
 
 var app = builder.Build();
 

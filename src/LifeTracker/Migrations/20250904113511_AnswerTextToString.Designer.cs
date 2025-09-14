@@ -3,6 +3,7 @@ using System;
 using LifeTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LifeTracker.Migrations
 {
     [DbContext(typeof(LifeTrackerContext))]
-    partial class LifeTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20250904113511_AnswerTextToString")]
+    partial class AnswerTextToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -222,7 +225,7 @@ namespace LifeTracker.Migrations
             modelBuilder.Entity("LifeTracker.Models.Answer", b =>
                 {
                     b.HasOne("LifeTracker.Models.Submission", null)
-                        .WithMany("Answers")
+                        .WithMany("Answer")
                         .HasForeignKey("SubmissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -267,7 +270,7 @@ namespace LifeTracker.Migrations
 
             modelBuilder.Entity("LifeTracker.Models.Submission", b =>
                 {
-                    b.Navigation("Answers");
+                    b.Navigation("Answer");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.Template", b =>

@@ -3,6 +3,7 @@ using System;
 using LifeTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LifeTracker.Migrations
 {
     [DbContext(typeof(LifeTrackerContext))]
-    partial class LifeTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20250901212208_AddPointsToQuestionModel")]
+    partial class AddPointsToQuestionModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,44 +24,6 @@ namespace LifeTracker.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("LifeTracker.Models.Answer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Points")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("points");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("question_id");
-
-                    b.Property<int>("SubmissionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("submission_id");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("text");
-
-                    b.HasKey("Id")
-                        .HasName("pk_answer");
-
-                    b.HasIndex("SubmissionId")
-                        .HasDatabaseName("ix_answer_submission_id");
-
-                    b.ToTable("answer", (string)null);
-                });
 
             modelBuilder.Entity("LifeTracker.Models.Question", b =>
                 {
@@ -219,16 +184,6 @@ namespace LifeTracker.Migrations
                     b.ToTable("template_question_link", (string)null);
                 });
 
-            modelBuilder.Entity("LifeTracker.Models.Answer", b =>
-                {
-                    b.HasOne("LifeTracker.Models.Submission", null)
-                        .WithMany("Answers")
-                        .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_answer_submission");
-                });
-
             modelBuilder.Entity("LifeTracker.Models.Template", b =>
                 {
                     b.HasOne("LifeTracker.Models.Questionnaire", "Questionnaire")
@@ -263,11 +218,6 @@ namespace LifeTracker.Migrations
             modelBuilder.Entity("LifeTracker.Models.Questionnaire", b =>
                 {
                     b.Navigation("Templates");
-                });
-
-            modelBuilder.Entity("LifeTracker.Models.Submission", b =>
-                {
-                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.Template", b =>

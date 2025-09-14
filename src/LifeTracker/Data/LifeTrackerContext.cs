@@ -15,8 +15,8 @@ public class LifeTrackerContext : DbContext
 
     public DbSet<TemplateQuestionLink> TemplateQuestionLink { get; set; }
     public DbSet<Question> Question { get; set; }
-
     public DbSet<Submission> Submission { get; set; }
+    public DbSet<Answer> Answer { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,7 +55,6 @@ public class LifeTrackerContext : DbContext
                 .HasForeignKey(t => t.QuestionnaireId)
                 .HasConstraintName("fk_template_questionnaire")
                 .OnDelete(DeleteBehavior.Cascade);
-
 
             entity.Property(t => t.QuestionnaireId)
                   .HasColumnName("questionnaire_id");
@@ -98,6 +97,10 @@ public class LifeTrackerContext : DbContext
                 .IsRequired()
                 .HasMaxLength(1000);
 
+            entity.Property(e => e.Points)
+                .IsRequired()
+                .HasDefaultValue(0);
+
         });
 
         modelBuilder.Entity<Submission>(entity =>
@@ -121,6 +124,33 @@ public class LifeTrackerContext : DbContext
 
             entity.Property(t => t.TemplateId)
                   .HasColumnName("template_id");
+        });
+
+        modelBuilder.Entity<Answer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(t => t.SubmissionId)
+                .HasColumnName("submission_id");
+
+            entity.Property(t => t.QuestionId)
+                .HasColumnName("question_id");
+
+            entity.Property(t => t.Points)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            entity.Property(t => t.Text)
+                .IsRequired()
+                .HasMaxLength(1000);
+
+            entity.HasOne<Submission>()
+                .WithMany(e => e.Answers)
+                .HasForeignKey(e => e.SubmissionId)
+                .HasConstraintName("fk_answer_submission")
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

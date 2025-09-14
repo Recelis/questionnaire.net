@@ -11,11 +11,11 @@
 - [x] - Setup NUnit tests
 - [x] - CRUD TemplateQuestionLink + Question
 - [x] - CRUD Submission
-- [ ] - CRUD Answer
-- [ ] - Locking templates
-- [ ] - duplicating templates
+- [x] - CRUD Answer
 - [ ] - Create User model + add to Questionnaire created_by field.
 - [ ] - Seed User
+- [ ] - Locking templates so cannot have answers until it is 'locked'. Cannot modify after locked.
+- [ ] - duplicating templates
 
 ### Future
 

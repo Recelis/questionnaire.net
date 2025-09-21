@@ -31,12 +31,12 @@ public class SubmissionController : ControllerBase
     /// </summary>
     /// <returns>A list of Submissions.</returns>
     /// <response code="200">Returns the list of Submissions</response>
-    [HttpGet("submission/{userId:string}")]
+    [HttpGet("submission/{userId:int}")]
     [ProducesResponseType(typeof(IEnumerable<Submission>), StatusCodes.Status200OK)]
     [Produces("application/json")]
-    public async Task<ActionResult<IEnumerable<Submission>>> Get(string userId)
+    public async Task<ActionResult<IEnumerable<Submission>>> Get(int userId)
     {
-        _logger.LogInformation("Getting all submissions under a template");
+        _logger.LogInformation("Getting all submissions under a user: {UserId}", userId);
         // get all templateSubmissionLinks
         // for each templateSubmissionLink get the Submission
         IEnumerable<Submission> submissions = await _submissionService.GetByUserAsync(userId);

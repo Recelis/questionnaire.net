@@ -11,4 +11,5 @@ public class User
     public required string PasswordHash { get; set; }
 
     public ICollection<Questionnaire> Questionnaires { get; set; } = new List<Questionnaire>();
+    public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }

@@ -16,10 +16,10 @@ public class EFSubmissionService : ISubmissionService
         _logger = logger;
     }
 
-    public async Task<List<Submission>> GetByUserAsync(string userId)
+    public async Task<List<Submission>> GetByUserAsync(int userId)
     {
         return await _lifeTrackerContext.Submission
-                .Where(t => t.CreatedBy == userId)
+                .Where(t => t.UserId == userId)
                 .ToListAsync();
     }
 
@@ -38,10 +38,18 @@ public class EFSubmissionService : ISubmissionService
             return null;
         }
 
+        User? user = await _lifeTrackerContext.User.FindAsync(createSubmissionDto.UserId);
+        if (user == null)
+        {
+            _logger.LogError("No User of id {userId}", createSubmissionDto.UserId);
+            return null;
+        }
+
         Submission newSubmission = new Submission
         {
             TemplateId = createSubmissionDto.TemplateId,
-            CreatedBy = createSubmissionDto.CreatedBy
+            UserId = createSubmissionDto.UserId,
+            User = user
         };
 
         _lifeTrackerContext.Submission.Add(newSubmission);

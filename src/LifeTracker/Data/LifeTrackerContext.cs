@@ -55,10 +55,6 @@ public class LifeTrackerContext : DbContext
                 .IsRequired()
                 .HasMaxLength(250);
 
-            // Change this to be User Id in the future
-            // entity.Property(e => e.CreatedBy)
-            //     .IsRequired()
-            //     .HasMaxLength(250);
             entity.HasOne(t => t.User)
                .WithMany(q => q.Questionnaires)
                .HasForeignKey(t => t.UserId)
@@ -145,10 +141,14 @@ public class LifeTrackerContext : DbContext
                 .IsRequired()
                 .HasMaxLength(250);
 
-            // Change this to be User Id in the future
-            entity.Property(e => e.CreatedBy)
-                .IsRequired()
-                .HasMaxLength(250);
+            entity.HasOne(t => t.User)
+               .WithMany(q => q.Submissions)
+               .HasForeignKey(t => t.UserId)
+               .HasConstraintName("fk_user_submission")
+               .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(t => t.UserId)
+                  .HasColumnName("user_id");
 
             entity.Property(e => e.TotalPoints)
                 .IsRequired()

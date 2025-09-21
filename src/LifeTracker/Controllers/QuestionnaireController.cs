@@ -26,13 +26,13 @@ public class QuestionnaireController : ControllerBase
     /// </summary>
     /// <returns>A list of QuestionnaireDtos.</returns>
     /// <response code="200">Returns the list of QuestionnaireDtos</response>
-    [HttpGet]
+    [HttpGet("user/{userId:int}")]
     [ProducesResponseType(typeof(IEnumerable<QuestionnaireDto>), StatusCodes.Status200OK)]
     [Produces("application/json")]
-    public async Task<ActionResult<IEnumerable<QuestionnaireDto>>> Get()
+    public async Task<ActionResult<IEnumerable<QuestionnaireDto>>> Get(int userId)
     {
         _logger.LogInformation("Getting all questionnaires");
-        IEnumerable<Questionnaire> questionnaires = await _questionnaireService.GetAllAsync();
+        IEnumerable<Questionnaire> questionnaires = await _questionnaireService.GetByUserId(userId);
 
         IEnumerable<QuestionnaireDto> questionnaireDtos = questionnaires.Select(q => new QuestionnaireDto
         {

@@ -31,10 +31,18 @@ public class EFQuestionnaireService : IQuestionnaireService
 
     public async Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
     {
+        User? user = await _lifeTrackerContext.User.FindAsync(createQuestionnaireDto.UserId);
+        if (user == null)
+        {
+            _logger.LogError("No User of id {user}", createQuestionnaireDto.UserId);
+            return null;
+        }
+
         Questionnaire newQuestionnaire = new Questionnaire
         {
             Name = createQuestionnaireDto.Name,
-            CreatedBy = createQuestionnaireDto.CreatedBy
+            UserId = createQuestionnaireDto.UserId,
+            User = user
         };
         _logger.LogDebug(newQuestionnaire.ToString());
         _lifeTrackerContext.Questionnaire.Add(newQuestionnaire);

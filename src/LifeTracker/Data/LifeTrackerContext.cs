@@ -10,6 +10,8 @@ public class LifeTrackerContext : DbContext
     {
     }
 
+    public DbSet<User> User => Set<User>();
+
     public DbSet<Questionnaire> Questionnaire => Set<Questionnaire>();
     public DbSet<Template> Template => Set<Template>();
 
@@ -22,6 +24,28 @@ public class LifeTrackerContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(250);
+
+            entity.Property(e => e.Email)
+            .IsRequired()
+            .HasMaxLength(250);
+
+            entity.HasIndex(e => e.Email)
+            .IsUnique();
+
+            entity.Property(e => e.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(500);
+        });
+
         modelBuilder.Entity<Questionnaire>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -32,9 +56,17 @@ public class LifeTrackerContext : DbContext
                 .HasMaxLength(250);
 
             // Change this to be User Id in the future
-            entity.Property(e => e.CreatedBy)
-                .IsRequired()
-                .HasMaxLength(250);
+            // entity.Property(e => e.CreatedBy)
+            //     .IsRequired()
+            //     .HasMaxLength(250);
+            entity.HasOne(t => t.User)
+               .WithMany(q => q.Questionnaires)
+               .HasForeignKey(t => t.UserId)
+               .HasConstraintName("fk_user_questionnaire")
+               .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(t => t.UserId)
+                  .HasColumnName("user_id");
         });
 
         modelBuilder.Entity<Template>(entity =>

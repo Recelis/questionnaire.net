@@ -10,5 +10,5 @@ public class Answer
 
     public int Points { get; set; }
 
-    public string Text { get; set; }
+    public required string Text { get; set; }
 }

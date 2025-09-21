@@ -5,6 +5,14 @@ namespace LifeTracker.Services;
 
 public class InMemoryQuestionnaireService : IQuestionnaireService
 {
+    User _user { get; } = new User
+    {
+        Id = 1,
+        Name = "Test User",
+        Email = "",
+        PasswordHash = "hashedpassword"
+    };
+
     List<Questionnaire> _questionnaires { get; } = new List<Questionnaire>();
     public InMemoryQuestionnaireService()
     {
@@ -25,7 +33,8 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
         {
             Id = maxId,
             Name = createQuestionnaireDto.Name,
-            CreatedBy = createQuestionnaireDto.CreatedBy,
+            UserId = createQuestionnaireDto.UserId,
+            User = _user
         };
         _questionnaires.Add(questionnaire);
         return Task.FromResult<Questionnaire>(questionnaire);
@@ -40,7 +49,8 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
             {
                 Id = id,
                 Name = updateQuestionnaireDto.Name,
-                CreatedBy = _questionnaires[index].CreatedBy
+                UserId = _questionnaires[index].UserId,
+                User = _user
             };
             return Task.FromResult<Questionnaire?>(_questionnaires[index]);
         }

@@ -38,7 +38,7 @@ public class QuestionnaireController : ControllerBase
         {
             Id = q.Id,
             Name = q.Name,
-            CreatedBy = q.CreatedBy,
+            UserId = q.UserId,
             Templates = q.Templates.Select(t => new TemplateDto
             {
                 Version = t.Version,
@@ -77,7 +77,7 @@ public class QuestionnaireController : ControllerBase
         {
             Id = questionnaire.Id,
             Name = questionnaire.Name,
-            CreatedBy = questionnaire.CreatedBy,
+            UserId = questionnaire.UserId,
             Templates = questionnaire.Templates.Select(t => new TemplateDto
             {
                 Version = t.Version,
@@ -111,7 +111,7 @@ public class QuestionnaireController : ControllerBase
         {
             Id = questionnaire.Id,
             Name = questionnaire.Name,
-            CreatedBy = questionnaire.CreatedBy,
+            UserId = questionnaire.UserId,
             Templates = questionnaire.Templates.Select(t => new TemplateDto
             {
                 Version = t.Version,
@@ -148,7 +148,7 @@ public class QuestionnaireController : ControllerBase
         {
             Id = questionnaire.Id,
             Name = questionnaire.Name,
-            CreatedBy = questionnaire.CreatedBy,
+            UserId = questionnaire.UserId,
             Templates = questionnaire.Templates.Select(t => new TemplateDto
             {
                 Version = t.Version,

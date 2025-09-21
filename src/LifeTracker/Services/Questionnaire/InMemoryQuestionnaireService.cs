@@ -18,9 +18,9 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
     {
     }
 
-    public Task<List<Questionnaire>> GetAllAsync()
+    public Task<List<Questionnaire>> GetByUserId(int userId)
     {
-        return Task.FromResult(_questionnaires.ToList());
+        return Task.FromResult(_questionnaires.ToList().FindAll(q => q.UserId == userId));
     }
 
     public Task<Questionnaire?> GetAsync(int questionnaireId) => Task.FromResult(_questionnaires.FirstOrDefault(x => x.Id == questionnaireId));

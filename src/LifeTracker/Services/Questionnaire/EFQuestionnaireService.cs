@@ -17,9 +17,11 @@ public class EFQuestionnaireService : IQuestionnaireService
         _logger = logger;
     }
 
-    public async Task<List<Questionnaire>> GetAllAsync()
+    public async Task<List<Questionnaire>> GetByUserId(int userId)
     {
-        return await _lifeTrackerContext.Questionnaire.ToListAsync();
+        return await _lifeTrackerContext.Questionnaire
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
     }
 
     public async Task<Questionnaire?> GetAsync(int questionnaireId)

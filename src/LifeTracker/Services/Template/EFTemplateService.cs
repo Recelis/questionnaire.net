@@ -16,7 +16,7 @@ public class EFTemplateService : ITemplateService
         _logger = logger;
     }
 
-    public async Task<List<Template>> GetByQuestionnaireId(int questionnaireId)
+    public async Task<List<Template>> GetByQuestionnaireIdAsync(int questionnaireId)
     {
         return await _lifeTrackerContext.Template.Where(template => template.QuestionnaireId == questionnaireId).ToListAsync();
     }

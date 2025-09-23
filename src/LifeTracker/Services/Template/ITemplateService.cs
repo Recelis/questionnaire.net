@@ -5,7 +5,7 @@ namespace LifeTracker.Services;
 
 public interface ITemplateService
 {
-    Task<List<Template>> GetByQuestionnaireId(int questionnaireId);
+    Task<List<Template>> GetByQuestionnaireIdAsync(int questionnaireId);
     Task<Template?> GetAsync(int templateId);
     Task<Template?> CreateAsync(CreateTemplateDto newTemplate);
 

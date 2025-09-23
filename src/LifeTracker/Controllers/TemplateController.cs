@@ -32,7 +32,7 @@ public class TemplateController : ControllerBase
     public async Task<ActionResult<IEnumerable<TemplateDto>>> GetByQuestionnaireId(int questionnaireId)
     {
         _logger.LogInformation("Getting templates by questionnaire: {Id}", questionnaireId);
-        List<Template> templates = await _templateService.GetByQuestionnaireId(questionnaireId);
+        List<Template> templates = await _templateService.GetByQuestionnaireIdAsync(questionnaireId);
 
         IEnumerable<TemplateDto> templateDtos = templates.Select(template => new TemplateDto
         {

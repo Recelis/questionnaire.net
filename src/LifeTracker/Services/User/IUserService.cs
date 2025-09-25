@@ -5,7 +5,7 @@ namespace LifeTracker.Services;
 
 public interface IUserService
 {
-    Task<User> Create(CreateUserDto createUserDto);
-    Task<string> Login(LoginUserDto loginUserDto);
-    Task<User?> GetByIdAsync(int userId);
+    Task<User> CreateAsync(CreateUserDto createUserDto);
+    Task<string> LoginAsync(LoginUserDto loginUserDto);
+    Task<User?> GetAsync(int userId);
 }

@@ -2,9 +2,9 @@ namespace LifeTracker.Dto;
 
 public class CreateUserDto
 {
-    public required int EmailAddress { get; set; }
+    public required string Email { get; set; }
 
-    public int Name { get; set; }
+    public string Name { get; set; }
 
-    public required string PasswordHash { get; set; }
+    public required string Password { get; set; }
 }

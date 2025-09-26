@@ -34,7 +34,6 @@ public class EFUserService : IUserService
             Email = createUserDto.Email,
             Name = createUserDto.Name,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password)
-
         };
 
         _logger.LogDebug(newUser.ToString());

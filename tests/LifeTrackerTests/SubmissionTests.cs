@@ -37,9 +37,9 @@ namespace LifeTracker.Tests.Services
             return await _templateService!.CreateAsync(dto);
         }
 
-        private async Task<Submission> CreateTestSubmission(int templateId, string createdBy = "UnitTester")
+        private async Task<Submission> CreateTestSubmission(int templateId, int userId = 0)
         {
-            var dto = new CreateSubmissionDto { TemplateId = templateId, CreatedBy = createdBy };
+            var dto = new CreateSubmissionDto { TemplateId = templateId, UserId = userId };
             return await _submissionService!.CreateAsync(dto);
         }
 
@@ -99,14 +99,14 @@ namespace LifeTracker.Tests.Services
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 
-            string CreatedBy0 = "UnitTester";
-            string CreatedBy1 = "NonUnitTester";
+            int userId0 = 0;
+            int userId1 = 1;
 
-            await CreateTestSubmission(template.Id, CreatedBy0);
-            await CreateTestSubmission(template.Id, CreatedBy0);
-            await CreateTestSubmission(template.Id, CreatedBy1);
+            await CreateTestSubmission(template.Id, userId0);
+            await CreateTestSubmission(template.Id, userId0);
+            await CreateTestSubmission(template.Id, userId1);
 
-            List<Submission> submissionsInDb = await _submissionService.GetByUserAsync(CreatedBy0);
+            List<Submission> submissionsInDb = await _submissionService.GetByUserAsync(userId0);
 
             Assert.That(submissionsInDb, Has.Exactly(2).Items);
         }

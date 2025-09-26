@@ -48,9 +48,9 @@ namespace LifeTracker.Tests.Services
             return await _questionService!.CreateAsync(dto);
         }
 
-        private async Task<Submission> CreateTestSubmission(int templateId, string createdBy = "UnitTester")
+        private async Task<Submission> CreateTestSubmission(int templateId, int userId = 0)
         {
-            var dto = new CreateSubmissionDto { TemplateId = templateId, CreatedBy = createdBy };
+            var dto = new CreateSubmissionDto { TemplateId = templateId, UserId = userId };
             return await _submissionService!.CreateAsync(dto);
         }
 

@@ -43,7 +43,7 @@ builder.Services.AddDbContext<LifeTrackerContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     .UseSnakeCaseNamingConvention());
 
-// builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, EFUserService>();
 builder.Services.AddScoped<IQuestionnaireService, EFQuestionnaireService>();
 builder.Services.AddScoped<ITemplateService, EFTemplateService>();
 builder.Services.AddScoped<IQuestionService, EFQuestionService>();

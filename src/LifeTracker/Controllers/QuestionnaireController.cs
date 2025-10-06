@@ -3,6 +3,7 @@ using LifeTracker.Models;
 using LifeTracker.Services;
 using System.Text.Json;
 using LifeTracker.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Controllers;
 
@@ -26,6 +27,7 @@ public class QuestionnaireController : ControllerBase
     /// </summary>
     /// <returns>A list of QuestionnaireDtos.</returns>
     /// <response code="200">Returns the list of QuestionnaireDtos</response>
+    [Authorize]
     [HttpGet("user/{userId:int}")]
     [ProducesResponseType(typeof(IEnumerable<QuestionnaireDto>), StatusCodes.Status200OK)]
     [Produces("application/json")]
@@ -60,6 +62,7 @@ public class QuestionnaireController : ControllerBase
     /// <returns>A QuestionnaireDto.</returns>
     /// <response code="200">Returns the QuestionnaireDto</response>
     /// <response code="404">No questionnaire found</response>
+    [Authorize]
     [HttpGet("{questionnaireId:int}")]
     [ProducesResponseType(typeof(QuestionnaireDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -93,6 +96,7 @@ public class QuestionnaireController : ControllerBase
     /// </summary>
     /// <param name="createQuestionnaireDto"></param>
     /// <response code="201">Returns the created questionnaire</response>
+    [Authorize]
     [HttpPost()]
     [ProducesResponseType(typeof(QuestionnaireDto), StatusCodes.Status201Created)]
     [Consumes("application/json")]
@@ -129,6 +133,7 @@ public class QuestionnaireController : ControllerBase
     /// <param name="newQuestionnaire"></param>
     /// <response code="200">Returns the created QuestionnaireDto</response>
     /// <response code="404">If the questionnaire doesn't exists</response>
+    [Authorize]
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(QuestionnaireDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -159,6 +164,7 @@ public class QuestionnaireController : ControllerBase
         return Ok(questionnaireDto);
     }
 
+    [Authorize]
     [HttpDelete("{questionnaireId:int}")]
     public async Task<IActionResult> Delete(int questionnaireId)
     {

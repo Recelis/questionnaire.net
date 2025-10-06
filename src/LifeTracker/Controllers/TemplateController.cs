@@ -3,6 +3,7 @@ using LifeTracker.Models;
 using LifeTracker.Services;
 using LifeTracker.Dto;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Controllers;
 
@@ -25,6 +26,7 @@ public class TemplateController : ControllerBase
     /// <param name="templateId">The ID of the questionnaire</param>
     /// <returns>A TemplateDto.</returns>
     /// <response code="200">Returns a list of templates</response>
+    [Authorize]
     [HttpGet("template/{questionnaireId:int}")]
     [ProducesResponseType(typeof(TemplateDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,6 +56,7 @@ public class TemplateController : ControllerBase
     /// <returns>A template.</returns>
     /// <response code="200">Returns the TemplateDto</response>
     /// <response code="404">No template found</response>
+    [Authorize]
     [HttpGet("{templateId:int}")]
     [ProducesResponseType(typeof(TemplateDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -85,6 +88,7 @@ public class TemplateController : ControllerBase
     /// </remarks>
     /// <param name="createTemplateDto"></param>
     /// <response code="201">Returns the created questionnaire</response>
+    [Authorize]
     [HttpPost()]
     [ProducesResponseType(typeof(TemplateDto), StatusCodes.Status201Created)]
     [Consumes("application/json")]
@@ -113,6 +117,7 @@ public class TemplateController : ControllerBase
     /// <param name="newTemplate"></param>
     /// <response code="200">Returns the created template</response>
     /// <response code="404">If the template doesn't exists</response>
+    [Authorize]
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(Template), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -3,6 +3,7 @@ using LifeTracker.Models;
 using LifeTracker.Services;
 using System.Text.Json;
 using LifeTracker.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Controllers;
 
@@ -31,6 +32,7 @@ public class SubmissionController : ControllerBase
     /// </summary>
     /// <returns>A list of Submissions.</returns>
     /// <response code="200">Returns the list of Submissions</response>
+    [Authorize]
     [HttpGet("submission/{userId:int}")]
     [ProducesResponseType(typeof(IEnumerable<Submission>), StatusCodes.Status200OK)]
     [Produces("application/json")]
@@ -54,6 +56,7 @@ public class SubmissionController : ControllerBase
     /// <returns>A Submission.</returns>
     /// <response code="200">Returns the Submission</response>
     /// <response code="404">No submission found</response>
+    [Authorize]
     [HttpGet("{submissionId:int}")]
     [ProducesResponseType(typeof(Submission), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -76,6 +79,7 @@ public class SubmissionController : ControllerBase
     /// </summary>
     /// <param name="createSubmissionDto"></param>
     /// <response code="201">Returns the created submission</response>
+    [Authorize]
     [HttpPost()]
     [ProducesResponseType(typeof(Submission), StatusCodes.Status201Created)]
     [Consumes("application/json")]
@@ -96,6 +100,7 @@ public class SubmissionController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { submissionId = submission.Id }, submission);
     }
 
+    [Authorize]
     [HttpDelete("{submissionId:int}")]
     public async Task<IActionResult> Delete(int submissionId)
     {

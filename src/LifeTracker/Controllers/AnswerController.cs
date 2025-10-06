@@ -3,6 +3,7 @@ using LifeTracker.Models;
 using LifeTracker.Services;
 using LifeTracker.Dto;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Controllers;
 
@@ -20,29 +21,23 @@ public class AnswerController : ControllerBase
     }
 
     /// <summary>
-    /// Gets a answers by questionnaireId.
+    /// Gets the answers by submissionId.
     /// </summary>
-    /// <param name="answerId">The ID of the questionnaire</param>
-    /// <returns>An AnswerDto.</returns>
+    /// <param name="answerId">The ID of the submission</param>
+    /// <returns>A list of answers.</returns>
     /// <response code="200">Returns a list of answers</response>
-    // [HttpGet("answer/{questionnaireId:int}")]
-    // [ProducesResponseType(typeof(AnswerDto), StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // [Produces("application/json")]
-    // public async Task<ActionResult<IEnumerable<AnswerDto>>> GetByQuestionnaireId(int questionnaireId)
-    // {
-    //     _logger.LogInformation("Getting answers by questionnaire: {Id}", questionnaireId);
-    //     List<Answer> answers = await _answerService.GetByQuestionnaireId(questionnaireId);
+    [Authorize]
+    [HttpGet("answer/{submissionId:int}")]
+    [ProducesResponseType(typeof(List<Answer>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Produces("application/json")]
+    public async Task<ActionResult<IEnumerable<Answer>>> GetBySubmission(int submissionId)
+    {
+        _logger.LogInformation("Getting answers by submission: {Id}", submissionId);
+        List<Answer> answers = await _answerService.GetBySubmissionAsync(submissionId);
 
-    //     IEnumerable<AnswerDto> answerDtos = answers.Select(answer => new AnswerDto
-    //     {
-    //         Id = answer.Id,
-    //         Version = answer.Version,
-    //         Name = answer.Name,
-    //         QuestionnaireId = answer.QuestionnaireId,
-    //     });
-    //     return Ok(answerDtos);
-    // }
+        return Ok(answers);
+    }
 
     /// <summary>
     /// Gets a answer.
@@ -54,6 +49,7 @@ public class AnswerController : ControllerBase
     /// <returns>A answer.</returns>
     /// <response code="200">Returns the Answer</response>
     /// <response code="404">No answer found</response>
+    [Authorize]
     [HttpGet("{answerId:int}")]
     [ProducesResponseType(typeof(Answer), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -78,6 +74,7 @@ public class AnswerController : ControllerBase
     /// </remarks>
     /// <param name="createAnswerDto"></param>
     /// <response code="201">Returns the created questionnaire</response>
+    [Authorize]
     [HttpPost()]
     [ProducesResponseType(typeof(Answer), StatusCodes.Status201Created)]
     [Consumes("application/json")]
@@ -100,6 +97,7 @@ public class AnswerController : ControllerBase
     /// <param name="newAnswer"></param>
     /// <response code="200">Returns the updated answer</response>
     /// <response code="404">If the answer doesn't exists</response>
+    [Authorize]
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(Answer), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -117,6 +115,7 @@ public class AnswerController : ControllerBase
         return Ok(answer);
     }
 
+    [Authorize]
     [HttpDelete("{answerId:int}")]
     public async Task<ActionResult> DeleteAsync(int answerId)
     {

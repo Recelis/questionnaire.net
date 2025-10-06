@@ -3,6 +3,7 @@ using LifeTracker.Models;
 using LifeTracker.Services;
 using System.Text.Json;
 using LifeTracker.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Controllers;
 
@@ -27,6 +28,7 @@ public class UserController : ControllerBase
     /// <returns>A User.</returns>
     /// <response code="200">Returns the User</response>
     /// <response code="404">if no user found</response>
+    [Authorize]
     [HttpGet("{userId:int}")]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [Produces("application/json")]
@@ -48,6 +50,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="createUserDto"></param>
     /// <response code="201">Returns the created user</response>
+    [AllowAnonymous]
     [HttpPost()]
     [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
     [Consumes("application/json")]
@@ -71,6 +74,7 @@ public class UserController : ControllerBase
     /// <param name="loginUserDto"></param>
     /// <response code="200">Returns a token</response>
     /// <response code="404">If the user doesn't exists</response>
+    [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

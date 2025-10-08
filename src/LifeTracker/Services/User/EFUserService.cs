@@ -22,6 +22,14 @@ public class EFUserService(LifeTrackerContext context, ILogger<EFUserService> lo
 
     public async Task<User> CreateAsync(CreateUserDto createUserDto)
     {
+        // Check if email already exists
+        bool emailExists = await _lifeTrackerContext.User
+            .AnyAsync(u => u.Email == createUserDto.Email);
+
+        if (emailExists)
+        {
+            throw new InvalidOperationException($"User with email {createUserDto.Email} already exists.");
+        }
         User newUser = new User
         {
             Email = createUserDto.Email,
@@ -30,9 +38,8 @@ public class EFUserService(LifeTrackerContext context, ILogger<EFUserService> lo
         };
 
         _logger.LogDebug(newUser.ToString());
-        _lifeTrackerContext.User.Add(newUser);
-
         await _lifeTrackerContext.SaveChangesAsync();
+
         return newUser;
 
     }

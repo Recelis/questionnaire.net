@@ -58,14 +58,16 @@ public class UserController : ControllerBase
     public async Task<ActionResult<User>> Post(CreateUserDto createUserDto)
     {
         _logger.LogInformation("Creating new user: {User}", JsonSerializer.Serialize(createUserDto));
-        User? user = await _userService.CreateAsync(createUserDto);
-
-        if (user == null)
+        try
         {
-            return NotFound();
+            var user = await _userService.CreateAsync(createUserDto);
+            return CreatedAtAction(nameof(Get), new { userId = user.Id }, user);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message }); // 409 Conflict
         }
 
-        return CreatedAtAction(nameof(Get), new { userId = user.Id }, user);
     }
 
     /// <summary>

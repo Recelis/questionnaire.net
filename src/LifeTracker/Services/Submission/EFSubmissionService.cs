@@ -9,9 +9,11 @@ public class EFSubmissionService : ISubmissionService
 {
     private readonly LifeTrackerContext _lifeTrackerContext;
     private readonly ILogger<EFSubmissionService> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public EFSubmissionService(LifeTrackerContext context, ILogger<EFSubmissionService> logger)
+    public EFSubmissionService(LifeTrackerContext context, ILogger<EFSubmissionService> logger, IHttpContextAccessor httpContextAccessor)
     {
+        _httpContextAccessor = httpContextAccessor;
         _lifeTrackerContext = context;
         _logger = logger;
     }
@@ -30,6 +32,12 @@ public class EFSubmissionService : ISubmissionService
 
     public async Task<Submission?> CreateAsync(CreateSubmissionDto createSubmissionDto)
     {
+        var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("id")?.Value;
+        int? userId = int.TryParse(userIdClaim, out var id) ? id : null;
+        if (userId is null)
+        {
+            return null;
+        }
         // find the Template first
         Template? template = await _lifeTrackerContext.Template.FindAsync(createSubmissionDto.TemplateId);
         if (template == null)
@@ -38,22 +46,21 @@ public class EFSubmissionService : ISubmissionService
             return null;
         }
 
-        User? user = await _lifeTrackerContext.User.FindAsync(createSubmissionDto.UserId);
+        User? user = await _lifeTrackerContext.User.FindAsync(userId);
         if (user == null)
         {
-            _logger.LogError("No User of id {userId}", createSubmissionDto.UserId);
+            _logger.LogError("No User of id {userId}", userId);
             return null;
         }
 
         Submission newSubmission = new Submission
         {
             TemplateId = createSubmissionDto.TemplateId,
-            UserId = createSubmissionDto.UserId,
+            UserId = user.Id,
             User = user
         };
 
         _lifeTrackerContext.Submission.Add(newSubmission);
-        await _lifeTrackerContext.SaveChangesAsync();
 
 
         _logger.LogDebug("Created new Submission", newSubmission.ToString());

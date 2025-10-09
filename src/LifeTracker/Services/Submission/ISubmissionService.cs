@@ -7,7 +7,7 @@ public interface ISubmissionService
 {
     Task<List<Submission>> GetByUserAsync(int userId);
     Task<Submission?> GetAsync(int submissionId);
-    Task<Submission> CreateAsync(CreateSubmissionDto newSubmission);
+    Task<Submission?> CreateAsync(CreateSubmissionDto newSubmission);
 
     // Task<Submission> UpdateTotalPointsAsync(int submissionId); TODO when answers model implemented
     Task<bool> DeleteAsync(int submissionId);

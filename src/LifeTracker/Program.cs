@@ -49,6 +49,7 @@ builder.Services.AddScoped<ITemplateService, EFTemplateService>();
 builder.Services.AddScoped<IQuestionService, EFQuestionService>();
 builder.Services.AddScoped<ISubmissionService, EFSubmissionService>();
 builder.Services.AddScoped<IAnswerService, EFAnswerService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

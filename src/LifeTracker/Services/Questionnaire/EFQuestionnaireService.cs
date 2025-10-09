@@ -10,9 +10,10 @@ public class EFQuestionnaireService : IQuestionnaireService
 {
     private readonly LifeTrackerContext _lifeTrackerContext;
     private readonly ILogger<EFQuestionnaireService> _logger;
-
-    public EFQuestionnaireService(LifeTrackerContext context, ILogger<EFQuestionnaireService> logger)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public EFQuestionnaireService(LifeTrackerContext context, ILogger<EFQuestionnaireService> logger, IHttpContextAccessor httpContextAccessor)
     {
+        _httpContextAccessor = httpContextAccessor;
         _lifeTrackerContext = context;
         _logger = logger;
     }
@@ -31,19 +32,25 @@ public class EFQuestionnaireService : IQuestionnaireService
             .FirstOrDefaultAsync(q => q.Id == questionnaireId);
     }
 
-    public async Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
+    public async Task<Questionnaire?> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
     {
-        User? user = await _lifeTrackerContext.User.FindAsync(createQuestionnaireDto.UserId);
+        var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("id")?.Value;
+        int? userId = int.TryParse(userIdClaim, out var id) ? id : null;
+        if (userId is null)
+        {
+            return null;
+        }
+        User? user = await _lifeTrackerContext.User.FindAsync(userId);
         if (user == null)
         {
-            _logger.LogError("No User of id {user}", createQuestionnaireDto.UserId);
+            _logger.LogError("No User of id {user}", userId);
             return null;
         }
 
         Questionnaire newQuestionnaire = new Questionnaire
         {
             Name = createQuestionnaireDto.Name,
-            UserId = createQuestionnaireDto.UserId,
+            UserId = user.Id,
             User = user
         };
         _logger.LogDebug(newQuestionnaire.ToString());

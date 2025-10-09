@@ -25,7 +25,7 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
 
     public Task<Questionnaire?> GetAsync(int questionnaireId) => Task.FromResult(_questionnaires.FirstOrDefault(x => x.Id == questionnaireId));
 
-    public Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
+    public Task<Questionnaire?> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
     {
         List<Questionnaire> questionnaires = _questionnaires.ToList();
         int maxId = questionnaires.Any() ? questionnaires.Max(q => q.Id) : 0;
@@ -33,11 +33,11 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
         {
             Id = maxId,
             Name = createQuestionnaireDto.Name,
-            UserId = createQuestionnaireDto.UserId,
+            UserId = 1,
             User = _user
         };
         _questionnaires.Add(questionnaire);
-        return Task.FromResult<Questionnaire>(questionnaire);
+        return Task.FromResult<Questionnaire?>(questionnaire);
     }
 
     public Task<Questionnaire?> UpdateAsync(int id, UpdateQuestionnaireDto updateQuestionnaireDto)

@@ -16,6 +16,8 @@ namespace LifeTracker.Tests.Services
     public class AnswerTests
     {
         private SqliteConnection? _connection;
+
+        private IUserService? _userService;
         private IQuestionnaireService? _questionnaireService;
         private ITemplateService? _templateService;
         private ISubmissionService? _submissionService;
@@ -23,6 +25,7 @@ namespace LifeTracker.Tests.Services
         private IAnswerService? _answerService;
 
         private LifeTrackerContext? _context;
+        private ILogger<EFUserService>? _userLogger;
         private ILogger<EFQuestionnaireService>? _questionnaireLogger;
         private ILogger<EFTemplateService>? _templateLogger;
         private ILogger<EFSubmissionService>? _submissionLogger;
@@ -30,9 +33,16 @@ namespace LifeTracker.Tests.Services
         private ILogger<EFAnswerService>? _answerLogger;
 
         // Helper functions
-        private async Task<Questionnaire> CreateTestQuestionnaire(string name = "Test Questionnaire", string createdBy = "UnitTester")
+
+        private async Task<User> CreateTestUser(string name = "Test User", string email = "testemail@email.com", string password = "TestPassword123!")
         {
-            var dto = new CreateQuestionnaireDto { Name = name, CreatedBy = createdBy };
+            var dto = new CreateUserDto { Name = name, Email = email, Password = password };
+            return await _userService.CreateAsync(dto);
+        }
+
+        private async Task<Questionnaire> CreateTestQuestionnaire(int userId = 0, string name = "Test Questionnaire")
+        {
+            var dto = new CreateQuestionnaireDto { Name = name, UserId = userId };
             return await _questionnaireService.CreateAsync(dto);
         }
 
@@ -48,9 +58,9 @@ namespace LifeTracker.Tests.Services
             return await _questionService!.CreateAsync(dto);
         }
 
-        private async Task<Submission> CreateTestSubmission(int templateId, string createdBy = "UnitTester")
+        private async Task<Submission> CreateTestSubmission(int templateId, int userId = 1)
         {
-            var dto = new CreateSubmissionDto { TemplateId = templateId, CreatedBy = createdBy };
+            var dto = new CreateSubmissionDto { TemplateId = templateId, UserId = userId };
             return await _submissionService!.CreateAsync(dto);
         }
 
@@ -73,12 +83,14 @@ namespace LifeTracker.Tests.Services
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
+            _userLogger = new Mock<ILogger<EFUserService>>().Object;
             _questionnaireLogger = new Mock<ILogger<EFQuestionnaireService>>().Object;
             _templateLogger = new Mock<ILogger<EFTemplateService>>().Object;
             _questionLogger = new Mock<ILogger<EFQuestionService>>().Object;
             _submissionLogger = new Mock<ILogger<EFSubmissionService>>().Object;
             _answerLogger = new Mock<ILogger<EFAnswerService>>().Object;
 
+            _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
             _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger);
             _templateService = new EFTemplateService(_context, _templateLogger);
             _questionService = new EFQuestionService(_context, _questionLogger);
@@ -96,7 +108,9 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task CreateAsync_ShouldAddAnswerToDb()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 
@@ -128,13 +142,25 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task UpdateAsync_ShouldUpdateAnswer()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            TestContext.WriteLine("Starting UpdateAsync_ShouldUpdateAnswer test");
+            User user = await CreateTestUser();
+
+            TestContext.WriteLine($"User ID: {user.Id}");
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
+
+            TestContext.WriteLine($"Questionnaire ID: {questionnaire.Id}");
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 
+            TestContext.WriteLine($"Template ID: {template.Id}");
+
             Question question = await CreateTestQuestion(template.Id);
 
-            Submission submission = await CreateTestSubmission(template.Id);
+            TestContext.WriteLine($"Question ID: {question.Id}");
+
+            Submission submission = await CreateTestSubmission(template.Id, user.Id);
+
+            TestContext.WriteLine($"Submission ID: {submission.Id}");
 
             CreateAnswerDto createAnswerDto = new CreateAnswerDto
             {
@@ -165,7 +191,9 @@ namespace LifeTracker.Tests.Services
         // [Test]
         public async Task GetByUserAsync_ShouldGetOnlySubmissionAnswers()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 
@@ -213,7 +241,9 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task DeleteAsync_ShouldDeleteAnswerToDb()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 

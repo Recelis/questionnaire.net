@@ -16,18 +16,25 @@ namespace LifeTracker.Tests.Services
     public class SubmissionTests
     {
         private SqliteConnection? _connection;
+        private IUserService? _userService;
         private IQuestionnaireService? _questionnaireService;
         private ITemplateService? _templateService;
         private ISubmissionService? _submissionService;
         private LifeTrackerContext? _context;
+        private ILogger<EFUserService>? _userLogger;
         private ILogger<EFQuestionnaireService>? _questionnaireLogger;
         private ILogger<EFTemplateService>? _templateLogger;
         private ILogger<EFSubmissionService>? _submissionLogger;
 
         // Helper functions
-        private async Task<Questionnaire> CreateTestQuestionnaire(string name = "Test Questionnaire", string createdBy = "UnitTester")
+        private async Task<User> CreateTestUser(string name = "Test User", string email = "testemail@email.com", string password = "TestPassword123!")
         {
-            var dto = new CreateQuestionnaireDto { Name = name, CreatedBy = createdBy };
+            var dto = new CreateUserDto { Name = name, Email = email, Password = password };
+            return await _userService.CreateAsync(dto);
+        }
+        private async Task<Questionnaire> CreateTestQuestionnaire(int userId = 0, string name = "Test Questionnaire")
+        {
+            var dto = new CreateQuestionnaireDto { Name = name, UserId = userId };
             return await _questionnaireService.CreateAsync(dto);
         }
 
@@ -37,9 +44,9 @@ namespace LifeTracker.Tests.Services
             return await _templateService!.CreateAsync(dto);
         }
 
-        private async Task<Submission> CreateTestSubmission(int templateId, string createdBy = "UnitTester")
+        private async Task<Submission> CreateTestSubmission(int userId = 0, int templateId = 0)
         {
-            var dto = new CreateSubmissionDto { TemplateId = templateId, CreatedBy = createdBy };
+            var dto = new CreateSubmissionDto { TemplateId = templateId, UserId = userId };
             return await _submissionService!.CreateAsync(dto);
         }
 
@@ -57,10 +64,12 @@ namespace LifeTracker.Tests.Services
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
+            _userLogger = new Mock<ILogger<EFUserService>>().Object;
             _questionnaireLogger = new Mock<ILogger<EFQuestionnaireService>>().Object;
             _templateLogger = new Mock<ILogger<EFTemplateService>>().Object;
             _submissionLogger = new Mock<ILogger<EFSubmissionService>>().Object;
 
+            _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
             _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger);
             _templateService = new EFTemplateService(_context, _templateLogger);
             _submissionService = new EFSubmissionService(_context, _submissionLogger);
@@ -76,7 +85,8 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task CreateAsync_ShouldAddSubmissionToDb()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 
@@ -85,7 +95,7 @@ namespace LifeTracker.Tests.Services
                 TemplateId = template.Id
             };
 
-            Submission submission = await CreateTestSubmission(template.Id);
+            Submission submission = await CreateTestSubmission(user.Id, template.Id);
 
             Assert.That(submission, Is.Not.Null);
 
@@ -95,18 +105,19 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task GetByUserAsync_ShouldGetOnlyUserOwnedSubmissions()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
-
+            User user0 = await CreateTestUser();
+            User user1 = await CreateTestUser("Test User 2", "testuser2@email.com");
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user0.Id);
             Template template = await CreateTestTemplate(questionnaire.Id);
 
-            string CreatedBy0 = "UnitTester";
-            string CreatedBy1 = "NonUnitTester";
+            Questionnaire questionnaire1 = await CreateTestQuestionnaire(user1.Id);
+            Template template1 = await CreateTestTemplate(questionnaire1.Id);
 
-            await CreateTestSubmission(template.Id, CreatedBy0);
-            await CreateTestSubmission(template.Id, CreatedBy0);
-            await CreateTestSubmission(template.Id, CreatedBy1);
+            await CreateTestSubmission(user0.Id, template.Id);
+            await CreateTestSubmission(user0.Id, template.Id);
+            await CreateTestSubmission(user1.Id, template1.Id);
 
-            List<Submission> submissionsInDb = await _submissionService.GetByUserAsync(CreatedBy0);
+            List<Submission> submissionsInDb = await _submissionService.GetByUserAsync(user0.Id);
 
             Assert.That(submissionsInDb, Has.Exactly(2).Items);
         }
@@ -114,16 +125,12 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task DeleteAsync_ShouldDeleteSubmissionToDb()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 
-            CreateSubmissionDto createSubmissionDto = new CreateSubmissionDto
-            {
-                TemplateId = template.Id
-            };
-
-            Submission submission = await CreateTestSubmission(template.Id);
+            Submission submission = await CreateTestSubmission(user.Id, template.Id);
 
             await _submissionService.DeleteAsync(submission.Id);
 

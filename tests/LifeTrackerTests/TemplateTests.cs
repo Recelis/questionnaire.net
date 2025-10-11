@@ -16,16 +16,23 @@ namespace LifeTracker.Tests.Services
     public class TemplateTests
     {
         private SqliteConnection? _connection;
+        private IUserService? _userService;
         private IQuestionnaireService? _questionnaireService;
         private ITemplateService? _templateService;
         private LifeTrackerContext? _context;
+        private ILogger<EFUserService>? _userLogger;
         private ILogger<EFQuestionnaireService>? _questionnaireLogger;
         private ILogger<EFTemplateService>? _templateLogger;
 
         // Helper functions
-        private async Task<Questionnaire> CreateTestQuestionnaire(string name = "Test Questionnaire", string createdBy = "UnitTester")
+        private async Task<User> CreateTestUser(string name = "Test User", string email = "testemail@email.com", string password = "TestPassword123!")
         {
-            var dto = new CreateQuestionnaireDto { Name = name, CreatedBy = createdBy };
+            var dto = new CreateUserDto { Name = name, Email = email, Password = password };
+            return await _userService.CreateAsync(dto);
+        }
+        private async Task<Questionnaire> CreateTestQuestionnaire(int userId = 0, string name = "Test Questionnaire")
+        {
+            var dto = new CreateQuestionnaireDto { Name = name, UserId = userId };
             return await _questionnaireService.CreateAsync(dto);
         }
 
@@ -49,11 +56,12 @@ namespace LifeTracker.Tests.Services
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
+            _userLogger = new Mock<ILogger<EFUserService>>().Object;
             _questionnaireLogger = new Mock<ILogger<EFQuestionnaireService>>().Object;
             _templateLogger = new Mock<ILogger<EFTemplateService>>().Object;
 
+            _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
             _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger);
-
             _templateService = new EFTemplateService(_context, _templateLogger);
         }
 
@@ -67,7 +75,8 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task CreateAsync_ShouldAddTemplateToDb()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             CreateTemplateDto createTemplateDto = new CreateTemplateDto
             {
@@ -90,7 +99,8 @@ namespace LifeTracker.Tests.Services
         public async Task UpdateAsync_ShouldUpdateTemplateToDb()
         {
 
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaireId: questionnaire.Id);
 
@@ -110,7 +120,8 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task DeleteAsync_ShouldDeleteTemplateToDb()
         {
-            Questionnaire questionnaire = await CreateTestQuestionnaire();
+            User user = await CreateTestUser();
+            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaireId: questionnaire.Id);
 

@@ -5,19 +5,27 @@ namespace LifeTracker.Services;
 
 public class InMemoryQuestionnaireService : IQuestionnaireService
 {
+    User _user { get; } = new User
+    {
+        Id = 1,
+        Name = "Test User",
+        Email = "",
+        PasswordHash = "hashedpassword"
+    };
+
     List<Questionnaire> _questionnaires { get; } = new List<Questionnaire>();
     public InMemoryQuestionnaireService()
     {
     }
 
-    public Task<List<Questionnaire>> GetAllAsync()
+    public Task<List<Questionnaire>> GetByUserId(int userId)
     {
-        return Task.FromResult(_questionnaires.ToList());
+        return Task.FromResult(_questionnaires.ToList().FindAll(q => q.UserId == userId));
     }
 
     public Task<Questionnaire?> GetAsync(int questionnaireId) => Task.FromResult(_questionnaires.FirstOrDefault(x => x.Id == questionnaireId));
 
-    public Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
+    public Task<Questionnaire?> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
     {
         List<Questionnaire> questionnaires = _questionnaires.ToList();
         int maxId = questionnaires.Any() ? questionnaires.Max(q => q.Id) : 0;
@@ -25,10 +33,11 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
         {
             Id = maxId,
             Name = createQuestionnaireDto.Name,
-            CreatedBy = createQuestionnaireDto.CreatedBy,
+            UserId = 1,
+            User = _user
         };
         _questionnaires.Add(questionnaire);
-        return Task.FromResult<Questionnaire>(questionnaire);
+        return Task.FromResult<Questionnaire?>(questionnaire);
     }
 
     public Task<Questionnaire?> UpdateAsync(int id, UpdateQuestionnaireDto updateQuestionnaireDto)
@@ -40,7 +49,8 @@ public class InMemoryQuestionnaireService : IQuestionnaireService
             {
                 Id = id,
                 Name = updateQuestionnaireDto.Name,
-                CreatedBy = _questionnaires[index].CreatedBy
+                UserId = _questionnaires[index].UserId,
+                User = _user
             };
             return Task.FromResult<Questionnaire?>(_questionnaires[index]);
         }

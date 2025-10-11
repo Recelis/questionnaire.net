@@ -10,16 +10,19 @@ public class EFQuestionnaireService : IQuestionnaireService
 {
     private readonly LifeTrackerContext _lifeTrackerContext;
     private readonly ILogger<EFQuestionnaireService> _logger;
-
-    public EFQuestionnaireService(LifeTrackerContext context, ILogger<EFQuestionnaireService> logger)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public EFQuestionnaireService(LifeTrackerContext context, ILogger<EFQuestionnaireService> logger, IHttpContextAccessor httpContextAccessor)
     {
+        _httpContextAccessor = httpContextAccessor;
         _lifeTrackerContext = context;
         _logger = logger;
     }
 
-    public async Task<List<Questionnaire>> GetAllAsync()
+    public async Task<List<Questionnaire>> GetByUserId(int userId)
     {
-        return await _lifeTrackerContext.Questionnaire.ToListAsync();
+        return await _lifeTrackerContext.Questionnaire
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
     }
 
     public async Task<Questionnaire?> GetAsync(int questionnaireId)
@@ -29,12 +32,26 @@ public class EFQuestionnaireService : IQuestionnaireService
             .FirstOrDefaultAsync(q => q.Id == questionnaireId);
     }
 
-    public async Task<Questionnaire> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
+    public async Task<Questionnaire?> CreateAsync(CreateQuestionnaireDto createQuestionnaireDto)
     {
+        var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("id")?.Value;
+        int? userId = int.TryParse(userIdClaim, out var id) ? id : null;
+        if (userId is null)
+        {
+            return null;
+        }
+        User? user = await _lifeTrackerContext.User.FindAsync(userId);
+        if (user == null)
+        {
+            _logger.LogError("No User of id {user}", userId);
+            return null;
+        }
+
         Questionnaire newQuestionnaire = new Questionnaire
         {
             Name = createQuestionnaireDto.Name,
-            CreatedBy = createQuestionnaireDto.CreatedBy
+            UserId = user.Id,
+            User = user
         };
         _logger.LogDebug(newQuestionnaire.ToString());
         _lifeTrackerContext.Questionnaire.Add(newQuestionnaire);

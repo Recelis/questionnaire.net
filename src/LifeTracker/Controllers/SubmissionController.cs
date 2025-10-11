@@ -3,6 +3,7 @@ using LifeTracker.Models;
 using LifeTracker.Services;
 using System.Text.Json;
 using LifeTracker.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Controllers;
 
@@ -27,25 +28,24 @@ public class SubmissionController : ControllerBase
     }
 
     /// <summary>
-    /// Gets all submissions under a template.
+    /// Gets all submissions under a user.
     /// </summary>
     /// <returns>A list of Submissions.</returns>
     /// <response code="200">Returns the list of Submissions</response>
-    [HttpGet("submission/{userId:string}")]
+    [Authorize]
+    [HttpGet("submission/{userId:int}")]
     [ProducesResponseType(typeof(IEnumerable<Submission>), StatusCodes.Status200OK)]
     [Produces("application/json")]
-    public async Task<ActionResult<IEnumerable<Submission>>> Get(string userId)
+    public async Task<ActionResult<IEnumerable<Submission>>> Get(int userId)
     {
-        _logger.LogInformation("Getting all submissions under a template");
-        // get all templateSubmissionLinks
-        // for each templateSubmissionLink get the Submission
+        _logger.LogInformation("Getting all submissions under a user: {UserId}", userId);
         IEnumerable<Submission> submissions = await _submissionService.GetByUserAsync(userId);
 
         return Ok(submissions);
     }
 
     /// <summary>
-    /// Gets a submission.
+    /// Gets a SubmissionDto.
     /// </summary>
     /// <remarks>
     /// Returns a 404 No Content if submission could not be found.
@@ -54,8 +54,9 @@ public class SubmissionController : ControllerBase
     /// <returns>A Submission.</returns>
     /// <response code="200">Returns the Submission</response>
     /// <response code="404">No submission found</response>
+    [Authorize]
     [HttpGet("{submissionId:int}")]
-    [ProducesResponseType(typeof(Submission), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SubmissionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]
     public async Task<ActionResult<Submission>> GetById(int submissionId)
@@ -68,16 +69,27 @@ public class SubmissionController : ControllerBase
             return NotFound();
         }
 
-        return Ok(submission);
+        SubmissionDto submissionDto = new SubmissionDto
+        {
+            Id = submission.Id,
+            Date = submission.Date,
+            UserId = submission.UserId,
+            TotalPoints = submission.TotalPoints,
+            TemplateId = submission.TemplateId,
+            Answers = submission.Answers
+        };
+
+        return Ok(submissionDto);
     }
 
     /// <summary>
-    /// Creates a new submission.
+    /// Creates a new SubmissionDto.
     /// </summary>
     /// <param name="createSubmissionDto"></param>
     /// <response code="201">Returns the created submission</response>
+    [Authorize]
     [HttpPost()]
-    [ProducesResponseType(typeof(Submission), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(SubmissionDto), StatusCodes.Status201Created)]
     [Consumes("application/json")]
     [Produces("application/json")]
     public async Task<ActionResult<Submission>> Post(CreateSubmissionDto createSubmissionDto)
@@ -92,10 +104,24 @@ public class SubmissionController : ControllerBase
         }
         // create submission, templateSubmissionLink with SubmissionNumber appended and scoped to Template.
         Submission? submission = await _submissionService.CreateAsync(createSubmissionDto);
+        if (submission == null)
+        {
+            return NotFound();
+        }
+        SubmissionDto submissionDto = new SubmissionDto
+        {
+            Id = submission.Id,
+            Date = submission.Date,
+            UserId = submission.UserId,
+            TotalPoints = submission.TotalPoints,
+            TemplateId = submission.TemplateId,
+            Answers = submission.Answers
+        };
 
-        return CreatedAtAction(nameof(GetById), new { submissionId = submission.Id }, submission);
+        return CreatedAtAction(nameof(GetById), new { submissionId = submissionDto.Id }, submissionDto);
     }
 
+    [Authorize]
     [HttpDelete("{submissionId:int}")]
     public async Task<IActionResult> Delete(int submissionId)
     {

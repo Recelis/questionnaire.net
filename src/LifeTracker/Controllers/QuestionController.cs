@@ -3,6 +3,7 @@ using LifeTracker.Models;
 using LifeTracker.Services;
 using System.Text.Json;
 using LifeTracker.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Controllers;
 
@@ -29,6 +30,7 @@ public class QuestionController : ControllerBase
     /// </summary>
     /// <returns>A list of Questions.</returns>
     /// <response code="200">Returns the list of Questions</response>
+    [Authorize]
     [HttpGet("question/{templateId:int}")]
     [ProducesResponseType(typeof(IEnumerable<Question>), StatusCodes.Status200OK)]
     [Produces("application/json")]
@@ -50,6 +52,7 @@ public class QuestionController : ControllerBase
     /// <returns>A Question.</returns>
     /// <response code="200">Returns the Question</response>
     /// <response code="404">No question found</response>
+    [Authorize]
     [HttpGet("{questionId:int}")]
     [ProducesResponseType(typeof(Question), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -72,6 +75,7 @@ public class QuestionController : ControllerBase
     /// </summary>
     /// <param name="createQuestionDto"></param>
     /// <response code="201">Returns the created question</response>
+    [Authorize]
     [HttpPost()]
     [ProducesResponseType(typeof(Question), StatusCodes.Status201Created)]
     [Consumes("application/json")]
@@ -98,6 +102,7 @@ public class QuestionController : ControllerBase
     /// <param name="newQuestion"></param>
     /// <response code="200">Returns the updated Question</response>
     /// <response code="404">If the question doesn't exists</response>
+    [Authorize]
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(Question), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -122,6 +127,7 @@ public class QuestionController : ControllerBase
     /// <param name="questionId"></param>
     /// <response code="200">Returns NoContent if success</response>
     /// <response code="404">If the question doesn't exist</response>
+    [Authorize]
     [HttpDelete("{questionId:int}")]
     public async Task<IActionResult> Delete(int questionId)
     {

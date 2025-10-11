@@ -5,9 +5,9 @@ namespace LifeTracker.Services;
 
 public interface IQuestionnaireService
 {
-    Task<List<Questionnaire>> GetAllAsync();
+    Task<List<Questionnaire>> GetByUserId(int userId);
     Task<Questionnaire?> GetAsync(int questionnaireId);
-    Task<Questionnaire> CreateAsync(CreateQuestionnaireDto newQuestionnaire);
+    Task<Questionnaire?> CreateAsync(CreateQuestionnaireDto newQuestionnaire);
     Task<Questionnaire?> UpdateAsync(int id, UpdateQuestionnaireDto newQuestionnaire);
     Task<bool> DeleteAsync(int questionnaireId);
 }

@@ -12,8 +12,7 @@
 - [x] - CRUD TemplateQuestionLink + Question
 - [x] - CRUD Submission
 - [x] - CRUD Answer
-- [ ] - Create User model + add to Questionnaire created_by field.
-- [ ] - Seed User
+- [x] - Create User model + add to Questionnaire created_by field.
 - [ ] - Locking templates so cannot have answers until it is 'locked'. Cannot modify after locked.
 - [ ] - duplicating templates
 

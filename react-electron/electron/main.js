@@ -6,7 +6,13 @@ const createWindow = () => {
     height: 600,
   });
 
-  win.loadFile("index.html");
+  if (process.env.NODE_ENV === "development") {
+    // Load your React dev server
+    mainWindow.loadURL("http://localhost:5173");
+  } else {
+    // Load built React files in production
+    mainWindow.loadFile(path.join(__dirname, "../src/index.html"));
+  }
 };
 
 app.whenReady().then(() => {

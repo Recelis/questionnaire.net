@@ -1,0 +1,81 @@
+# ========================================
+# Node / React / Electron gitignore
+# ========================================
+
+# Node modules
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+out/
+release/
+public/build/
+app/build/
+app/dist/
+
+# Electron packaged apps
+*.asar
+*.asar.unpacked/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache
+.cache/
+.tmp/
+temp/
+.DS_Store
+Thumbs.db
+
+# OS-specific
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# VSCode / JetBrains / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Build artifacts
+*.tgz
+*.zip
+*.tar
+*.gz
+
+# TypeScript
+*.tsbuildinfo
+
+# Electron specific
+# Temporary build files
+electron-build/
+app-release/
+app-builds/
+
+# Electron Forge / Builder outputs
+**/make/
+**/dist/
+**/out/
+
+# Auto-generated icons and assets
+resources/
+icons/
+
+# Option

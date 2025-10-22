@@ -20,7 +20,7 @@
 
 #### Electron Project
 
-- - [ ] - Setup Electron project
+- - [x] - Setup Electron project
 - - [ ] - Users can log in
 - - [ ] - Users can create their own Questionnaires
 - - [ ] - Users can create their own Templates

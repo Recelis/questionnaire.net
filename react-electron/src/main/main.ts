@@ -1,5 +1,11 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const isDev = process.env.NODE_ENV === "development";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -7,8 +13,10 @@ const createWindow = () => {
     height: 600,
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(process.env.VITE_DEV_SERVER_URL);
+  if (isDev) {
+    // ✅ Development — use Vite’s dev server (HMR)
+    win.loadURL("http://localhost:5173");
+    win.webContents.openDevTools(); // optional for debugging
   } else {
     win.loadFile(path.join(__dirname, "../renderer/index.html"));
   }

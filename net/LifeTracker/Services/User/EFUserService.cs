@@ -38,6 +38,7 @@ public class EFUserService(LifeTrackerContext context, ILogger<EFUserService> lo
         };
 
         _logger.LogDebug(newUser.ToString());
+        await _lifeTrackerContext.User.AddAsync(newUser);
         await _lifeTrackerContext.SaveChangesAsync();
 
         return newUser;

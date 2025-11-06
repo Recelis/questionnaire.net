@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 import "./App.css";
 import { Link } from "react-router";
-import RouterComponent from "./routes";
+import RouterComponent from "./routes/routes";
+import { AuthProvider } from "./context/AuthProvider";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -35,7 +36,9 @@ function App() {
   return (
     <>
       {user && user.name}
-      <RouterComponent />
+      <AuthProvider>
+        <RouterComponent />
+      </AuthProvider>
     </>
   );
 }

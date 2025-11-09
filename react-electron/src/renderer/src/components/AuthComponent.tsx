@@ -29,7 +29,7 @@ const AuthComponent = () => {
       <Outlet />
     ) : (
       // else navigate back to the signin page
-      <Navigate to={"/"} />
+      <Navigate to={"/signin"} />
     );
   }
 };

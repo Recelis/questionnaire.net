@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
 
+const host = "http://localhost:5283";
+
 export function AuthProvider(props: { children: ReactNode }) {
   const [token, setToken] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,11 +14,27 @@ export function AuthProvider(props: { children: ReactNode }) {
 
   const signin = async (email: string, password: string) => {
     // sign in
+    setLoading(true);
+    try {
+      const res = await fetch(`${host}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const newToken = "string";
-    setToken(newToken);
-    // get user
-    // localStorage.setItem("user_token", newToken);
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      localStorage.setItem("user_token", data);
+      console.log(data);
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
   };
 
   const signup = async () => {};

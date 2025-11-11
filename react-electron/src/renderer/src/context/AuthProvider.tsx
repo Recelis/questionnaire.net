@@ -30,7 +30,7 @@ export function AuthProvider(props: { children: ReactNode }) {
 
       const data = await res.json();
       localStorage.setItem("user_token", data);
-      console.log(data);
+      setToken(data);
     } catch (err) {
       console.error(err);
     }

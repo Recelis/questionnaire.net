@@ -5,7 +5,6 @@ import { publicRoutes } from "../routes/types";
 const AuthComponent = () => {
   const { token, loading } = useAuth();
   const location = useLocation();
-
   if (loading) return <div>Loading...</div>;
 
   // Display

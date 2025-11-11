@@ -7,12 +7,13 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const auth = useAuth();
 
-  const onSubmit = () => {};
+  const handleSubmit = () => {
+    auth.signin(email, password);
+  };
   return (
     <div>
-      <Link to="/">Back</Link>
       <form
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column" }}
       >
         <h1>Sign in</h1>
@@ -35,7 +36,9 @@ export default function Signin() {
           }}
           value={password}
         />
+        <button type="submit">Submit</button>
       </form>
+      <Link to="/signup">or Sign up</Link>
     </div>
   );
 }

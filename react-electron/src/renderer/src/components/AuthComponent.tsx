@@ -3,7 +3,7 @@ import useAuth from "../hooks/useAuth";
 import { publicRoutes } from "../routes/types";
 
 const AuthComponent = () => {
-  const { token, loading } = useAuth();
+  const { isLoggedIn, loading } = useAuth();
   const location = useLocation();
   if (loading) return <div>Loading...</div>;
 
@@ -12,7 +12,7 @@ const AuthComponent = () => {
   // show empty screen when fetching token.
 
   if (loading) return <>loading</>;
-  else if (token) {
+  else if (isLoggedIn) {
     // but if you are on any public paths like signin, then navigate to the root page.
     return isPublicPath ? (
       <Navigate to={"/"} />

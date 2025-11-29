@@ -1,0 +1,925 @@
+{
+	"info": {
+		"_postman_id": "questionnaire-api-collection",
+		"name": "Questionnaire API",
+		"description": "Complete API collection for Questionnaire.Net application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"name\": \"John Doe\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/User",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User"
+							]
+						},
+						"description": "Creates a new user. No authentication required."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/User/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User",
+								"login"
+							]
+						},
+						"description": "Logs in the user and returns a JWT token. No authentication required."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/User/:userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets a user by ID. Requires authentication."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Questionnaire",
+			"item": [
+				{
+					"name": "Get Questionnaires by User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Questionnaire/user/:userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Questionnaire",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets all questionnaires for a specific user. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Questionnaire by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Questionnaire/:questionnaireId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Questionnaire",
+								":questionnaireId"
+							],
+							"variable": [
+								{
+									"key": "questionnaireId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets a questionnaire by ID. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Questionnaire",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My Questionnaire\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Questionnaire",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Questionnaire"
+							]
+						},
+						"description": "Creates a new questionnaire. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Questionnaire",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Questionnaire Name\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Questionnaire/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Questionnaire",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Updates a questionnaire. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Questionnaire",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Questionnaire/:questionnaireId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Questionnaire",
+								":questionnaireId"
+							],
+							"variable": [
+								{
+									"key": "questionnaireId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Deletes a questionnaire. Requires authentication."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Template",
+			"item": [
+				{
+					"name": "Get Templates by Questionnaire",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Template/template/:questionnaireId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Template",
+								"template",
+								":questionnaireId"
+							],
+							"variable": [
+								{
+									"key": "questionnaireId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets all templates for a specific questionnaire. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Template by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Template/:templateId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Template",
+								":templateId"
+							],
+							"variable": [
+								{
+									"key": "templateId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets a template by ID. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Template",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My Template\",\n  \"questionnaireId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Template",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Template"
+							]
+						},
+						"description": "Creates a new template. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Template",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Template Name\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Template/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Template",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Updates a template. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Template",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Template/:templateId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Template",
+								":templateId"
+							],
+							"variable": [
+								{
+									"key": "templateId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Deletes a template. Requires authentication."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Question",
+			"item": [
+				{
+					"name": "Get Questions by Template",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Question/question/:templateId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Question",
+								"question",
+								":templateId"
+							],
+							"variable": [
+								{
+									"key": "templateId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets all questions for a specific template. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Question by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Question/:questionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Question",
+								":questionId"
+							],
+							"variable": [
+								{
+									"key": "questionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets a question by ID. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Question",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"What is your favorite color?\",\n  \"templateId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Question",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Question"
+							]
+						},
+						"description": "Creates a new question. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Question",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Updated question text\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Question/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Question",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Updates a question. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Question",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Question/:questionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Question",
+								":questionId"
+							],
+							"variable": [
+								{
+									"key": "questionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Deletes a question. Requires authentication."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Submission",
+			"item": [
+				{
+					"name": "Get Submissions by User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Submission/submission/:userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Submission",
+								"submission",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets all submissions for a specific user. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Submission by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Submission/:submissionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Submission",
+								":submissionId"
+							],
+							"variable": [
+								{
+									"key": "submissionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets a submission by ID. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Submission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"templateId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Submission",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Submission"
+							]
+						},
+						"description": "Creates a new submission. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Submission",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Submission/:submissionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Submission",
+								":submissionId"
+							],
+							"variable": [
+								{
+									"key": "submissionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Deletes a submission. Requires authentication."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Answer",
+			"item": [
+				{
+					"name": "Get Answers by Submission",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Answer/answer/:submissionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Answer",
+								"answer",
+								":submissionId"
+							],
+							"variable": [
+								{
+									"key": "submissionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets all answers for a specific submission. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Answer by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Answer/:answerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Answer",
+								":answerId"
+							],
+							"variable": [
+								{
+									"key": "answerId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gets an answer by ID. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Answer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"questionId\": 1,\n  \"submissionId\": 1,\n  \"text\": \"My answer text\",\n  \"points\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Answer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Answer"
+							]
+						},
+						"description": "Creates a new answer. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Answer",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Updated answer text\",\n  \"points\": 15\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/Answer/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Answer",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Updates an answer. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Answer",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/Answer/:answerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"Answer",
+								":answerId"
+							],
+							"variable": [
+								{
+									"key": "answerId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Deletes an answer. Requires authentication."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5283",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+

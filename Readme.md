@@ -21,7 +21,7 @@
 #### Electron Project
 
 - - [x] - Setup Electron project
-- - [ ] - Users can log in
+- - [x] - Users can log in
 - - [ ] - Users can create their own Questionnaires
 - - [ ] - Users can create their own Templates
 - - [ ] - Users can add questions to their templates

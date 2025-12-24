@@ -7,7 +7,8 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const auth = useAuth();
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     auth.signin(email, password);
   };
   return (

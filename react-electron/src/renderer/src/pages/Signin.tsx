@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
 import useAuth from "../hooks/useAuth";
 
@@ -11,6 +11,10 @@ export default function Signin() {
     e.preventDefault();
     await auth.signin(email, password);
   };
+
+  useEffect(() => {
+    auth.clearError();
+  }, [])
 
   return (
     <div>

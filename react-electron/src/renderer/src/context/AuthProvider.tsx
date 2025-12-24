@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
 import { jwtDecode, type JwtPayload } from "jwt-decode";
 import type { IUser } from "./types";
-import { apiGetUser, apiUserLogin } from "../api/api";
+import { apiGetUser, apiUserLogin, apiUserSignup } from "../api/api";
 
 export function AuthProvider(props: { children: ReactNode }) {
   const [token, setToken] = useState<string | undefined>(undefined);
@@ -48,7 +48,24 @@ export function AuthProvider(props: { children: ReactNode }) {
     }
   };
 
-  const signup = async () => {};
+  const signup = async (email: string, name: string, password: string): Promise<void> => {
+    setLoading(true);
+    setError(undefined);
+    try {
+      const newUser = await apiUserSignup({ email, name, password });
+      if (!newUser) {
+        setError("Failed to create account. Please try again.");
+        setLoading(false);
+        return;
+      }
+      // After successful signup, automatically sign in the user
+      await signin(email, password);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create account. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signout = async () => {
     setToken(undefined);
@@ -64,9 +81,13 @@ export function AuthProvider(props: { children: ReactNode }) {
     return id;
   };
 
+  const clearError = () => {
+    setError("")
+  }
+
   return (
     <AuthContext.Provider
-      value={{ token, signin, signup, signout, loading, user, isLoggedIn, error }}
+      value={{ token, signin, signup, signout, clearError, loading, user, isLoggedIn, error }}
     >
       {props.children}
     </AuthContext.Provider>

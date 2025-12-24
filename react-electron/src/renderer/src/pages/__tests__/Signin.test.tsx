@@ -141,5 +141,112 @@ describe("Signin", () => {
     expect(signupLink).toBeInTheDocument();
     expect(signupLink.closest("a")).toHaveAttribute("href", "/signup");
   });
+
+  it("displays error message when signin fails", async () => {
+    const user = userEvent.setup();
+    vi.mocked(api.apiUserLogin).mockResolvedValue(undefined);
+
+    render(<Signin />);
+
+    const emailInput = screen.getByLabelText("Email");
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", { name: /submit/i });
+
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "wrongpassword");
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Invalid email or password/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("displays error message when API throws an error", async () => {
+    const user = userEvent.setup();
+    vi.mocked(api.apiUserLogin).mockRejectedValue(
+      new Error("Invalid email or password")
+    );
+
+    render(<Signin />);
+
+    const emailInput = screen.getByLabelText("Email");
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", { name: /submit/i });
+
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "wrongpassword");
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Invalid email or password/i)).toBeInTheDocument();
+    });
+  });
+
+  it("clears error message when form is resubmitted", async () => {
+    const user = userEvent.setup();
+    const mockToken = createMockToken();
+    const mockUser = { email: "test@example.com" };
+
+    // First attempt fails
+    vi.mocked(api.apiUserLogin).mockResolvedValueOnce(undefined);
+    // Second attempt succeeds
+    vi.mocked(api.apiUserLogin).mockResolvedValueOnce(mockToken);
+    vi.mocked(api.apiGetUser).mockResolvedValue(mockUser);
+
+    render(<Signin />);
+
+    const emailInput = screen.getByLabelText("Email");
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", { name: /submit/i });
+
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "wrongpassword");
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Invalid email or password/i)).toBeInTheDocument();
+    });
+
+    // Update password and resubmit
+    await user.clear(passwordInput);
+    await user.type(passwordInput, "correctpassword");
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText(/Invalid email or password/i)
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("disables submit button while loading", async () => {
+    const user = userEvent.setup();
+    const mockToken = createMockToken();
+    const mockUser = { email: "test@example.com" };
+
+    vi.mocked(api.apiUserLogin).mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve(mockToken), 100))
+    );
+    vi.mocked(api.apiGetUser).mockResolvedValue(mockUser);
+
+    render(<Signin />);
+
+    const emailInput = screen.getByLabelText("Email");
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", { name: /submit/i });
+
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "password123");
+    await user.click(submitButton);
+
+    expect(submitButton).toBeDisabled();
+    expect(screen.getByText(/Signing in.../i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+  });
 });
 

@@ -5,7 +5,7 @@ const DEFAULT_BASE_URL = "http://localhost:5283";
 export const apiUserLogin = async (body: {
   email: string;
   password: string;
-}) => {
+}): Promise<string | undefined> => {
   try {
     const res = await fetch(`${DEFAULT_BASE_URL}/user/login`, {
       method: "POST",
@@ -16,13 +16,17 @@ export const apiUserLogin = async (body: {
     });
 
     if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
+      if (res.status === 401 || res.status === 404) {
+        throw new Error("Invalid email or password");
+      }
+      throw new Error(`Failed to sign in. Status: ${res.status}`);
     }
 
     const data = await res.json();
     return data;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 

@@ -5,6 +5,7 @@ interface IAuthContext {
   token: string | undefined;
   isLoggedIn: boolean;
   loading: boolean;
+  error: string | undefined;
   signin: (email: string, password: string) => Promise<void>;
   signup: () => Promise<void>;
   signout: () => Promise<void>;

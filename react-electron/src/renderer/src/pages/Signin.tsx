@@ -7,10 +7,11 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const auth = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    auth.signin(email, password);
+    await auth.signin(email, password);
   };
+
   return (
     <div>
       <form
@@ -18,6 +19,20 @@ export default function Signin() {
         style={{ display: "flex", flexDirection: "column" }}
       >
         <h1>Sign in</h1>
+        {auth.error && (
+          <div
+            style={{
+              color: "red",
+              padding: "10px",
+              marginBottom: "10px",
+              border: "1px solid red",
+              borderRadius: "4px",
+              backgroundColor: "#ffe6e6",
+            }}
+          >
+            {auth.error}
+          </div>
+        )}
         <label htmlFor="email">Email</label>
         <input
           id="email"
@@ -37,7 +52,9 @@ export default function Signin() {
           }}
           value={password}
         />
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={auth.loading}>
+          {auth.loading ? "Signing in..." : "Submit"}
+        </button>
       </form>
       <Link to="/signup">or Sign up</Link>
     </div>

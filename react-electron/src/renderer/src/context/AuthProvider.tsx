@@ -8,6 +8,7 @@ export function AuthProvider(props: { children: ReactNode }) {
   const [token, setToken] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState<IUser | undefined>(undefined);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const isLoggedIn = token !== undefined && user !== undefined;
 
@@ -27,13 +28,24 @@ export function AuthProvider(props: { children: ReactNode }) {
     checksLogin(userToken);
   }, [checksLogin]);
 
-  const signin = async (email: string, password: string) => {
+  const signin = async (email: string, password: string): Promise<void> => {
     // sign in
     setLoading(true);
-    const userToken = await apiUserLogin({ email, password });
-    localStorage.setItem("user_token", userToken);
-    checksLogin(userToken);
-    setLoading(false);
+    setError(undefined);
+    try {
+      const userToken = await apiUserLogin({ email, password });
+      if (!userToken) {
+        setError("Invalid email or password. Please try again.");
+        setLoading(false);
+        return;
+      }
+      localStorage.setItem("user_token", userToken);
+      await checksLogin(userToken);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to sign in. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signup = async () => {};
@@ -54,7 +66,7 @@ export function AuthProvider(props: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, signin, signup, signout, loading, user, isLoggedIn }}
+      value={{ token, signin, signup, signout, loading, user, isLoggedIn, error }}
     >
       {props.children}
     </AuthContext.Provider>

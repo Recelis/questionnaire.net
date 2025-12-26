@@ -5,13 +5,14 @@ import { publicRoutes } from "../routes/types";
 const AuthComponent = () => {
   const { isLoggedIn, loading } = useAuth();
   const location = useLocation();
-  if (loading) return <div>Loading...</div>;
+  
 
   // Display
   const isPublicPath = publicRoutes.includes(location.pathname);
   // show empty screen when fetching token.
 
-  if (loading) return <>loading</>;
+  if (loading) return <div></div>;
+
   else if (isLoggedIn) {
     // but if you are on any public paths like signin, then navigate to the root page.
     return isPublicPath ? (

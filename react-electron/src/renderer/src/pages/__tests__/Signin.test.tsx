@@ -64,7 +64,7 @@ describe("Signin", () => {
   it("calls signin function when form is submitted with valid credentials", async () => {
     const user = userEvent.setup();
     const mockToken = createMockToken();
-    const mockUser = { email: "test@example.com" };
+    const mockUser = { email: "test@example.com", id: 1, name: "Test User" };
 
     vi.mocked(api.apiUserLogin).mockResolvedValue(mockToken);
     vi.mocked(api.apiGetUser).mockResolvedValue(mockUser);
@@ -90,7 +90,7 @@ describe("Signin", () => {
   it("submits form when submit button is clicked", async () => {
     const user = userEvent.setup();
     const mockToken = createMockToken();
-    const mockUser = { email: "test@example.com" };
+    const mockUser = { email: "test@example.com", id: 1, name: "Test User" };
 
     vi.mocked(api.apiUserLogin).mockResolvedValue(mockToken);
     vi.mocked(api.apiGetUser).mockResolvedValue(mockUser);
@@ -116,7 +116,7 @@ describe("Signin", () => {
   it("handles empty form submission", async () => {
     const user = userEvent.setup();
     const mockToken = createMockToken();
-    const mockUser = { email: "test@example.com" };
+    const mockUser = { email: "test@example.com", id: 1, name: "Test User" };
 
     vi.mocked(api.apiUserLogin).mockResolvedValue(mockToken);
     vi.mocked(api.apiGetUser).mockResolvedValue(mockUser);
@@ -187,7 +187,7 @@ describe("Signin", () => {
   it("clears error message when form is resubmitted", async () => {
     const user = userEvent.setup();
     const mockToken = createMockToken();
-    const mockUser = { email: "test@example.com" };
+    const mockUser = { email: "test@example.com", id: 1, name: "Test User" };
 
     // First attempt fails
     vi.mocked(api.apiUserLogin).mockResolvedValueOnce(undefined);
@@ -224,7 +224,7 @@ describe("Signin", () => {
   it("disables submit button while loading", async () => {
     const user = userEvent.setup();
     const mockToken = createMockToken();
-    const mockUser = { email: "test@example.com" };
+    const mockUser = { email: "test@example.com", id: 1, name: "Test User" };
 
     vi.mocked(api.apiUserLogin).mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve(mockToken), 100))

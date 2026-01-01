@@ -59,7 +59,6 @@ export default function QuestionnaireCreate() {
                 fontSize: "1em",
                 borderRadius: "8px",
                 border: "1px solid #646cff",
-                backgroundColor: "#1a1a1a",
                 color: "inherit",
                 fontFamily: "inherit",
               }}

@@ -1,14 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
 import Layout from "../../components/Layout";
 import useAuth from "../../hooks/useAuth";
-import { apiGetQuestionnaires, type IQuestionnaire } from "../../api/api";
+import {
+  apiGetQuestionnaires,
+  apiDeleteQuestionnaire,
+  type IQuestionnaire,
+} from "../../api/api";
+import DropdownMenu from "../../components/DropdownMenu";
+import ConfirmationModal from "../../components/ConfirmationModal";
 
 export default function Home() {
   const [questionnaires, setQuestionnaires] = useState<IQuestionnaire[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [questionnaireToDelete, setQuestionnaireToDelete] = useState<
+    IQuestionnaire | null
+  >(null);
+  const [deleting, setDeleting] = useState(false);
   const auth = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchQuestionnaires = async () => {
@@ -33,6 +45,50 @@ export default function Home() {
 
     fetchQuestionnaires();
   }, [auth.user?.id]);
+
+  const handleDeleteClick = (questionnaire: IQuestionnaire) => {
+    setQuestionnaireToDelete(questionnaire);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!questionnaireToDelete) return;
+
+    try {
+      setDeleting(true);
+      const success = await apiDeleteQuestionnaire(questionnaireToDelete.id);
+      if (success) {
+        setQuestionnaires(
+          questionnaires.filter((q) => q.id !== questionnaireToDelete.id)
+        );
+        setDeleteModalOpen(false);
+        setQuestionnaireToDelete(null);
+      } else {
+        setError("Failed to delete questionnaire. It may not exist.");
+        setDeleteModalOpen(false);
+        setQuestionnaireToDelete(null);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to delete questionnaire. Please try again."
+      );
+      setDeleteModalOpen(false);
+      setQuestionnaireToDelete(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+    setQuestionnaireToDelete(null);
+  };
+
+  const handleEditClick = (questionnaire: IQuestionnaire) => {
+    navigate(`/questionnaire/${questionnaire.id}/edit`);
+  };
 
   return (
     <Layout>
@@ -127,7 +183,7 @@ export default function Home() {
                   borderRadius: "8px",
                   border: "1px solid #333",
                   transition: "all 0.25s",
-                  cursor: "pointer",
+                  position: "relative",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = "#646cff";
@@ -138,15 +194,51 @@ export default function Home() {
                   e.currentTarget.style.transform = "translateY(0)";
                 }}
               >
-                <h3
+                <div
                   style={{
-                    margin: "0 0 0.5rem 0",
-                    fontSize: "1.25em",
-                    color: "#646cff",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "0.5rem",
                   }}
                 >
-                  {questionnaire.name}
-                </h3>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: "1.25em",
+                      color: "#646cff",
+                      flex: 1,
+                    }}
+                  >
+                    {questionnaire.name}
+                  </h3>
+                  <DropdownMenu
+                    trigger={
+                      <div
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          cursor: "pointer",
+                          color: "#888",
+                          fontSize: "1.2em",
+                          userSelect: "none",
+                        }}
+                      >
+                        ⋮
+                      </div>
+                    }
+                    options={[
+                      {
+                        label: "Edit",
+                        action: () => handleEditClick(questionnaire),
+                      },
+                      {
+                        label: "Delete",
+                        action: () => handleDeleteClick(questionnaire),
+                        danger: true,
+                      },
+                    ]}
+                  />
+                </div>
                 <p style={{ margin: "0.5rem 0", color: "#888", fontSize: "0.9em" }}>
                   {questionnaire.templates.length} template
                   {questionnaire.templates.length !== 1 ? "s" : ""}
@@ -158,6 +250,21 @@ export default function Home() {
             ))}
           </div>
         )}
+
+        <ConfirmationModal
+          isOpen={deleteModalOpen}
+          title="Delete Questionnaire"
+          message={
+            questionnaireToDelete
+              ? `Are you sure you want to delete "${questionnaireToDelete.name}"? This action cannot be undone.`
+              : ""
+          }
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCancel}
+          isLoading={deleting}
+        />
       </div>
     </Layout>
   );

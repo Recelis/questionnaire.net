@@ -7,8 +7,8 @@ import {
   apiDeleteQuestionnaire,
   type IQuestionnaire,
 } from "../../api/api";
-import DropdownMenu from "../../components/DropdownMenu";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import QuestionnaireListItem from "./QuestionnaireListItem";
 
 export default function Home() {
   const [questionnaires, setQuestionnaires] = useState<IQuestionnaire[]>([]);
@@ -46,12 +46,12 @@ export default function Home() {
     fetchQuestionnaires();
   }, [auth.user?.id]);
 
-  const handleDeleteClick = (questionnaire: IQuestionnaire) => {
+  const onDeleteClick = (questionnaire: IQuestionnaire) => {
     setQuestionnaireToDelete(questionnaire);
     setDeleteModalOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const onDeleteConfirm = async () => {
     if (!questionnaireToDelete) return;
 
     try {
@@ -81,12 +81,12 @@ export default function Home() {
     }
   };
 
-  const handleDeleteCancel = () => {
+  const onDeleteCancel = () => {
     setDeleteModalOpen(false);
     setQuestionnaireToDelete(null);
   };
 
-  const handleEditClick = (questionnaire: IQuestionnaire) => {
+  const onEditClick = (questionnaire: IQuestionnaire) => {
     navigate(`/questionnaire/${questionnaire.id}/edit`);
   };
 
@@ -175,78 +175,7 @@ export default function Home() {
             }}
           >
             {questionnaires.map((questionnaire) => (
-              <div
-                key={questionnaire.id}
-                style={{
-                  padding: "1.5rem",
-                  // backgroundColor: "#1a1a1a",
-                  borderRadius: "8px",
-                  border: "1px solid #333",
-                  transition: "all 0.25s",
-                  position: "relative",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "#646cff";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "#333";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "1.25em",
-                      color: "#646cff",
-                      flex: 1,
-                    }}
-                  >
-                    {questionnaire.name}
-                  </h3>
-                  <DropdownMenu
-                    trigger={
-                      <div
-                        style={{
-                          padding: "0.25rem 0.5rem",
-                          cursor: "pointer",
-                          color: "#888",
-                          fontSize: "1.2em",
-                          userSelect: "none",
-                        }}
-                      >
-                        ⋮
-                      </div>
-                    }
-                    options={[
-                      {
-                        label: "Edit",
-                        action: () => handleEditClick(questionnaire),
-                      },
-                      {
-                        label: "Delete",
-                        action: () => handleDeleteClick(questionnaire),
-                        danger: true,
-                      },
-                    ]}
-                  />
-                </div>
-                <p style={{ margin: "0.5rem 0", color: "#888", fontSize: "0.9em" }}>
-                  {questionnaire.templates.length} template
-                  {questionnaire.templates.length !== 1 ? "s" : ""}
-                </p>
-                <div style={{ marginTop: "1rem", fontSize: "0.85em", color: "#666" }}>
-                  ID: {questionnaire.id}
-                </div>
-              </div>
+              <QuestionnaireListItem key={questionnaire.id} questionnaire={questionnaire} onDeleteClick={onDeleteClick} onEditClick={onEditClick} />
             ))}
           </div>
         )}
@@ -261,8 +190,8 @@ export default function Home() {
           }
           confirmText="Delete"
           cancelText="Cancel"
-          onConfirm={handleDeleteConfirm}
-          onCancel={handleDeleteCancel}
+          onConfirm={onDeleteConfirm}
+          onCancel={onDeleteCancel}
           isLoading={deleting}
         />
       </div>

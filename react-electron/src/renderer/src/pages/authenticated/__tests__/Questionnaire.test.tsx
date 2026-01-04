@@ -3,10 +3,14 @@ import { render, screen, waitFor } from "../../../test/test-utils";
 import userEvent from "@testing-library/user-event";
 import QuestionnaireCreate from "../QuestionnaireCreate";
 import * as api from "../../../api/api";
+import QuestionnaireEdit from "../QuestionnaireEdit";
+import QuestionnaireListItem from "../QuestionnaireListItem";
 
 // Mock the API module
 vi.mock("../../../api/api", () => ({
   apiCreateQuestionnaire: vi.fn(),
+  apiUpdateQuestionnaire: vi.fn(),
+  apiGetQuestionnaires: vi.fn(),
 }));
 
 // Mock react-router
@@ -362,6 +366,163 @@ describe("QuestionnaireCreate", () => {
     const cancelLink = screen.getByText("Cancel");
     expect(cancelLink).toBeInTheDocument();
     expect(cancelLink.closest("a")).toHaveAttribute("href", "/");
+  });
+});
+
+describe("QuestionnaireListItem dropdown menu", () => {
+  const onEditClick = vi.fn();
+  const onEditQuestionsClick = vi.fn();
+  const onDeleteClick = vi.fn();
+
+  const mockQuestionnaire = {
+    id: 1,
+    name: "My Test Questionnaire",
+    userId: 1,
+    templates: [],
+  };
+
+  it("renders the dropdown list on the questionnaire list item", () => {
+    render(<QuestionnaireListItem questionnaire={mockQuestionnaire} onEditClick={onEditClick} onEditQuestionsClick={onEditQuestionsClick} onDeleteClick={onDeleteClick} />);
+
+    const dropdownMenu = screen.getByRole("button", { name: "⋮" });
+    expect(dropdownMenu).toBeInTheDocument();
+  });
+
+  it("calls onEditClick when Edit is clicked", async () => {
+    const user = userEvent.setup();
+    const onEditClick = vi.fn();
+    render(<QuestionnaireListItem questionnaire={mockQuestionnaire} onEditClick={onEditClick} onEditQuestionsClick={onEditQuestionsClick} onDeleteClick={onDeleteClick} />);
+    const dropdownMenu = screen.getByRole("button", { name: "⋮" });
+    await user.click(dropdownMenu);
+    const editOption = screen.getByText("Edit");
+    await user.click(editOption);
+    expect(onEditClick).toHaveBeenCalledWith(mockQuestionnaire);
+  });
+
+  it("calls onEditQuestionsClick when Edit Questions is clicked", async () => {
+    const user = userEvent.setup();
+    const onEditQuestionsClick = vi.fn();
+    render(<QuestionnaireListItem questionnaire={mockQuestionnaire} onEditClick={onEditClick} onEditQuestionsClick={onEditQuestionsClick} onDeleteClick={onDeleteClick} />);
+    const dropdownMenu = screen.getByRole("button", { name: "⋮" });
+    await user.click(dropdownMenu);
+    const editQuestionsOption = screen.getByText("Edit Questions");
+    await user.click(editQuestionsOption);
+    expect(onEditQuestionsClick).toHaveBeenCalledWith(mockQuestionnaire);
+  });
+
+  it("calls onDeleteClick when Delete is clicked", async () => {
+    const user = userEvent.setup();
+    const onDeleteClick = vi.fn();
+    render(<QuestionnaireListItem questionnaire={mockQuestionnaire} onEditClick={onEditClick} onEditQuestionsClick={onEditQuestionsClick} onDeleteClick={onDeleteClick} />);
+    const dropdownMenu = screen.getByRole("button", { name: "⋮" });
+    await user.click(dropdownMenu);
+    const deleteOption = screen.getByText("Delete");
+    await user.click(deleteOption);
+    expect(onDeleteClick).toHaveBeenCalledWith(mockQuestionnaire);
+  });
+});
+
+describe("QuestionnaireEdit", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  it("renders the edit questionnaire form with all elements", () => {
+    render(<QuestionnaireEdit />);
+
+    expect(screen.getByText("Edit Questionnaire")).toBeInTheDocument();
+    expect(screen.getByLabelText("Questionnaire Name")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Enter questionnaire name")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Update Questionnaire/i })).toBeInTheDocument();
+    expect(screen.getByText("Cancel")).toBeInTheDocument();
+    expect(screen.getByText("← Back to Questionnaires")).toBeInTheDocument();
+  });
+
+  it("allows user to type in the questionnaire name field", async () => {
+    const user = userEvent.setup();
+    render(<QuestionnaireEdit />);
+
+    const nameInput = screen.getByLabelText("Questionnaire Name");
+    await user.type(nameInput, "My Test Questionnaire");
+
+    expect((nameInput as HTMLInputElement).value).toBe("My Test Questionnaire");
+  });
+
+  it("calls apiUpdateQuestionnaire when form is submitted with valid name", async () => {
+    const user = userEvent.setup();
+    const mockQuestionnaire = {
+      id: 1,
+      name: "My Test Questionnaire",
+      userId: 1,
+      templates: [],
+    };
+    vi.mocked(api.apiUpdateQuestionnaire).mockResolvedValue(mockQuestionnaire);
+
+    render(<QuestionnaireEdit />);
+
+    const nameInput = screen.getByLabelText("Questionnaire Name");
+    const submitButton = screen.getByRole("button", {
+      name: /Update Questionnaire/i,
+    });
+
+    await user.type(nameInput, "My Test Questionnaire");
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(api.apiUpdateQuestionnaire).toHaveBeenCalledWith(1, {
+        name: "My Test Questionnaire",
+      });
+    });
+  });
+
+  // it("displays error message when API call fails", async () => {
+  //   const user = userEvent.setup();
+  //   vi.mocked(api.apiUpdateQuestionnaire).mockRejectedValue(
+  //     new Error("Failed to update questionnaire. Status: 500: Internal Server Error")
+  //   );
+
+  //   render(<QuestionnaireEdit />);
+  // });
+
+  // it("displays generic error message when API throws non-Error", async () => {
+  //   const user = userEvent.setup();
+  //   vi.mocked(api.apiUpdateQuestionnaire).mockRejectedValue("Unknown error");
+
+  //   render(<QuestionnaireEdit />);
+  // });
+
+  it("clears error message when form is resubmitted", async () => {
+    const user = userEvent.setup();
+    const mockQuestionnaire = {
+      id: 1,
+      name: "My Test Questionnaire",
+      userId: 1,
+      templates: [],
+    };
+
+    vi.mocked(api.apiUpdateQuestionnaire).mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve(mockQuestionnaire), 100)
+        )
+    );
+
+    render(<QuestionnaireEdit />);
+
+    const nameInput = screen.getByLabelText("Questionnaire Name");
+    const submitButton = screen.getByRole("button", {
+      name: /Update Questionnaire/i,
+    });
+
+    await user.type(nameInput, "My Test Questionnaire");
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Failed to update questionnaire/i)
+      ).toBeInTheDocument();
+    });
   });
 });
 

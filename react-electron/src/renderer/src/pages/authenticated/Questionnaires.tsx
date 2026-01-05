@@ -10,7 +10,7 @@ import {
 import ConfirmationModal from "../../components/ConfirmationModal";
 import QuestionnaireListItem from "./QuestionnaireListItem";
 
-export default function Home() {
+export default function Questionnaires() {
   const [questionnaires, setQuestionnaires] = useState<IQuestionnaire[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -88,6 +88,10 @@ export default function Home() {
 
   const onEditClick = (questionnaire: IQuestionnaire) => {
     navigate(`/questionnaire/${questionnaire.id}/edit`);
+  };
+
+  const onEditQuestionsClick = (questionnaire: IQuestionnaire) => {
+    navigate(`/questionnaire/${questionnaire.id}/edit/questions`);
   };
 
   return (
@@ -175,7 +179,13 @@ export default function Home() {
             }}
           >
             {questionnaires.map((questionnaire) => (
-              <QuestionnaireListItem key={questionnaire.id} questionnaire={questionnaire} onDeleteClick={onDeleteClick} onEditClick={onEditClick} />
+              <QuestionnaireListItem 
+                key={questionnaire.id}
+                questionnaire={questionnaire}
+                onDeleteClick={onDeleteClick}
+                onEditClick={onEditClick}
+                onEditQuestionsClick={onEditQuestionsClick} 
+              />
             ))}
           </div>
         )}

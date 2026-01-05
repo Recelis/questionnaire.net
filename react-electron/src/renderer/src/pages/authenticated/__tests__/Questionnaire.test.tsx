@@ -11,10 +11,12 @@ vi.mock("../../../api/api", () => ({
   apiCreateQuestionnaire: vi.fn(),
   apiUpdateQuestionnaire: vi.fn(),
   apiGetQuestionnaires: vi.fn(),
+  apiGetUser: vi.fn(),
 }));
 
 // Mock react-router
 const mockNavigate = vi.fn();
+const mockUseParams = vi.fn();
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
@@ -23,6 +25,7 @@ vi.mock("react-router", async () => {
       <a href={to}>{children}</a>
     ),
     useNavigate: () => mockNavigate,
+    useParams: () => mockUseParams(),
   };
 });
 
@@ -423,9 +426,15 @@ describe("QuestionnaireListItem dropdown menu", () => {
 });
 
 describe("QuestionnaireEdit", () => {
+  const createMockToken = () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEifQ.signature";
+  const mockUser = { id: 1, email: "test@example.com", name: "Test User" };
+
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    mockUseParams.mockReturnValue({ id: "1" });
+    vi.mocked(api.apiGetUser).mockResolvedValue(mockUser);
+    localStorage.setItem("user_token", createMockToken());
   });
 
   it("renders the edit questionnaire form with all elements", () => {
@@ -453,11 +462,47 @@ describe("QuestionnaireEdit", () => {
     const user = userEvent.setup();
     const mockQuestionnaire = {
       id: 1,
-      name: "My Test Questionnaire",
+      name: "Original Name",
       userId: 1,
       templates: [],
     };
     vi.mocked(api.apiUpdateQuestionnaire).mockResolvedValue(mockQuestionnaire);
+    vi.mocked(api.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+
+    render(<QuestionnaireEdit />);
+
+    // Wait for the component to load the questionnaire
+    await waitFor(() => {
+      expect(api.apiGetQuestionnaires).toHaveBeenCalled();
+    });
+
+    const nameInput = screen.getByLabelText("Questionnaire Name") as HTMLInputElement;
+    // Wait for the input to be populated with the existing name
+    await waitFor(() => {
+      expect(nameInput.value).toBe("Original Name");
+    });
+
+    // Clear and type new name
+    await user.clear(nameInput);
+    await user.type(nameInput, "My Test Questionnaire");
+    
+    const submitButton = screen.getByRole("button", {
+      name: /Update Questionnaire/i,
+    });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(api.apiUpdateQuestionnaire).toHaveBeenCalledWith(1, {
+        name: "My Test Questionnaire",
+      });
+    });
+  });
+
+  it("displays error message when API call fails", async () => {
+    const user = userEvent.setup();
+    vi.mocked(api.apiUpdateQuestionnaire).mockRejectedValue(
+      new Error("Failed to update questionnaire. Status: 500: Internal Server Error")
+    );
 
     render(<QuestionnaireEdit />);
 
@@ -470,30 +515,15 @@ describe("QuestionnaireEdit", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(api.apiUpdateQuestionnaire).toHaveBeenCalledWith(1, {
-        name: "My Test Questionnaire",
-      });
+      expect(
+        screen.getByText(/Failed to update questionnaire/i)
+      ).toBeInTheDocument();
     });
   });
 
-  // it("displays error message when API call fails", async () => {
-  //   const user = userEvent.setup();
-  //   vi.mocked(api.apiUpdateQuestionnaire).mockRejectedValue(
-  //     new Error("Failed to update questionnaire. Status: 500: Internal Server Error")
-  //   );
-
-  //   render(<QuestionnaireEdit />);
-  // });
-
-  // it("displays generic error message when API throws non-Error", async () => {
-  //   const user = userEvent.setup();
-  //   vi.mocked(api.apiUpdateQuestionnaire).mockRejectedValue("Unknown error");
-
-  //   render(<QuestionnaireEdit />);
-  // });
-
   it("clears error message when form is resubmitted", async () => {
     const user = userEvent.setup();
+    
     const mockQuestionnaire = {
       id: 1,
       name: "My Test Questionnaire",
@@ -501,11 +531,13 @@ describe("QuestionnaireEdit", () => {
       templates: [],
     };
 
-    vi.mocked(api.apiUpdateQuestionnaire).mockImplementation(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve(mockQuestionnaire), 100)
-        )
+    // First attempt fails
+    vi.mocked(api.apiCreateQuestionnaire).mockRejectedValueOnce(
+      new Error("Failed to create questionnaire")
+    );
+    // Second attempt succeeds
+    vi.mocked(api.apiCreateQuestionnaire).mockResolvedValueOnce(
+      mockQuestionnaire
     );
 
     render(<QuestionnaireEdit />);

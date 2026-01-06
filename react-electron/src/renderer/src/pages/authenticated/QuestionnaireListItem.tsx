@@ -2,14 +2,14 @@ import React from "react";
 import type { IQuestionnaire } from "../../api/api";
 import DropdownMenu from "../../components/DropdownMenu";
 
-interface IQuestionnaireListItem {
+interface IQuestionnaireListItemProps {
   questionnaire: IQuestionnaire;
   onDeleteClick: (questionnaire: IQuestionnaire) => void;
   onEditClick: (questionnaire: IQuestionnaire) => void;
   onEditQuestionsClick: (questionnaire: IQuestionnaire) => void;
 }
 
-export default function QuestionnaireListItem(props: IQuestionnaireListItem) {
+export default function QuestionnaireListItem(props: IQuestionnaireListItemProps) {
   const { questionnaire, onDeleteClick, onEditClick, onEditQuestionsClick } =
     props;
 

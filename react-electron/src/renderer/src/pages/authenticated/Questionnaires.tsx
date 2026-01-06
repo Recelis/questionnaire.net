@@ -91,7 +91,7 @@ export default function Questionnaires() {
   };
 
   const onEditQuestionsClick = (questionnaire: IQuestionnaire) => {
-    navigate(`/questionnaire/${questionnaire.id}/edit/questions`);
+    navigate(`/questionnaire/${questionnaire.id}/edit/template`);
   };
 
   return (

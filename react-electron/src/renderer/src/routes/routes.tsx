@@ -6,7 +6,7 @@ import AuthComponent from "../components/AuthComponent";
 import QuestionnaireCreate from "../pages/authenticated/QuestionnaireCreate";
 import QuestionnaireEdit from "../pages/authenticated/QuestionnaireEdit";
 import Questionnaires from "../pages/authenticated/Questionnaires";
-import Questions from "../pages/authenticated/Questions";
+import Templates from "../pages/authenticated/Templates";
 
 const RouterComponent = () => {
   return (
@@ -21,7 +21,7 @@ const RouterComponent = () => {
           <Route path="questionnaire">
             <Route path="create" element={<QuestionnaireCreate />} />
             <Route path=":id/edit" element={<QuestionnaireEdit />} />
-            <Route path=":id/edit/question" element={<Questions />} />
+            <Route path=":id/edit/template" element={<Templates />} />
           </Route>
           {/* <Route path="questionnaire/:questionnaire" element={<Questionnaire />} /> */}
         </Route>

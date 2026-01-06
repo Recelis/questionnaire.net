@@ -23,17 +23,24 @@ vi.mock("react-router", async () => {
   };
 });
 
-describe("QuestionList", () => {
+describe("TemplateList", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
   });
 
-  it.todo("renders the questions for the questionnaire");
+  it("renders the templates for the templatenaire", () => {
+    const mockQuestionnaire = {
+      id: 1,
+      name: "My Test Questionnaire",
+      userId: 1,
+      templates: [],
+    };
+  });
 
   it.todo("displays a message when there are no questions for the questionnaire");
 
-  it.todo("displays a button for adding a new question");
+  it.todo("displays a button for adding a new template");
 });
 
 describe("QuestionCreate", () => {
@@ -42,19 +49,19 @@ describe("QuestionCreate", () => {
     localStorage.clear();
   });
 
-  it.todo("renders the create question form with all elements including questionnaire name");
+  it.todo("renders the create template form with all elements including questionnaire name");
 
-  it.todo("allows user to type in the question name field");
+  it.todo("allows user to type in the template name field");
 
   it.todo("calls apiCreateQuestion when form is submitted with valid name");
 
   it.todo("displays a continue adding questions or return to home page modal after form is successfully submitted");
 
-  it.todo("trims whitespace from question name before submission");
+  it.todo("trims whitespace from template name before submitting");
 
-  it.todo("prevents submission when question name is empty");
+  it.todo("prevents submitting when template name is empty");
 
-  it.todo("prevents submission when question name is only whitespace");
+  it.todo("prevents submitting when template name is only whitespace");
 
   it.todo("displays error message when API call fails");
 

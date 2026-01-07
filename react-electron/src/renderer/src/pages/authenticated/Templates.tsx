@@ -55,7 +55,8 @@ export default function Templates() {
         setShowCreateForm(false);
     };
 
-    if (showCreateForm || templates.length === 0) {
+    // Show create form only if no error, not loading, and either explicitly requested or no templates
+    if (!error && !loading && (showCreateForm || templates.length === 0)) {
         return (
             <TemplateCreate
                 questionnaireId={id ? parseInt(id, 10) : undefined}
@@ -103,22 +104,24 @@ export default function Templates() {
                             </p>
                         )}
                     </div>
-                    <button
-                        onClick={() => setShowCreateForm(true)}
-                        style={{
-                            padding: '0.6em 1.2em',
-                            fontSize: '1em',
-                            fontWeight: 500,
-                            borderRadius: '8px',
-                            border: '1px solid transparent',
-                            backgroundColor: '#646cff',
-                            color: 'white',
-                            cursor: 'pointer',
-                            transition: 'all 0.25s',
-                        }}
-                    >
-                        + Create New Template
-                    </button>
+                    {!error && (
+                        <button
+                            onClick={() => setShowCreateForm(true)}
+                            style={{
+                                padding: '0.6em 1.2em',
+                                fontSize: '1em',
+                                fontWeight: 500,
+                                borderRadius: '8px',
+                                border: '1px solid transparent',
+                                backgroundColor: '#646cff',
+                                color: 'white',
+                                cursor: 'pointer',
+                                transition: 'all 0.25s',
+                            }}
+                        >
+                            + Create New Template
+                        </button>
+                    )}
                 </div>
 
                 {loading && (

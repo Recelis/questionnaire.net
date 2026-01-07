@@ -14,6 +14,7 @@ export interface IQuestionnaire {
   }
 
   export interface ITemplate {
+    id: number;
     version: number;
     name: string;
     questionnaireId: number;

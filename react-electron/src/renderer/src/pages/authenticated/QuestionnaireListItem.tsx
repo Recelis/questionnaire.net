@@ -6,11 +6,11 @@ interface IQuestionnaireListItemProps {
     questionnaire: IQuestionnaire;
     onDeleteClick: (questionnaire: IQuestionnaire) => void;
     onEditClick: (questionnaire: IQuestionnaire) => void;
-    onEditQuestionsClick: (questionnaire: IQuestionnaire) => void;
+    onEditTemplatesClick: (questionnaire: IQuestionnaire) => void;
 }
 
 export default function QuestionnaireListItem(props: IQuestionnaireListItemProps) {
-    const { questionnaire, onDeleteClick, onEditClick, onEditQuestionsClick } = props;
+    const { questionnaire, onDeleteClick, onEditClick, onEditTemplatesClick } = props;
 
     return (
         <div
@@ -69,9 +69,13 @@ export default function QuestionnaireListItem(props: IQuestionnaireListItemProps
                             action: () => onEditClick(questionnaire),
                         },
                         {
-                            label: 'Edit Questions',
-                            action: () => onEditQuestionsClick(questionnaire),
+                            label: 'Edit Templates',
+                            action: () => onEditTemplatesClick(questionnaire),
                         },
+                        // {
+                        //     label: 'View Latest Submissions',
+                        //     action: () => {},
+                        // },
                         {
                             label: 'Delete',
                             action: () => onDeleteClick(questionnaire),

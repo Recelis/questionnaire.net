@@ -83,7 +83,7 @@ export default function Questionnaires() {
         navigate(`/questionnaire/${questionnaire.id}/edit`);
     };
 
-    const onEditQuestionsClick = (questionnaire: IQuestionnaire) => {
+    const onEditTemplatesClick = (questionnaire: IQuestionnaire) => {
         navigate(`/questionnaire/${questionnaire.id}/edit/template`);
     };
 
@@ -179,7 +179,7 @@ export default function Questionnaires() {
                                 questionnaire={questionnaire}
                                 onDeleteClick={onDeleteClick}
                                 onEditClick={onEditClick}
-                                onEditQuestionsClick={onEditQuestionsClick}
+                                onEditTemplatesClick={onEditTemplatesClick}
                             />
                         ))}
                     </div>

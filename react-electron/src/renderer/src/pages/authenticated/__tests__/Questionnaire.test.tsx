@@ -360,7 +360,7 @@ describe('QuestionnaireCreate', () => {
 
 describe('QuestionnaireListItem dropdown menu', () => {
     const onEditClick = vi.fn();
-    const onEditQuestionsClick = vi.fn();
+    const onEditTemplatesClick = vi.fn();
     const onDeleteClick = vi.fn();
 
     const mockQuestionnaire = {
@@ -375,7 +375,7 @@ describe('QuestionnaireListItem dropdown menu', () => {
             <QuestionnaireListItem
                 questionnaire={mockQuestionnaire}
                 onEditClick={onEditClick}
-                onEditQuestionsClick={onEditQuestionsClick}
+                onEditTemplatesClick={onEditTemplatesClick}
                 onDeleteClick={onDeleteClick}
             />
         );
@@ -391,7 +391,7 @@ describe('QuestionnaireListItem dropdown menu', () => {
             <QuestionnaireListItem
                 questionnaire={mockQuestionnaire}
                 onEditClick={onEditClick}
-                onEditQuestionsClick={onEditQuestionsClick}
+                onEditTemplatesClick={onEditTemplatesClick}
                 onDeleteClick={onDeleteClick}
             />
         );
@@ -402,22 +402,22 @@ describe('QuestionnaireListItem dropdown menu', () => {
         expect(onEditClick).toHaveBeenCalledWith(mockQuestionnaire);
     });
 
-    it('calls onEditQuestionsClick when Edit Questions is clicked', async () => {
+    it('calls onEditTemplatesClick when Edit Templates is clicked', async () => {
         const user = userEvent.setup();
-        const onEditQuestionsClick = vi.fn();
+        const onEditTemplatesClick = vi.fn();
         render(
             <QuestionnaireListItem
                 questionnaire={mockQuestionnaire}
                 onEditClick={onEditClick}
-                onEditQuestionsClick={onEditQuestionsClick}
+                onEditTemplatesClick={onEditTemplatesClick}
                 onDeleteClick={onDeleteClick}
             />
         );
         const dropdownMenu = screen.getByRole('button', { name: '⋮' });
         await user.click(dropdownMenu);
-        const editQuestionsOption = screen.getByText('Edit Questions');
+        const editQuestionsOption = screen.getByText('Edit Templates');
         await user.click(editQuestionsOption);
-        expect(onEditQuestionsClick).toHaveBeenCalledWith(mockQuestionnaire);
+        expect(onEditTemplatesClick).toHaveBeenCalledWith(mockQuestionnaire);
     });
 
     it('calls onDeleteClick when Delete is clicked', async () => {
@@ -427,7 +427,7 @@ describe('QuestionnaireListItem dropdown menu', () => {
             <QuestionnaireListItem
                 questionnaire={mockQuestionnaire}
                 onEditClick={onEditClick}
-                onEditQuestionsClick={onEditQuestionsClick}
+                onEditTemplatesClick={onEditTemplatesClick}
                 onDeleteClick={onDeleteClick}
             />
         );

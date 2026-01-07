@@ -1,23 +1,7 @@
 import type { IUser } from "../context/types";
+import type { ICreateQuestionnaire,IQuestionnaire,IUpdateQuestionnaire } from "./types";
 
 const DEFAULT_BASE_URL = "http://localhost:5283";
-
-export interface IQuestionnaire {
-  id: number;
-  name: string;
-  userId: number;
-  templates: ITemplate[];
-}
-
-export interface ITemplate {
-  version: number;
-  name: string;
-  questionnaireId: number;
-}
-
-export interface ICreateQuestionnaire {
-  name: string;
-}
 
 const getAuthHeaders = (): HeadersInit => {
   const token = localStorage.getItem("user_token");
@@ -163,9 +147,7 @@ export const apiGetQuestionnaires = async (
   }
 };
 
-export interface IUpdateQuestionnaire {
-  name: string;
-}
+
 
 export const apiUpdateQuestionnaire = async (
   id: number,

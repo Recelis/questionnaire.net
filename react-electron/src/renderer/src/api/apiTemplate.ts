@@ -1,200 +1,76 @@
-import type { IUser } from "../context/types";
-import type { ICreateQuestionnaire,IQuestionnaire,IUpdateQuestionnaire } from "./types";
+import type { ICreateTemplate, IQuestionnaire, ITemplate, IUpdateTemplate } from './types';
+import { getAuthHeaders } from './api';
 
-const DEFAULT_BASE_URL = "http://localhost:5283";
+const DEFAULT_BASE_URL = 'http://localhost:5283';
 
-const getAuthHeaders = (): HeadersInit => {
-  const token = localStorage.getItem("user_token");
-  const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  return headers;
+export const apiGetTemplates = async (
+    questionnaireId: number
+): Promise<ITemplate[] | undefined> => {
+    try {
+        const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
+        const res = await fetch(`${baseUrl}/Template/questionnaire/${questionnaireId}`, {
+            method: 'GET',
+            headers: getAuthHeaders(),
+        });
+
+        if (!res.ok) {
+            const message = await res.text();
+            throw new Error(`Failed to get templates. Status: ${res.status}: ${message}`);
+        }
+
+        const data = await res.json();
+        return data as ITemplate[];
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
 };
 
-export const apiUserLogin = async (body: {
-  email: string;
-  password: string;
-}): Promise<string | undefined> => {
-  try {
-    const res = await fetch(`${DEFAULT_BASE_URL}/user/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+export const apiCreateTemplate = async (
+    body: ICreateTemplate
+): Promise<ICreateTemplate | undefined> => {
+    try {
+        const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
+        const res = await fetch(`${baseUrl}/Template`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(body),
+        });
 
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 404) {
-        throw new Error("Invalid email or password");
-      }
-      throw new Error(`Failed to sign in. Status: ${res.status}`);
+        if (!res.ok) {
+            const message = await res.text();
+            throw new Error(`Failed to create template. Status: ${res.status}: ${message}`);
+        }
+
+        const data = await res.json();
+        return data as ITemplate;
+    } catch (err) {
+        console.error(err);
+        throw err;
     }
-
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
 };
 
-export const apiUserSignup = async (body: {
-  email: string;
-  name: string;
-  password: string;
-}): Promise<IUser | undefined> => {
-  try {
-    const res = await fetch(`${DEFAULT_BASE_URL}/user`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      if (res.status === 409) {
-        const errorData = await res.json().catch(() => ({ message: "User already exists" }));
-        throw new Error(errorData.message || "User with this email already exists");
-      }
-      throw new Error(`Failed to create account. Status: ${res.status}`);
-    }
-
-    const data = await res.json();
-    return data as IUser;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-};
-
-export const apiGetUser = async (id: string): Promise<IUser | undefined> => {
-  try {
-    if (!/^\d+$/.test(id)) {
-      throw new Error("Invalid user ID — must be a numeric string");
-    }
-
-    const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
-    const url = new URL(`/user/${encodeURIComponent(id)}`, baseUrl).toString();
-    const headers = getAuthHeaders();
-
-
-    const res = await fetch(url, { method: "GET", headers });
-
-    if (!res.ok) {
-      const message = await res.text();
-      throw new Error(`API Error (${res.status}): ${message}`);
-    }
-
-    const contentType = res.headers.get("content-type") || "";
-    if (!contentType.includes("application/json")) {
-      throw new Error("Expected JSON response");
-    }
-
-    return (await res.json()) as IUser;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-
-export const apiCreateQuestionnaire = async (
-  body: ICreateQuestionnaire
+export const apiUpdateTemplate = async (
+    id: number,
+    body: IUpdateTemplate
 ): Promise<IQuestionnaire | undefined> => {
-  try {
-    const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
-    const res = await fetch(`${baseUrl}/Questionnaire`, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(body),
-    });
+    try {
+        const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
+        const res = await fetch(`${baseUrl}/Template/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(body),
+        });
 
-    if (!res.ok) {
-      const message = await res.text();
-      throw new Error(`Failed to create questionnaire. Status: ${res.status}: ${message}`);
+        if (!res.ok) {
+            const message = await res.text();
+            throw new Error(`Failed to update template. Status: ${res.status}: ${message}`);
+        }
+
+        const data = await res.json();
+        return data as IQuestionnaire;
+    } catch (err) {
+        console.error(err);
+        throw err;
     }
-
-    const data = await res.json();
-    return data as IQuestionnaire;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-};
-
-export const apiGetQuestionnaires = async (
-  userId: number
-): Promise<IQuestionnaire[] | undefined> => {
-  try {
-    const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
-    const res = await fetch(`${baseUrl}/Questionnaire/user/${userId}`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
-
-    if (!res.ok) {
-      const message = await res.text();
-      throw new Error(`Failed to get questionnaires. Status: ${res.status}: ${message}`);
-    }
-
-    const data = await res.json();
-    return data as IQuestionnaire[];
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-};
-
-
-
-export const apiUpdateQuestionnaire = async (
-  id: number,
-  body: IUpdateQuestionnaire
-): Promise<IQuestionnaire | undefined> => {
-  try {
-    const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
-    const res = await fetch(`${baseUrl}/Questionnaire/${id}`, {
-      method: "PUT",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      const message = await res.text();
-      throw new Error(`Failed to update questionnaire. Status: ${res.status}: ${message}`);
-    }
-
-    const data = await res.json();
-    return data as IQuestionnaire;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-};
-
-export const apiDeleteQuestionnaire = async (
-  questionnaireId: number
-): Promise<boolean> => {
-  try {
-    const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
-    const res = await fetch(`${baseUrl}/Questionnaire/${questionnaireId}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
-
-    if (!res.ok) {
-      if (res.status === 404) {
-        return false;
-      }
-      const message = await res.text();
-      throw new Error(`Failed to delete questionnaire. Status: ${res.status}: ${message}`);
-    }
-
-    return true;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
 };

@@ -27,7 +27,7 @@ public class AnswerController : ControllerBase
     /// <returns>A list of answers.</returns>
     /// <response code="200">Returns a list of answers</response>
     [Authorize]
-    [HttpGet("answer/{submissionId:int}")]
+    [HttpGet("submission/{submissionId:int}")]
     [ProducesResponseType(typeof(List<Answer>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]

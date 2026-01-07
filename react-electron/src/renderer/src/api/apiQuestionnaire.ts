@@ -1,15 +1,7 @@
+import { getAuthHeaders } from "./api";
 import type { ICreateQuestionnaire,IQuestionnaire,IUpdateQuestionnaire } from "./types";
 
 const DEFAULT_BASE_URL = "http://localhost:5283";
-
-const getAuthHeaders = (): HeadersInit => {
-  const token = localStorage.getItem("user_token");
-  const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  return headers;
-};
 
 export const apiCreateQuestionnaire = async (
   body: ICreateQuestionnaire

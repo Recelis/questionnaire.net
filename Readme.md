@@ -22,8 +22,8 @@
 
 - - [x] - Setup Electron project
 - - [x] - Users can log in
-- - [ ] - Users can create their own Questionnaires
-- - [ ] - Users can create their own Templates
+- - [x] - Users can create their own Questionnaires
+- - [x] - Users can create their own Templates
 - - [ ] - Users can add questions to their templates
 - - [ ] - Users can duplicate their templates
 - - [ ] - Users can create submissions

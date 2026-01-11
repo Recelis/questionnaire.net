@@ -624,3 +624,34 @@ describe('TemplateCreate', () => {
         expect(backLink.closest('a')).toHaveAttribute('href', '/');
     });
 });
+
+describe('TemplateItemCard', () => {
+    it.todo('Clicking on card navigates to the template questions page');
+
+    it.todo("Clicking on the template 'Edit' dropdown takes the user to the Edit Template Form");
+});
+
+describe('TemplateEdit', () => {
+    const createMockToken = () => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEifQ.signature';
+    const mockUser = { id: 1, email: 'test@example.com', name: 'Test User' };
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        localStorage.clear();
+        mockUseParams.mockReturnValue({ id: '1' });
+        vi.mocked(apiUser.apiGetUser).mockResolvedValue(mockUser);
+        localStorage.setItem('user_token', createMockToken());
+    });
+
+    it.todo('renders the edit template form with all elements');
+
+    it.todo('renders the edit template form with all elements');
+
+    it.todo('allows user to type in the template name field');
+
+    it.todo('calls apiUpdateTemplate when form is submitted with valid name');
+
+    it.todo('displays error message when API call fails');
+
+    it.todo('clears error message when form is resubmitted');
+});

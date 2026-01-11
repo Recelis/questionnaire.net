@@ -1,14 +1,16 @@
-import React from 'react';
 import type { ITemplate } from '../../api/types';
+import { Link } from 'react-router';
 
 export interface ITemplateListItemProps {
+    questionnaireId: number;
     template: ITemplate;
 }
 
 export default function TemplateListItem(props: ITemplateListItemProps) {
-    const { template } = props;
+    const { template, questionnaireId } = props;
     return (
-        <div
+        <Link
+            to={`/questionnaire/${questionnaireId}/edit/template/edit/${template.id}`}
             key={template.id}
             style={{
                 padding: '1.5rem',
@@ -41,6 +43,6 @@ export default function TemplateListItem(props: ITemplateListItemProps) {
             <div style={{ marginTop: '1rem', fontSize: '0.85em', color: '#666' }}>
                 ID: {template.id}
             </div>
-        </div>
+        </Link>
     );
 }

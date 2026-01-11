@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import Layout from '../../components/Layout';
 import TemplateCreate from './TemplateCreate';
 import TemplateListItem from './TemplateListItem';
@@ -17,6 +17,13 @@ export default function Templates() {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const auth = useAuth();
 
+    const navigate = useNavigate();
+    const questionnaireId = id ? parseInt(id, 10) : undefined;
+    if (!questionnaireId) {
+        navigate('/');
+        return;
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             if (!auth.user?.id || !id) {
@@ -26,7 +33,6 @@ export default function Templates() {
             try {
                 setLoading(true);
                 setError(undefined);
-                const questionnaireId = parseInt(id, 10);
 
                 // Fetch questionnaire to get its name
                 const questionnaires = await apiGetQuestionnaires(auth.user.id);
@@ -60,7 +66,7 @@ export default function Templates() {
     if (!error && !loading && (showCreateForm || templates.length === 0)) {
         return (
             <TemplateCreate
-                questionnaireId={id ? parseInt(id, 10) : undefined}
+                questionnaireId={questionnaireId}
                 questionnaireName={questionnaireName}
                 onTemplateCreated={handleTemplateCreated}
                 onCancel={() => {
@@ -155,7 +161,11 @@ export default function Templates() {
                         }}
                     >
                         {templates.map(template => (
-                            <TemplateListItem template={template} />
+                            <TemplateListItem
+                                key={template.id}
+                                questionnaireId={questionnaireId}
+                                template={template}
+                            />
                         ))}
                     </div>
                 )}

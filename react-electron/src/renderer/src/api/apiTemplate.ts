@@ -26,6 +26,29 @@ export const apiGetTemplates = async (
     }
 };
 
+export const apiGetTemplate = async (templateId: number): Promise<ITemplate | undefined> => {
+    try {
+        const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
+        const res = await fetch(`${baseUrl}/Template/${templateId}`, {
+            method: 'GET',
+            headers: getAuthHeaders(),
+        });
+
+        if (!res.ok) {
+            const message = await res.text();
+            throw new Error(
+                `Failed to get template for id ${templateId}. Status: ${res.status}: ${message}`
+            );
+        }
+
+        const data = await res.json();
+        return data as ITemplate;
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+};
+
 export const apiCreateTemplate = async (
     body: ICreateTemplate
 ): Promise<ICreateTemplate | undefined> => {

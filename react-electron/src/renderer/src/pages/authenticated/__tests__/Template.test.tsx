@@ -625,10 +625,12 @@ describe('TemplateCreate', () => {
     });
 });
 
-describe('TemplateItemCard', () => {
+describe('TemplateListItem', () => {
+    it.todo("Clicking on the template 'Edit' dropdown takes the user to the Edit Template Form");
+
     it.todo('Clicking on card navigates to the template questions page');
 
-    it.todo("Clicking on the template 'Edit' dropdown takes the user to the Edit Template Form");
+    it.todo("Clicking on the template 'Delete' dropdown opens a modal to delete the template");
 });
 
 describe('TemplateEdit', () => {

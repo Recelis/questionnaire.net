@@ -1,5 +1,6 @@
 import React from 'react';
+import Layout from '../../components/Layout';
 
 export default function TemplateQuestions() {
-    return <div>TemplateQuestions</div>;
+    return <Layout>TemplateQuestions</Layout>;
 }

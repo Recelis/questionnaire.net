@@ -686,8 +686,6 @@ describe('TemplateListItem', () => {
         const listItem = screen.getByRole('link');
         expect(listItem).toHaveAttribute('href', '/questionnaire/1/edit/template/2/question');
     });
-
-    it.todo("Clicking on the template 'Delete' dropdown opens a modal to delete the template");
 });
 
 describe('TemplateEdit', () => {

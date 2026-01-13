@@ -79,11 +79,6 @@ export default function TemplateListItem(props: ITemplateListItemProps) {
                             label: 'Edit',
                             action: () => onEditClick(),
                         },
-                        {
-                            label: 'Delete',
-                            action: () => onDeleteClick(),
-                            danger: true,
-                        },
                     ]}
                 />
             </div>

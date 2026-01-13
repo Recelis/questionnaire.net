@@ -15,7 +15,6 @@
 - [x] - Create User model + add to Questionnaire created_by field.
 - [ ] - Locking templates so cannot have answers until it is 'locked'. Cannot modify after locked.
 - [ ] - duplicating templates
-- [ ] - can only delete the most recent template
 
 ### Future
 

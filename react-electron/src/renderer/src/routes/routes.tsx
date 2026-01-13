@@ -8,6 +8,7 @@ import QuestionnaireEdit from '../pages/authenticated/QuestionnaireEdit';
 import Questionnaires from '../pages/authenticated/Questionnaires';
 import Templates from '../pages/authenticated/Templates';
 import TemplateEdit from '../pages/authenticated/TemplateEdit';
+import TemplateQuestions from '../pages/authenticated/TemplateQuestions';
 
 const RouterComponent = () => {
     return (
@@ -27,8 +28,11 @@ const RouterComponent = () => {
                             path=":id/edit/template/edit/:templateid"
                             element={<TemplateEdit />}
                         />
+                        <Route
+                            path=":id/edit/template/:templateid/question"
+                            element={<TemplateQuestions />}
+                        />
                     </Route>
-                    {/* <Route path="questionnaire/:questionnaire" element={<Questionnaire />} /> */}
                 </Route>
             </Route>
         </Routes>

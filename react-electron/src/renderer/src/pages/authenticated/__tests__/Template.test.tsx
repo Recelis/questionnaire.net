@@ -6,6 +6,7 @@ import TemplateCreate from '../TemplateCreate';
 import * as apiTemplate from '../../../api/apiTemplate';
 import * as apiQuestionnaire from '../../../api/apiQuestionnaire';
 import * as apiUser from '../../../api/apiUser';
+import TemplateListItem from '../TemplateListItem';
 
 // Mock the API modules
 vi.mock('../../../api/apiTemplate', () => ({
@@ -29,9 +30,27 @@ vi.mock('react-router', async () => {
     const actual = await vi.importActual('react-router');
     return {
         ...actual,
-        Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
-            <a href={to}>{children}</a>
-        ),
+        Link: ({
+            to,
+            children,
+            onClick,
+        }: {
+            to: string;
+            children: React.ReactNode;
+            onClick?: () => void;
+        }) => {
+            const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                e.preventDefault();
+                e.stopPropagation();
+                mockNavigate(to);
+                onClick?.();
+            };
+            return (
+                <a href={to} onClick={handleClick}>
+                    {children}
+                </a>
+            );
+        },
         useNavigate: () => mockNavigate,
         useParams: () => mockUseParams(),
     };
@@ -626,9 +645,47 @@ describe('TemplateCreate', () => {
 });
 
 describe('TemplateListItem', () => {
-    it.todo("Clicking on the template 'Edit' dropdown takes the user to the Edit Template Form");
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
-    it.todo('Clicking on card navigates to the template questions page');
+    it("Clicking on the template 'Edit' dropdown takes the user to the Edit Template Form", async () => {
+        const user = userEvent.setup();
+
+        const mockTemplate = {
+            id: 2,
+            version: 2,
+            name: 'My template',
+            questionnaireId: 1,
+        };
+
+        render(<TemplateListItem questionnaireId={1} template={mockTemplate} />);
+
+        // find Dropdown Menu
+        const dropdownMenu = await screen.findByRole('button');
+        await user.click(dropdownMenu);
+        // find edit dropdown
+        const editDropdown = screen.getByText(/Edit/);
+        expect(editDropdown).toBeInTheDocument();
+        await user.click(editDropdown);
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/questionnaire/1/edit/template/edit/2');
+        });
+    });
+
+    it('The list item has a link to the associated template questions page', () => {
+        const mockTemplate = {
+            id: 2,
+            version: 2,
+            name: 'My template',
+            questionnaireId: 1,
+        };
+
+        render(<TemplateListItem questionnaireId={1} template={mockTemplate} />);
+        // Verify the Link has the correct href attribute (the mocked Link renders as an anchor tag)
+        const listItem = screen.getByRole('link');
+        expect(listItem).toHaveAttribute('href', '/questionnaire/1/edit/template/2/question');
+    });
 
     it.todo("Clicking on the template 'Delete' dropdown opens a modal to delete the template");
 });

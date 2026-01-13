@@ -20,7 +20,7 @@ export default function TemplateListItem(props: ITemplateListItemProps) {
     const onDeleteClick = () => {};
     return (
         <Link
-            to={`/questionnaire/${questionnaireId}/edit/template/edit/${template.id}`}
+            to={`/questionnaire/${questionnaireId}/edit/template/${template.id}/question`}
             key={template.id}
             style={{
                 padding: '1.5rem',

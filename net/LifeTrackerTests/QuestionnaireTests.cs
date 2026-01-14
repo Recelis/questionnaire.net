@@ -64,21 +64,69 @@ namespace LifeTracker.Tests.Services
         [Test]
         public async Task CreateAsync_ShouldAddQuestionnaireToDb()
         {
+            // Arrange
             User user = await CreateTestUser();
-            CreateQuestionnaireDto dto = new CreateQuestionnaireDto
+
+            var dto = new CreateQuestionnaireDto
             {
                 Name = "Test Questionnaire",
-                UserId = user.Id
             };
+            
+            // Act
             var result = await _service.CreateAsync(dto);
 
+            // Assert on returned object
             Assert.That(result, Is.Not.Null);
-            Assert.That(dto.Name, Is.EqualTo(result.Name));
-            Assert.That(dto.UserId, Is.EqualTo(result.UserId));
+            Assert.That(result.Name, Is.EqualTo(dto.Name));
+            Assert.That(result.Id, Is.GreaterThan(0));   // important!
 
-            var questionnaireInDb = await _context.Questionnaire.FindAsync(result.Id);
+            // Fetch from database with relationships included
+            var questionnaireInDb = await _context.Questionnaire
+                .Where(q => q.Id == result.Id)
+                .Include(q => q.Templates)
+                .FirstOrDefaultAsync();
+
             Assert.That(questionnaireInDb, Is.Not.Null);
+            Assert.That(questionnaireInDb.Name, Is.EqualTo(dto.Name));
+            Assert.That(questionnaireInDb.UserId, Is.EqualTo(user.Id));
+
+            // Relationship sanity check
+            Assert.That(questionnaireInDb.Templates, Is.Not.Null);
+            Assert.That(questionnaireInDb.Templates, Is.Empty);
         }
+        
+        public async Task CreateAsync_ShouldPersistQuestionnaireWithTemplate()
+        {
+            // Arrange
+            User user = await CreateTestUser();
+
+            var dto = new CreateQuestionnaireDto
+            {
+                Name = "Test Questionnaire",
+            };
+            
+            // Act
+            var result = await _service.CreateAsync(dto);
+            await _context.SaveChangesAsync();
+
+            var dto = new CreateTemplateDto { Name = name, QuestionnaireId = result.id };
+            await _templateService!.CreateAsync(dto);
+
+            var template = await _context.Template.AddAsync(template);
+            await _context.SaveChangesAsync();
+
+            // Act – load with relationship
+            var fromDb = await _context.Questionnaire
+                .Where(q => q.Id == questionnaire.Id)
+                .Include(q => q.Templates)
+                .FirstOrDefaultAsync();
+
+            // Assert
+            Assert.That(fromDb, Is.Not.Null);
+            Assert.That(fromDb.Templates.Count, Is.EqualTo(1));
+            Assert.That(fromDb.Templates.First().Name, Is.EqualTo("Template A"));
+        }
+
 
         [Test]
         public async Task UpdateAsync_ShouldUpdateQuestionnaireToDb()
@@ -86,8 +134,7 @@ namespace LifeTracker.Tests.Services
             User user = await CreateTestUser();
             CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
             {
-                Name = "Test Questionnaire",
-                UserId = user.Id
+                Name = "Test Questionnaire"
             };
             Questionnaire questionnaire = await _service.CreateAsync(createDto);
 
@@ -110,8 +157,7 @@ namespace LifeTracker.Tests.Services
             User user = await CreateTestUser();
             CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
             {
-                Name = "Test Questionnaire",
-                UserId = user.Id
+                Name = "Test Questionnaire"
             };
             Questionnaire questionnaire = await _service.CreateAsync(createDto);
 

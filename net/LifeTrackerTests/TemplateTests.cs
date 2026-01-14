@@ -32,7 +32,7 @@ namespace LifeTracker.Tests.Services
         }
         private async Task<Questionnaire> CreateTestQuestionnaire(int userId = 0, string name = "Test Questionnaire")
         {
-            var dto = new CreateQuestionnaireDto { Name = name, UserId = userId };
+            var dto = new CreateQuestionnaireDto { Name = name };
             return await _questionnaireService.CreateAsync(dto);
         }
 

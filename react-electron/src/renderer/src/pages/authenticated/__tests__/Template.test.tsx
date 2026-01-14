@@ -7,6 +7,7 @@ import * as apiTemplate from '../../../api/apiTemplate';
 import * as apiQuestionnaire from '../../../api/apiQuestionnaire';
 import * as apiUser from '../../../api/apiUser';
 import TemplateListItem from '../TemplateListItem';
+import TemplateEdit from '../TemplateEdit';
 
 // Mock the API modules
 vi.mock('../../../api/apiTemplate', () => ({
@@ -700,13 +701,67 @@ describe('TemplateEdit', () => {
         localStorage.setItem('user_token', createMockToken());
     });
 
-    it.todo('renders the edit template form with all elements');
+    it('renders the edit template form with all elements', () => {
+        render(<TemplateEdit />);
 
-    it.todo('renders the edit template form with all elements');
+        expect(screen.getByText('Edit Template')).toBeInTheDocument();
+        expect(screen.getByLabelText('Template Name')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Enter template name')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Update Template/i })).toBeInTheDocument();
+        expect(screen.getByText('Cancel')).toBeInTheDocument();
+        expect(screen.getByText('← Back to Templates')).toBeInTheDocument();
+    });
 
-    it.todo('allows user to type in the template name field');
+    it('allows user to type in the template name field', async () => {
+        const user = userEvent.setup();
+        render(<TemplateEdit />);
 
-    it.todo('calls apiUpdateTemplate when form is submitted with valid name');
+        const nameInput = screen.getByLabelText('Template Name');
+        await user.type(nameInput, 'My Test Template');
+
+        expect((nameInput as HTMLInputElement).value).toBe('My Test Template');
+    });
+
+    it.todo('calls apiUpdateTemplate when form is submitted with valid name', async () => {
+        const user = userEvent.setup();
+        const mockQuestionnaire = {
+            id: 1,
+            name: 'Original Name',
+            userId: 1,
+            templates: [],
+        };
+
+        vi.mocked(apiQuestionnaire.apiUpdateQuestionnaire).mockResolvedValue(mockQuestionnaire);
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+
+        render(<TemplateEdit />);
+
+        // Wait for the component to load the questionnaire
+        await waitFor(() => {
+            expect(apiQuestionnaire.apiGetQuestionnaires).toHaveBeenCalled();
+        });
+
+        const nameInput = screen.getByLabelText('Questionnaire Name') as HTMLInputElement;
+        // Wait for the input to be populated with the existing name
+        await waitFor(() => {
+            expect(nameInput.value).toBe('Original Name');
+        });
+
+        // Clear and type new name
+        await user.clear(nameInput);
+        await user.type(nameInput, 'My Test Questionnaire');
+
+        const submitButton = screen.getByRole('button', {
+            name: /Update Questionnaire/i,
+        });
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(apiQuestionnaire.apiUpdateQuestionnaire).toHaveBeenCalledWith(1, {
+                name: 'My Test Questionnaire',
+            });
+        });
+    });
 
     it.todo('displays error message when API call fails');
 

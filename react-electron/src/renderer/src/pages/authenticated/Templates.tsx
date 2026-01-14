@@ -4,8 +4,7 @@ import Layout from '../../components/Layout';
 import TemplateCreate from './TemplateCreate';
 import TemplateListItem from './TemplateListItem';
 import useAuth from '../../hooks/useAuth';
-import { apiGetTemplates } from '../../api/apiTemplate';
-import { apiGetQuestionnaires } from '../../api/apiQuestionnaire';
+import { apiGetQuestionnaire } from '../../api/apiQuestionnaire';
 import type { ITemplate } from '../../api/types';
 
 export default function Templates() {
@@ -35,18 +34,11 @@ export default function Templates() {
                 setError(undefined);
 
                 // Fetch questionnaire to get its name
-                const questionnaires = await apiGetQuestionnaires(auth.user.id);
-                if (questionnaires) {
-                    const questionnaire = questionnaires.find(q => q.id === questionnaireId);
-                    if (questionnaire) {
-                        setQuestionnaireName(questionnaire.name);
-                    }
-                }
+                const questionnaire = await apiGetQuestionnaire(questionnaireId);
 
-                // Fetch templates
-                const data = await apiGetTemplates(questionnaireId);
-                if (data) {
-                    setTemplates(data);
+                if (questionnaire) {
+                    setQuestionnaireName(questionnaire.name);
+                    setTemplates(questionnaire.templates);
                 }
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load templates');
@@ -72,6 +64,8 @@ export default function Templates() {
                 onCancel={() => {
                     if (templates.length > 0) {
                         setShowCreateForm(false);
+                    } else {
+                        navigate('/');
                     }
                 }}
             />

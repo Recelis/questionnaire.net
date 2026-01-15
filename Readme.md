@@ -112,8 +112,20 @@ You can also cd into the LifeTracker project folder and run:
 dotnet run
 ```
 
-To run the tests, go to the root.
+To run the tests, go to LifeTrackerTest.
 
 ```bash
 dotnet test
+```
+
+For running a particular test suit:
+
+```bash
+dotnet test --filter "AnswerTests"
+```
+
+For running just one test:
+
+```bash
+dotnet test --filter "FullyQualifiedName~CreateAsync_ShouldAddAnswerToDb"
 ```

@@ -32,6 +32,26 @@ namespace LifeTracker.Tests.Services
         private ILogger<EFQuestionService>? _questionLogger;
         private ILogger<EFAnswerService>? _answerLogger;
 
+        // Helper to create a mock HttpContextAccessor with a specific user ID
+        private static Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor> CreateMockHttpContextAccessor(int userId)
+        {
+            var mockHttpContextAccessor = new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+            var mockHttpContext = new Mock<Microsoft.AspNetCore.Http.HttpContext>();
+            var mockUser = new Mock<System.Security.Claims.ClaimsPrincipal>();
+            mockUser.Setup(u => u.FindFirst("id")).Returns(new System.Security.Claims.Claim("id", userId.ToString()));
+            mockHttpContext.Setup(c => c.User).Returns(mockUser.Object);
+            mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
+            return mockHttpContextAccessor;
+        }
+
+        // Helper to initialize services with a specific user
+        private void InitializeServicesWithUser(User user)
+        {
+            var mockAccessor = CreateMockHttpContextAccessor(user.Id).Object;
+            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger, mockAccessor);
+            _submissionService = new EFSubmissionService(_context, _submissionLogger, mockAccessor);
+        }
+
         // Helper functions
 
         private async Task<User> CreateTestUser(string name = "Test User", string email = "testemail@email.com", string password = "TestPassword123!")
@@ -60,8 +80,13 @@ namespace LifeTracker.Tests.Services
 
         private async Task<Submission> CreateTestSubmission(int templateId, int userId = 1)
         {
+            if (_submissionService == null)
+                throw new InvalidOperationException("_submissionService is null");
             var dto = new CreateSubmissionDto { TemplateId = templateId };
-            return await _submissionService!.CreateAsync(dto);
+            var submission = await _submissionService.CreateAsync(dto);
+            if (submission == null)
+                throw new InvalidOperationException("Failed to create test submission");
+            return submission;
         }
 
         private async Task<Answer> CreateTestAnswer(CreateAnswerDto dto)
@@ -91,11 +116,11 @@ namespace LifeTracker.Tests.Services
             _answerLogger = new Mock<ILogger<EFAnswerService>>().Object;
 
             _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
-            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger);
             _templateService = new EFTemplateService(_context, _templateLogger);
             _questionService = new EFQuestionService(_context, _questionLogger);
-            _submissionService = new EFSubmissionService(_context, _submissionLogger);
             _answerService = new EFAnswerService(_context, _answerLogger);
+            
+            // Services that need HttpContextAccessor will be initialized in each test with InitializeServicesWithUser()
         }
 
         [TearDown]
@@ -109,6 +134,7 @@ namespace LifeTracker.Tests.Services
         public async Task CreateAsync_ShouldAddAnswerToDb()
         {
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
 
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
@@ -117,6 +143,7 @@ namespace LifeTracker.Tests.Services
             Question question = await CreateTestQuestion(template.Id);
 
             Submission submission = await CreateTestSubmission(template.Id);
+            Assert.That(submission, Is.Not.Null, "Submission creation failed");
 
             CreateAnswerDto createAnswerDto = new CreateAnswerDto
             {
@@ -135,8 +162,8 @@ namespace LifeTracker.Tests.Services
             Assert.That(createAnswerDto.Text, Is.EqualTo(answer.Text));
             Assert.That(createAnswerDto.Points, Is.EqualTo(answer.Points));
 
-            Submission? submissionInDb = await _context.Submission.FindAsync(questionnaire.Id);
-            Assert.That(submissionInDb?.Answers.Count(), Is.EqualTo(1));
+            Submission? submissionInDb = await _context.Submission.FindAsync(submission.Id);
+            Assert.That(submissionInDb?.Answers, Has.Exactly(1).Items);
         }
 
         [Test]
@@ -144,6 +171,7 @@ namespace LifeTracker.Tests.Services
         {
             TestContext.WriteLine("Starting UpdateAsync_ShouldUpdateAnswer test");
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
 
             TestContext.WriteLine($"User ID: {user.Id}");
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
@@ -192,6 +220,7 @@ namespace LifeTracker.Tests.Services
         public async Task GetByUserAsync_ShouldGetOnlySubmissionAnswers()
         {
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
 
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
@@ -242,6 +271,7 @@ namespace LifeTracker.Tests.Services
         public async Task DeleteAsync_ShouldDeleteAnswerToDb()
         {
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
 
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
@@ -264,7 +294,7 @@ namespace LifeTracker.Tests.Services
             await _answerService.DeleteAsync(answer.Id);
 
             Assert.That(answer, Is.Not.Null);
-            Submission? submissionInDb = await _context.Submission.FindAsync(questionnaire.Id);
+            Submission? submissionInDb = await _context.Submission.FindAsync(submission.Id);
             Assert.That(submissionInDb?.Answers, Has.Exactly(0).Items);
         }
     }

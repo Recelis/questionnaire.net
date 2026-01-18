@@ -22,10 +22,30 @@ namespace LifeTracker.Tests.Services
 
         private IUserService? _userService;
 
-        private IQuestionnaireService? _service;
+        private IQuestionnaireService? _questionnaireService;
+        private ITemplateService? _templateService;
         private ILogger<EFUserService>? _userLogger;
         private LifeTrackerContext? _context;
-        private ILogger<EFQuestionnaireService>? _logger;
+        private ILogger<EFQuestionnaireService>? _questionnaireLogger;
+
+        // Helper to create a mock HttpContextAccessor with a specific user ID
+        private static Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor> CreateMockHttpContextAccessor(int userId)
+        {
+            var mockHttpContextAccessor = new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+            var mockHttpContext = new Mock<Microsoft.AspNetCore.Http.HttpContext>();
+            var mockUser = new Mock<System.Security.Claims.ClaimsPrincipal>();
+            mockUser.Setup(u => u.FindFirst("id")).Returns(new System.Security.Claims.Claim("id", userId.ToString()));
+            mockHttpContext.Setup(c => c.User).Returns(mockUser.Object);
+            mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
+            return mockHttpContextAccessor;
+        }
+
+        // Helper to initialize services with a specific user
+        private void InitializeServicesWithUser(User user)
+        {
+            var mockAccessor = CreateMockHttpContextAccessor(user.Id).Object;
+            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger, mockAccessor);
+        }
 
         private async Task<User> CreateTestUser(string name = "Test User", string email = "testemail@email.com", string password = "TestPassword123!")
         {
@@ -48,10 +68,13 @@ namespace LifeTracker.Tests.Services
 
             _userLogger = new Mock<ILogger<EFUserService>>().Object;
             var loggerMock = new Mock<ILogger<EFQuestionnaireService>>();
-            _logger = loggerMock.Object;
+            
+            _questionnaireLogger = loggerMock.Object;
 
             _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
-            _service = new EFQuestionnaireService(_context, _logger);
+
+            var templateLogger = new Mock<ILogger<EFTemplateService>>().Object;
+            _templateService = new EFTemplateService(_context, templateLogger);
         }
 
         [TearDown]
@@ -66,6 +89,7 @@ namespace LifeTracker.Tests.Services
         {
             // Arrange
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
 
             var dto = new CreateQuestionnaireDto
             {
@@ -73,12 +97,12 @@ namespace LifeTracker.Tests.Services
             };
             
             // Act
-            var result = await _service.CreateAsync(dto);
+            var result = await _questionnaireService.CreateAsync(dto);
 
             // Assert on returned object
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Name, Is.EqualTo(dto.Name));
-            Assert.That(result.Id, Is.GreaterThan(0));   // important!
+            Assert.That(result.Id, Is.GreaterThan(0));
 
             // Fetch from database with relationships included
             var questionnaireInDb = await _context.Questionnaire
@@ -95,29 +119,28 @@ namespace LifeTracker.Tests.Services
             Assert.That(questionnaireInDb.Templates, Is.Empty);
         }
         
+        [Test]
         public async Task CreateAsync_ShouldPersistQuestionnaireWithTemplate()
         {
             // Arrange
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
 
-            var dto = new CreateQuestionnaireDto
+            var createQuestionnaireDto = new CreateQuestionnaireDto
             {
                 Name = "Test Questionnaire",
             };
             
             // Act
-            var result = await _service.CreateAsync(dto);
-            await _context.SaveChangesAsync();
+            Questionnaire result = await _questionnaireService.CreateAsync(createQuestionnaireDto);
 
-            var dto = new CreateTemplateDto { Name = name, QuestionnaireId = result.id };
-            await _templateService!.CreateAsync(dto);
+            var templateDto = new CreateTemplateDto { Name = "Template A", QuestionnaireId = result.Id };
+            await _templateService!.CreateAsync(templateDto);
 
-            var template = await _context.Template.AddAsync(template);
-            await _context.SaveChangesAsync();
 
             // Act – load with relationship
             var fromDb = await _context.Questionnaire
-                .Where(q => q.Id == questionnaire.Id)
+                .Where(q => q.Id == result.Id)
                 .Include(q => q.Templates)
                 .FirstOrDefaultAsync();
 
@@ -132,17 +155,19 @@ namespace LifeTracker.Tests.Services
         public async Task UpdateAsync_ShouldUpdateQuestionnaireToDb()
         {
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
+
             CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
             {
                 Name = "Test Questionnaire"
             };
-            Questionnaire questionnaire = await _service.CreateAsync(createDto);
+            Questionnaire questionnaire = await _questionnaireService.CreateAsync(createDto);
 
             UpdateQuestionnaireDto updateDto = new UpdateQuestionnaireDto
             {
                 Name = "Updated Questionnaire",
             };
-            Questionnaire updatedQuestionnaire = await _service.UpdateAsync(questionnaire.Id, updateDto);
+            Questionnaire updatedQuestionnaire = await _questionnaireService.UpdateAsync(questionnaire.Id, updateDto);
 
             Assert.That(updatedQuestionnaire, Is.Not.Null);
             Assert.That(updatedQuestionnaire.Name, Is.EqualTo(updateDto.Name));
@@ -155,13 +180,14 @@ namespace LifeTracker.Tests.Services
         public async Task DeleteAsync_ShouldDeleteQuestionnaireToDb()
         {
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
             CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
             {
                 Name = "Test Questionnaire"
             };
-            Questionnaire questionnaire = await _service.CreateAsync(createDto);
+            Questionnaire questionnaire = await _questionnaireService.CreateAsync(createDto);
 
-            await _service.DeleteAsync(questionnaire.Id);
+            await _questionnaireService.DeleteAsync(questionnaire.Id);
 
             var questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
             Assert.That(questionnaireInDb, Is.Null);

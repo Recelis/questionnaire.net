@@ -103,7 +103,7 @@ dotnet build
 To run LifeTracker from root.
 
 ```bash
-dotnet run --project src/LifeTracker
+dotnet run --project LifeTracker
 ```
 
 You can also cd into the LifeTracker project folder and run:
@@ -127,5 +127,5 @@ dotnet test --filter "AnswerTests"
 For running just one test:
 
 ```bash
-dotnet test --filter "FullyQualifiedName~CreateAsync_ShouldAddAnswerToDb"
+dotnet test --filter "FullyQualifiedName=LifeTracker.Tests.Services.AnswerTests.CreateAsync_ShouldAddAnswerToDb"
 ```

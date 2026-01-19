@@ -18,7 +18,7 @@ namespace LifeTracker.Tests.Services
     [TestFixture]
     public class QuestionnaireTests
     {
-        private SqliteConnection _connection;
+        private SqliteConnection? _connection;
 
         private IUserService? _userService;
 
@@ -41,8 +41,12 @@ namespace LifeTracker.Tests.Services
         }
 
         // Helper to initialize services with a specific user
-        private void InitializeServicesWithUser(User user)
+        private void SetServiceWithUserContext(User user)
         {
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
+            if (_questionnaireLogger == null)
+                throw new InvalidOperationException("_questionnaireLogger is null");
             var mockAccessor = CreateMockHttpContextAccessor(user.Id).Object;
             _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger, mockAccessor);
         }
@@ -50,7 +54,12 @@ namespace LifeTracker.Tests.Services
         private async Task<User> CreateTestUser(string name = "Test User", string email = "testemail@email.com", string password = "TestPassword123!")
         {
             var dto = new CreateUserDto { Name = name, Email = email, Password = password };
-            return await _userService.CreateAsync(dto);
+            if (_userService == null)
+                throw new InvalidOperationException("_userService is null");
+            var result = await _userService.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test user");
+            return result;
         }
 
         [SetUp]
@@ -63,6 +72,9 @@ namespace LifeTracker.Tests.Services
                 .Options;
             _context = new LifeTrackerContext(options);
 
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
+
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
@@ -73,15 +85,23 @@ namespace LifeTracker.Tests.Services
 
             _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
 
+            if (_userService == null)
+                throw new InvalidOperationException("_userService is null");
+
             var templateLogger = new Mock<ILogger<EFTemplateService>>().Object;
             _templateService = new EFTemplateService(_context, templateLogger);
+
+            if (_templateService == null)
+                throw new InvalidOperationException("_templateService is null");
         }
 
         [TearDown]
         public void TearDown()
         {
-            _context.Dispose();
-            _connection.Close();
+            if (_context != null)
+                _context.Dispose();
+            if (_connection != null)
+                _connection.Close();
         }
 
         [Test]
@@ -89,7 +109,7 @@ namespace LifeTracker.Tests.Services
         {
             // Arrange
             User user = await CreateTestUser();
-            InitializeServicesWithUser(user);
+            SetServiceWithUserContext(user);
 
             var dto = new CreateQuestionnaireDto
             {
@@ -97,7 +117,12 @@ namespace LifeTracker.Tests.Services
             };
             
             // Act
-            var result = await _questionnaireService.CreateAsync(dto);
+            if (_questionnaireService == null)
+                throw new InvalidOperationException("_questionnaireService is null");
+            Questionnaire? result = await _questionnaireService.CreateAsync(dto);
+
+            if (result == null)
+                throw new InvalidOperationException("Failed to create questionnaire");
 
             // Assert on returned object
             Assert.That(result, Is.Not.Null);
@@ -105,6 +130,8 @@ namespace LifeTracker.Tests.Services
             Assert.That(result.Id, Is.GreaterThan(0));
 
             // Fetch from database with relationships included
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
             var questionnaireInDb = await _context.Questionnaire
                 .Where(q => q.Id == result.Id)
                 .Include(q => q.Templates)
@@ -124,7 +151,7 @@ namespace LifeTracker.Tests.Services
         {
             // Arrange
             User user = await CreateTestUser();
-            InitializeServicesWithUser(user);
+            SetServiceWithUserContext(user);
 
             var createQuestionnaireDto = new CreateQuestionnaireDto
             {
@@ -132,13 +159,23 @@ namespace LifeTracker.Tests.Services
             };
             
             // Act
-            Questionnaire result = await _questionnaireService.CreateAsync(createQuestionnaireDto);
+            if (_questionnaireService == null)
+                throw new InvalidOperationException("_questionnaireService is null");
+            Questionnaire? resultNullable = await _questionnaireService.CreateAsync(createQuestionnaireDto);
+            
+            if (resultNullable == null)
+                throw new InvalidOperationException("Failed to create questionnaire");
+            Questionnaire result = resultNullable;
 
+            if (_templateService == null)
+                throw new InvalidOperationException("_templateService is null");
             var templateDto = new CreateTemplateDto { Name = "Template A", QuestionnaireId = result.Id };
-            await _templateService!.CreateAsync(templateDto);
+            await _templateService.CreateAsync(templateDto);
 
 
             // Act – load with relationship
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
             var fromDb = await _context.Questionnaire
                 .Where(q => q.Id == result.Id)
                 .Include(q => q.Templates)
@@ -155,23 +192,35 @@ namespace LifeTracker.Tests.Services
         public async Task UpdateAsync_ShouldUpdateQuestionnaireToDb()
         {
             User user = await CreateTestUser();
-            InitializeServicesWithUser(user);
+            SetServiceWithUserContext(user);
+
+            if (_questionnaireService == null)
+                throw new InvalidOperationException("_questionnaireService is null");
 
             CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
             {
                 Name = "Test Questionnaire"
             };
-            Questionnaire questionnaire = await _questionnaireService.CreateAsync(createDto);
+            var temp = await _questionnaireService.CreateAsync(createDto);
+            if (temp == null)
+                throw new InvalidOperationException("Failed to create questionnaire");
+            Questionnaire questionnaire = temp;
 
             UpdateQuestionnaireDto updateDto = new UpdateQuestionnaireDto
             {
                 Name = "Updated Questionnaire",
             };
-            Questionnaire updatedQuestionnaire = await _questionnaireService.UpdateAsync(questionnaire.Id, updateDto);
+            Questionnaire? updatedQuestionnaireNullable = await _questionnaireService.UpdateAsync(questionnaire.Id, updateDto);
+            
+            if (updatedQuestionnaireNullable == null)
+                throw new InvalidOperationException("Failed to update questionnaire");
+            Questionnaire updatedQuestionnaire = updatedQuestionnaireNullable;
 
             Assert.That(updatedQuestionnaire, Is.Not.Null);
             Assert.That(updatedQuestionnaire.Name, Is.EqualTo(updateDto.Name));
 
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
             var questionnaireInDb = await _context.Questionnaire.FindAsync(updatedQuestionnaire.Id);
             Assert.That(questionnaireInDb, Is.Not.Null);
         }
@@ -180,15 +229,21 @@ namespace LifeTracker.Tests.Services
         public async Task DeleteAsync_ShouldDeleteQuestionnaireToDb()
         {
             User user = await CreateTestUser();
-            InitializeServicesWithUser(user);
+            SetServiceWithUserContext(user);
             CreateQuestionnaireDto createDto = new CreateQuestionnaireDto
             {
                 Name = "Test Questionnaire"
             };
-            Questionnaire questionnaire = await _questionnaireService.CreateAsync(createDto);
-
+            if (_questionnaireService == null)
+                throw new InvalidOperationException("_questionnaireService is null");
+            var temp = await _questionnaireService.CreateAsync(createDto);
+            if (temp == null)
+                throw new InvalidOperationException("Failed to create questionnaire");
+            Questionnaire questionnaire = temp;
             await _questionnaireService.DeleteAsync(questionnaire.Id);
 
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
             var questionnaireInDb = await _context.Questionnaire.FindAsync(questionnaire.Id);
             Assert.That(questionnaireInDb, Is.Null);
         }

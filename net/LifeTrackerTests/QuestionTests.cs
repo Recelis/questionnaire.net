@@ -33,22 +33,49 @@ namespace LifeTracker.Tests.Services
             var dto = new CreateUserDto { Name = name, Email = email, Password = password };
             return await _userService.CreateAsync(dto);
         }
-        private async Task<Questionnaire> CreateTestQuestionnaire(int userId = 0, string name = "Test Questionnaire")
+        private async Task<Questionnaire?> CreateTestQuestionnaire(int userId = 0, string name = "Test Questionnaire")
         {
             var dto = new CreateQuestionnaireDto { Name = name };
-            return await _questionnaireService.CreateAsync(dto);
+            var result = await _questionnaireService!.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test questionnaire");
+            return result;
         }
 
-        private async Task<Template> CreateTestTemplate(int questionnaireId, string name = "Test Template")
+        private async Task<Template?> CreateTestTemplate(int questionnaireId, string name = "Test Template")
         {
             var dto = new CreateTemplateDto { Name = name, QuestionnaireId = questionnaireId };
-            return await _templateService.CreateAsync(dto);
+            var result = await _templateService!.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test template");
+            return result;
         }
 
-        private async Task<Question> CreateTestQuestion(int templateId, string text = "test question")
+        private async Task<Question?> CreateTestQuestion(int templateId, string text = "test question")
         {
             var dto = new CreateQuestionDto { Text = text, TemplateId = templateId };
-            return await _questionService!.CreateAsync(dto);
+            var result = await _questionService!.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test question");
+            return result;
+        }
+        // Helper to create a mock HttpContextAccessor with a specific user ID
+        private static Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor> CreateMockHttpContextAccessor(int userId)
+        {
+            var mockHttpContextAccessor = new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+            var mockHttpContext = new Mock<Microsoft.AspNetCore.Http.HttpContext>();
+            var mockUser = new Mock<System.Security.Claims.ClaimsPrincipal>();
+            mockUser.Setup(u => u.FindFirst("id")).Returns(new System.Security.Claims.Claim("id", userId.ToString()));
+            mockHttpContext.Setup(c => c.User).Returns(mockUser.Object);
+            mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
+            return mockHttpContextAccessor;
+        }
+
+        // Helper to initialize services with a specific user
+        private void InitializeServicesWithUser(User user)
+        {
+            var mockAccessor = CreateMockHttpContextAccessor(user.Id).Object;
+            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger, mockAccessor);
         }
 
         [SetUp]
@@ -71,7 +98,7 @@ namespace LifeTracker.Tests.Services
             _questionLogger = new Mock<ILogger<EFQuestionService>>().Object;
 
             _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
-            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger);
+            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger, new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>().Object);
             _templateService = new EFTemplateService(_context, _templateLogger);
             _questionService = new EFQuestionService(_context, _questionLogger);
         }
@@ -88,6 +115,7 @@ namespace LifeTracker.Tests.Services
         {
 
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template1 = await CreateTestTemplate(questionnaire.Id);
@@ -109,6 +137,8 @@ namespace LifeTracker.Tests.Services
         public async Task CreateAsync_ShouldAddQuestionToDb()
         {
             User user = await CreateTestUser();
+            InitializeServicesWithUser(user);
+
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
@@ -130,11 +160,12 @@ namespace LifeTracker.Tests.Services
         {
             // NOTE: this should only be used when the template has not been used.
             User user = await CreateTestUser();
-            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
+            InitializeServicesWithUser(user);
+            Questionnaire? questionnaire = await CreateTestQuestionnaire(user.Id);
 
-            Template template = await CreateTestTemplate(questionnaire.Id);
+            Template? template = await CreateTestTemplate(questionnaire.Id);
 
-            Question question = await CreateTestQuestion(template.Id);
+            Question? question = await CreateTestQuestion(template.Id);
 
             UpdateQuestionDto updateDto = new UpdateQuestionDto
             {
@@ -150,11 +181,12 @@ namespace LifeTracker.Tests.Services
         public async Task DeleteAsync_ShouldDeleteQuestionToDb()
         {
             User user = await CreateTestUser();
-            Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
+            InitializeServicesWithUser(user);
+            Questionnaire? questionnaire = await CreateTestQuestionnaire(user.Id);
 
-            Template template = await CreateTestTemplate(questionnaire.Id);
+            Template? template = await CreateTestTemplate(questionnaire.Id);
 
-            Question question = await CreateTestQuestion(template.Id);
+            Question? question = await CreateTestQuestion(template.Id);
 
             Question questionInDb = await _context.Question.FindAsync(question.Id);
 

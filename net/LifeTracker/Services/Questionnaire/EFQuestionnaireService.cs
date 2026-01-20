@@ -22,6 +22,7 @@ public class EFQuestionnaireService : IQuestionnaireService
     {
         return await _lifeTrackerContext.Questionnaire
                 .Where(t => t.UserId == userId)
+                .Include(q => q.Templates)
                 .ToListAsync();
     }
 

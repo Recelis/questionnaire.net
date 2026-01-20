@@ -31,7 +31,7 @@ public class QuestionController : ControllerBase
     /// <returns>A list of Questions.</returns>
     /// <response code="200">Returns the list of Questions</response>
     [Authorize]
-    [HttpGet("question/{templateId:int}")]
+    [HttpGet("template/{templateId:int}")]
     [ProducesResponseType(typeof(IEnumerable<Question>), StatusCodes.Status200OK)]
     [Produces("application/json")]
     public async Task<ActionResult<IEnumerable<Question>>> Get(int templateId)

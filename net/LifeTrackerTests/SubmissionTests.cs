@@ -30,24 +30,70 @@ namespace LifeTracker.Tests.Services
         private async Task<User> CreateTestUser(string name = "Test User", string email = "testemail@email.com", string password = "TestPassword123!")
         {
             var dto = new CreateUserDto { Name = name, Email = email, Password = password };
-            return await _userService.CreateAsync(dto);
+            if (_userService == null)
+                throw new InvalidOperationException("_userService is null");
+            var result = await _userService.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test user");
+            return result;
         }
         private async Task<Questionnaire> CreateTestQuestionnaire(int userId = 0, string name = "Test Questionnaire")
         {
-            var dto = new CreateQuestionnaireDto { Name = name, UserId = userId };
-            return await _questionnaireService.CreateAsync(dto);
+            var dto = new CreateQuestionnaireDto { Name = name };
+            if (_questionnaireService == null)
+                throw new InvalidOperationException("_questionnaireService is null");
+            var result = await _questionnaireService.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test questionnaire");
+            return result;
         }
 
         private async Task<Template> CreateTestTemplate(int questionnaireId, string name = "Test Template")
         {
             var dto = new CreateTemplateDto { Name = name, QuestionnaireId = questionnaireId };
-            return await _templateService!.CreateAsync(dto);
+            if (_templateService == null)
+                throw new InvalidOperationException("_templateService is null");
+            var result = await _templateService.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test template");
+            return result;
         }
 
         private async Task<Submission> CreateTestSubmission(int userId = 0, int templateId = 0)
         {
-            var dto = new CreateSubmissionDto { TemplateId = templateId, UserId = userId };
-            return await _submissionService!.CreateAsync(dto);
+            var dto = new CreateSubmissionDto { TemplateId = templateId };
+            if (_submissionService == null)
+                throw new InvalidOperationException("_submissionService is null");
+            var result = await _submissionService.CreateAsync(dto);
+            if (result == null)
+                throw new InvalidOperationException("Failed to create test submission");
+            return result;
+        }
+
+        // Helper to create a mock HttpContextAccessor with a specific user ID
+        private static Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor> CreateMockHttpContextAccessor(int userId)
+        {
+            var mockHttpContextAccessor = new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+            var mockHttpContext = new Mock<Microsoft.AspNetCore.Http.HttpContext>();
+            var mockUser = new Mock<System.Security.Claims.ClaimsPrincipal>();
+            mockUser.Setup(u => u.FindFirst("id")).Returns(new System.Security.Claims.Claim("id", userId.ToString()));
+            mockHttpContext.Setup(c => c.User).Returns(mockUser.Object);
+            mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
+            return mockHttpContextAccessor;
+        }
+
+        // Helper to initialize services with a specific user
+        private void SetServiceWithUserContext(User user)
+        {
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
+            if (_questionnaireLogger == null)
+                throw new InvalidOperationException("_questionnaireLogger is null");
+            if (_submissionLogger == null)
+                throw new InvalidOperationException("_submissionLogger is null");
+            var mockAccessor = CreateMockHttpContextAccessor(user.Id).Object;
+            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger, mockAccessor);
+            _submissionService = new EFSubmissionService(_context, _submissionLogger, mockAccessor);
         }
 
         [SetUp]
@@ -61,6 +107,9 @@ namespace LifeTracker.Tests.Services
                 .Options;
             _context = new LifeTrackerContext(options);
 
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
+
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
@@ -70,22 +119,40 @@ namespace LifeTracker.Tests.Services
             _submissionLogger = new Mock<ILogger<EFSubmissionService>>().Object;
 
             _userService = new EFUserService(_context, _userLogger, new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object);
-            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger);
+
+            if (_userService == null)
+                throw new InvalidOperationException("_userService is null");
+
+            _questionnaireService = new EFQuestionnaireService(_context, _questionnaireLogger, new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>().Object);
+
+            if (_questionnaireService == null)
+                throw new InvalidOperationException("_questionnaireService is null");
+
             _templateService = new EFTemplateService(_context, _templateLogger);
-            _submissionService = new EFSubmissionService(_context, _submissionLogger);
+
+            if (_templateService == null)
+                throw new InvalidOperationException("_templateService is null");
+
+            _submissionService = new EFSubmissionService(_context, _submissionLogger, new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>().Object);
+
+            if (_submissionService == null)
+                throw new InvalidOperationException("_submissionService is null");
         }
 
         [TearDown]
         public void TearDown()
         {
-            _context.Dispose();
-            _connection.Close();
+            if (_context != null)
+                _context.Dispose();
+            if (_connection != null)
+                _connection.Close();
         }
 
         [Test]
         public async Task CreateAsync_ShouldAddSubmissionToDb()
         {
             User user = await CreateTestUser();
+            SetServiceWithUserContext(user);
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
@@ -106,17 +173,25 @@ namespace LifeTracker.Tests.Services
         public async Task GetByUserAsync_ShouldGetOnlyUserOwnedSubmissions()
         {
             User user0 = await CreateTestUser();
-            User user1 = await CreateTestUser("Test User 2", "testuser2@email.com");
+            SetServiceWithUserContext(user0);
             Questionnaire questionnaire = await CreateTestQuestionnaire(user0.Id);
             Template template = await CreateTestTemplate(questionnaire.Id);
 
+            User user1 = await CreateTestUser("Test User 2", "testuser2@email.com");
+            SetServiceWithUserContext(user1);
             Questionnaire questionnaire1 = await CreateTestQuestionnaire(user1.Id);
             Template template1 = await CreateTestTemplate(questionnaire1.Id);
 
+            SetServiceWithUserContext(user0);
             await CreateTestSubmission(user0.Id, template.Id);
             await CreateTestSubmission(user0.Id, template.Id);
+            
+            SetServiceWithUserContext(user1);
             await CreateTestSubmission(user1.Id, template1.Id);
 
+            SetServiceWithUserContext(user0);
+            if (_submissionService == null)
+                throw new InvalidOperationException("_submissionService is null");
             List<Submission> submissionsInDb = await _submissionService.GetByUserAsync(user0.Id);
 
             Assert.That(submissionsInDb, Has.Exactly(2).Items);
@@ -126,15 +201,20 @@ namespace LifeTracker.Tests.Services
         public async Task DeleteAsync_ShouldDeleteSubmissionToDb()
         {
             User user = await CreateTestUser();
+            SetServiceWithUserContext(user);
             Questionnaire questionnaire = await CreateTestQuestionnaire(user.Id);
 
             Template template = await CreateTestTemplate(questionnaire.Id);
 
             Submission submission = await CreateTestSubmission(user.Id, template.Id);
 
+            if (_submissionService == null)
+                throw new InvalidOperationException("_submissionService is null");
             await _submissionService.DeleteAsync(submission.Id);
 
-            Submission submissionInDb = await _context.Submission.FindAsync(submission.Id);
+            if (_context == null)
+                throw new InvalidOperationException("_context is null");
+            Submission? submissionInDb = await _context.Submission.FindAsync(submission.Id);
 
             Assert.That(submissionInDb, Is.Null);
         }

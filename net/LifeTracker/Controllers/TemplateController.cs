@@ -27,7 +27,7 @@ public class TemplateController : ControllerBase
     /// <returns>A TemplateDto.</returns>
     /// <response code="200">Returns a list of templates</response>
     [Authorize]
-    [HttpGet("template/{questionnaireId:int}")]
+    [HttpGet("questionnaire/{questionnaireId:int}")]
     [ProducesResponseType(typeof(TemplateDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]

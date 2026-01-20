@@ -33,7 +33,7 @@ public class SubmissionController : ControllerBase
     /// <returns>A list of Submissions.</returns>
     /// <response code="200">Returns the list of Submissions</response>
     [Authorize]
-    [HttpGet("submission/{userId:int}")]
+    [HttpGet("user/{userId:int}")]
     [ProducesResponseType(typeof(IEnumerable<Submission>), StatusCodes.Status200OK)]
     [Produces("application/json")]
     public async Task<ActionResult<IEnumerable<Submission>>> Get(int userId)

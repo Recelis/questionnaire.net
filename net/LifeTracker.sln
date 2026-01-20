@@ -5,11 +5,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{73F03712-323A-4543-9926-ED1570870F26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeTracker", "src\LifeTracker\LifeTracker.csproj", "{4810F8A4-BAA2-45B8-925F-1A94FFCDBE48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeTracker", "LifeTracker\LifeTracker.csproj", "{4810F8A4-BAA2-45B8-925F-1A94FFCDBE48}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{77769866-12E9-4641-89EC-28CF0F39E849}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeTrackerTests", "tests\LifeTrackerTests\LifeTrackerTests.csproj", "{3080FB9E-8579-4B06-BDF1-0E0491ED36AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeTrackerTests", "LifeTrackerTests\LifeTrackerTests.csproj", "{3080FB9E-8579-4B06-BDF1-0E0491ED36AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,7 +30,6 @@ Global
 		{3080FB9E-8579-4B06-BDF1-0E0491ED36AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{4810F8A4-BAA2-45B8-925F-1A94FFCDBE48} = {73F03712-323A-4543-9926-ED1570870F26}
 		{3080FB9E-8579-4B06-BDF1-0E0491ED36AD} = {77769866-12E9-4641-89EC-28CF0F39E849}
 	EndGlobalSection
 EndGlobal

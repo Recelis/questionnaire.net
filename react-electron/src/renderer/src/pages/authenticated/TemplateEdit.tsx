@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import Layout from '../../components/Layout';
-import { apiUpdateQuestionnaire, apiGetQuestionnaires } from '../../api/apiQuestionnaire';
+import { apiGetTemplate, apiUpdateTemplate, apiGetTemplates } from '../../api/apiTemplate';
 import useAuth from '../../hooks/useAuth';
 
-export default function QuestionnaireEdit() {
-    const { id } = useParams<{ id: string }>();
+export default function TemplateEdit() {
+    const { id, templateid } = useParams<{ id: string; templateid: string }>();
+    const templateId = templateid;
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -14,8 +15,8 @@ export default function QuestionnaireEdit() {
     const auth = useAuth();
 
     useEffect(() => {
-        const fetchQuestionnaire = async () => {
-            if (!id || !auth.user?.id) {
+        const fetchTemplate = async () => {
+            if (!templateId || !auth.user?.id) {
                 setInitialLoading(false);
                 return;
             }
@@ -23,43 +24,40 @@ export default function QuestionnaireEdit() {
             try {
                 setInitialLoading(true);
                 setError(undefined);
-                const questionnaires = await apiGetQuestionnaires(auth.user.id);
-                if (questionnaires) {
-                    const questionnaire = questionnaires.find(q => q.id === parseInt(id, 10));
-                    if (questionnaire) {
-                        setName(questionnaire.name);
-                    } else {
-                        setError('Questionnaire not found');
-                    }
+                const template = await apiGetTemplate(parseInt(templateId, 10));
+                if (template) {
+                    setName(template.name);
+                } else {
+                    setError('Template not found');
                 }
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load questionnaire');
+                setError(err instanceof Error ? err.message : 'Failed to load template');
             } finally {
                 setInitialLoading(false);
             }
         };
 
-        fetchQuestionnaire();
-    }, [id, auth.user?.id]);
+        fetchTemplate();
+    }, [templateId, auth.user?.id]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!id) return;
+        if (!templateId) return;
 
         setError(undefined);
         setLoading(true);
 
         try {
             if (!name.trim()) {
-                setError('Questionnaire name is required');
+                setError('Template name is required');
                 setLoading(false);
                 return;
             }
 
-            await apiUpdateQuestionnaire(parseInt(id, 10), { name: name.trim() });
-            navigate('/');
+            await apiUpdateTemplate(parseInt(templateId, 10), { name: name.trim() });
+            navigate(`/questionnaire/${id}/edit/template`);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update questionnaire');
+            setError(err instanceof Error ? err.message : 'Failed to update template');
         } finally {
             setLoading(false);
         }
@@ -70,7 +68,7 @@ export default function QuestionnaireEdit() {
             <Layout>
                 <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
                     <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
-                        Loading questionnaire...
+                        Loading template...
                     </div>
                 </div>
             </Layout>
@@ -81,12 +79,15 @@ export default function QuestionnaireEdit() {
         <Layout>
             <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
                 <div style={{ marginBottom: '2rem' }}>
-                    <Link to="/" style={{ color: '#646cff', textDecoration: 'none' }}>
-                        ← Back to Questionnaires
+                    <Link
+                        to={`/questionnaire/${id}/edit/template`}
+                        style={{ color: '#646cff', textDecoration: 'none' }}
+                    >
+                        ← Back to Templates
                     </Link>
                 </div>
 
-                <h1 style={{ marginBottom: '1.5rem' }}>Edit Questionnaire</h1>
+                <h1 style={{ marginBottom: '1.5rem' }}>Edit Template</h1>
 
                 {error && !loading && (
                     <div
@@ -116,14 +117,14 @@ export default function QuestionnaireEdit() {
                                 fontWeight: 500,
                             }}
                         >
-                            Questionnaire Name
+                            Template Name
                         </label>
                         <input
                             id="name"
                             type="text"
                             value={name}
                             onChange={e => setName(e.target.value)}
-                            placeholder="Enter questionnaire name"
+                            placeholder="Enter template name"
                             disabled={loading}
                             style={{
                                 width: '100%',
@@ -155,10 +156,10 @@ export default function QuestionnaireEdit() {
                                 transition: 'all 0.25s',
                             }}
                         >
-                            {loading ? 'Updating...' : 'Update Questionnaire'}
+                            {loading ? 'Updating...' : 'Update Template'}
                         </button>
                         <Link
-                            to="/"
+                            to={`/questionnaire/${id}/edit/template`}
                             style={{
                                 padding: '0.6em 1.2em',
                                 fontSize: '1em',

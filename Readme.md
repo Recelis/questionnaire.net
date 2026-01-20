@@ -22,8 +22,8 @@
 
 - - [x] - Setup Electron project
 - - [x] - Users can log in
-- - [ ] - Users can create their own Questionnaires
-- - [ ] - Users can create their own Templates
+- - [x] - Users can create their own Questionnaires
+- - [x] - Users can create their own Templates
 - - [ ] - Users can add questions to their templates
 - - [ ] - Users can duplicate their templates
 - - [ ] - Users can create submissions
@@ -103,7 +103,7 @@ dotnet build
 To run LifeTracker from root.
 
 ```bash
-dotnet run --project src/LifeTracker
+dotnet run --project LifeTracker
 ```
 
 You can also cd into the LifeTracker project folder and run:
@@ -112,8 +112,20 @@ You can also cd into the LifeTracker project folder and run:
 dotnet run
 ```
 
-To run the tests, go to the root.
+To run the tests, go to LifeTrackerTest.
 
 ```bash
 dotnet test
+```
+
+For running a particular test suit:
+
+```bash
+dotnet test --filter "AnswerTests"
+```
+
+For running just one test:
+
+```bash
+dotnet test --filter "FullyQualifiedName=LifeTracker.Tests.Services.AnswerTests.CreateAsync_ShouldAddAnswerToDb"
 ```

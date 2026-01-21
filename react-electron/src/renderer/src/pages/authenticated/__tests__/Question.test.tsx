@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '../../../test/test-utils';
 import userEvent from '@testing-library/user-event';
-import Templates from '../Templates';
+import TemplateQuestions from '../TemplateQuestions';
 import QuestionCreate from '../QuestionCreate';
 import * as apiTemplate from '../../../api/apiTemplate';
 import * as apiQuestionnaire from '../../../api/apiQuestionnaire';
@@ -13,6 +13,7 @@ vi.mock('../../../api/apiTemplate', () => ({
     apiGetTemplates: vi.fn(),
     apiCreateTemplate: vi.fn(),
     apiUpdateTemplate: vi.fn(),
+    apiGetTemplate: vi.fn(),
 }));
 
 vi.mock('../../../api/apiQuestionnaire', () => ({
@@ -25,6 +26,7 @@ vi.mock('../../../api/apiUser', () => ({
 
 vi.mock('../../../api/apiQuestion', () => ({
     apiCreateQuestion: vi.fn(),
+    apiGetQuestions: vi.fn(),
 }));
 
 // Mock react-router
@@ -65,77 +67,171 @@ vi.mock('react-router', async () => {
 const createMockToken = () => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEifQ.signature';
 
 describe('TemplateQuestions', () => {
-    const mockUser = {
+    const mockTemplate = {
         id: 1,
-        email: 'test@example.com',
-        name: 'Test User',
+        name: 'Test Template',
+        version: 1,
+        questionnaireId: 1,
     };
 
-    const mockQuestionnaire = {
-        id: 1,
-        name: 'My Test Questionnaire',
-        userId: 1,
-        templates: [],
-    };
-
-    const mockTemplates = [
+    const mockQuestions = [
         {
             id: 1,
-            name: 'Template 1',
-            version: 1,
-            questionnaireId: 1,
+            questionText: 'What is your name?',
+            templateId: 1,
         },
         {
             id: 2,
-            name: 'Template 2',
-            version: 2,
-            questionnaireId: 1,
+            questionText: 'What is your age?',
+            templateId: 1,
         },
     ];
 
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
-        mockUseParams.mockReturnValue({ id: '1' });
-        vi.mocked(apiUser.apiGetUser).mockResolvedValue(mockUser);
-        localStorage.setItem('user_token', createMockToken());
+        mockUseParams.mockReturnValue({ templateId: '1' });
     });
 
     it('renders loading state initially', async () => {
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockImplementation(
+        vi.mocked(apiTemplate.apiGetTemplate).mockImplementation(
             () => new Promise(() => {}) // Never resolves
         );
-        vi.mocked(apiTemplate.apiGetTemplates).mockImplementation(
+        vi.mocked(apiQuestion.apiGetQuestions).mockImplementation(
             () => new Promise(() => {}) // Never resolves
         );
 
-        render(<Templates />);
+        render(<TemplateQuestions />);
 
-        // Wait for auth to initialize, then check for loading state
         await waitFor(
             () => {
-                const loadingText = screen.queryByText('Loading templates...');
-                const createForm = screen.queryByText('Create New Template');
-                // Either loading or create form should be visible
-                expect(loadingText || createForm).toBeTruthy();
+                const loadingText = screen.queryByText('Loading questions...');
+                expect(loadingText).toBeTruthy();
             },
             { timeout: 2000 }
         );
     });
 
-    it.todo('displays questions for the template');
+    it('displays questions for the template', async () => {
+        vi.mocked(apiTemplate.apiGetTemplate).mockResolvedValue(mockTemplate);
+        vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
 
-    it.todo('displays create form when there are no templates');
+        render(<TemplateQuestions />);
 
-    it.todo('displays button for adding a new template when templates exist');
+        await waitFor(() => {
+            expect(screen.getByText('What is your name?')).toBeInTheDocument();
+            expect(screen.getByText('What is your age?')).toBeInTheDocument();
+        });
+    });
 
-    it.todo('shows create form when create button is clicked');
+    it('displays create form when there are no questions for the template', async () => {
+        vi.mocked(apiTemplate.apiGetTemplate).mockResolvedValue(mockTemplate);
+        vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue([]);
 
-    it.todo('displays error message when API call fails');
+        render(<TemplateQuestions />);
 
-    it.todo('displays back link to templates');
+        await waitFor(() => {
+            expect(screen.getByRole('heading', { name: 'Create Question' })).toBeInTheDocument();
+            expect(screen.getByPlaceholderText('Enter the question text...')).toBeInTheDocument();
+        });
+    });
 
-    it('updates questions list when new question is created');
+    it('displays button for adding a new question when question exist', async () => {
+        vi.mocked(apiTemplate.apiGetTemplate).mockResolvedValue(mockTemplate);
+        vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+
+        render(<TemplateQuestions />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /add question/i })).toBeInTheDocument();
+        });
+    });
+
+    it('shows create form when create button is clicked', async () => {
+        const user = userEvent.setup();
+        vi.mocked(apiTemplate.apiGetTemplate).mockResolvedValue(mockTemplate);
+        vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+
+        render(<TemplateQuestions />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /add question/i })).toBeInTheDocument();
+        });
+
+        const addButton = screen.getByRole('button', { name: /add question/i });
+        await user.click(addButton);
+
+        await waitFor(() => {
+            expect(screen.getByRole('heading', { name: 'Create Question' })).toBeInTheDocument();
+            expect(screen.getByPlaceholderText('Enter the question text...')).toBeInTheDocument();
+        });
+    });
+
+    it('displays error message when API call fails', async () => {
+        const errorMessage = 'Failed to load questions';
+        vi.mocked(apiTemplate.apiGetTemplate).mockRejectedValue(new Error(errorMessage));
+        vi.mocked(apiQuestion.apiGetQuestions).mockRejectedValue(new Error(errorMessage));
+
+        render(<TemplateQuestions />);
+
+        await waitFor(() => {
+            expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        });
+    });
+
+    it('displays back link to templates', async () => {
+        vi.mocked(apiTemplate.apiGetTemplate).mockResolvedValue(mockTemplate);
+        vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+
+        render(<TemplateQuestions />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('link', { name: /back to templates/i })).toBeInTheDocument();
+        });
+    });
+
+    it('updates questions list when new question is created', async () => {
+        const user = userEvent.setup();
+        const newQuestion = {
+            id: 3,
+            questionText: 'What is your email?',
+            templateId: 1,
+        };
+
+        vi.mocked(apiTemplate.apiGetTemplate).mockResolvedValue(mockTemplate);
+        vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+        vi.mocked(apiQuestion.apiCreateQuestion).mockResolvedValue(newQuestion);
+
+        render(<TemplateQuestions />);
+
+        // Wait for initial questions to load
+        await waitFor(() => {
+            expect(screen.getByText('What is your name?')).toBeInTheDocument();
+        });
+
+        // Click add button
+        const addButton = screen.getByRole('button', { name: /add question/i });
+        await user.click(addButton);
+
+        // Wait for form to appear
+        await waitFor(() => {
+            expect(screen.getByRole('heading', { name: 'Create Question' })).toBeInTheDocument();
+        });
+
+        // Fill and submit form
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, 'What is your email?');
+
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
+
+        // Verify new question appears in the list
+        await waitFor(() => {
+            expect(screen.getByText('What is your email?')).toBeInTheDocument();
+            expect(screen.getByText('What is your name?')).toBeInTheDocument();
+            expect(screen.getByText('What is your age?')).toBeInTheDocument();
+        });
+    });
 });
 
 describe('QuestionCreate', () => {

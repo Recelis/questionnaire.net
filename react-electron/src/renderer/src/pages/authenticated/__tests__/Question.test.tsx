@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '../../../test/test-utils';
 import userEvent from '@testing-library/user-event';
 import Templates from '../Templates';
-import TemplateCreate from '../TemplateCreate';
+import QuestionCreate from '../QuestionCreate';
 import * as apiTemplate from '../../../api/apiTemplate';
 import * as apiQuestionnaire from '../../../api/apiQuestionnaire';
 import * as apiUser from '../../../api/apiUser';
-import TemplateListItem from '../TemplateListItem';
+import * as apiQuestion from '../../../api/apiQuestion';
 
 // Mock the API modules
 vi.mock('../../../api/apiTemplate', () => ({
@@ -21,6 +21,10 @@ vi.mock('../../../api/apiQuestionnaire', () => ({
 
 vi.mock('../../../api/apiUser', () => ({
     apiGetUser: vi.fn(),
+}));
+
+vi.mock('../../../api/apiQuestion', () => ({
+    apiCreateQuestion: vi.fn(),
 }));
 
 // Mock react-router
@@ -135,38 +139,321 @@ describe('TemplateQuestions', () => {
 });
 
 describe('QuestionCreate', () => {
+    const mockTemplateId = 1;
+    const mockTemplateName = 'Test Template';
+
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
+        mockUseParams.mockReturnValue({ id: '1' });
     });
 
-    it.todo('renders the create question form with all elements');
+    it('renders the create question form with all elements', () => {
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
 
-    it.todo('renders form without template name when not provided');
+        expect(screen.getByRole('heading', { name: 'Create Question' })).toBeInTheDocument();
+        expect(screen.getByLabelText('Question Text:')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Enter the question text...')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /create question/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+        expect(screen.getByRole('link')).toBeInTheDocument();
+    });
 
-    it.todo('allows user to type in the question text field');
+    it('renders form without template name when not provided', () => {
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+            />
+        );
 
-    it.todo('calls apiCreateQuestion when form is submitted with valid name');
+        expect(screen.getByRole('heading', { name: 'Create Question' })).toBeInTheDocument();
+        expect(screen.queryByText(`Template: ${mockTemplateName}`)).not.toBeInTheDocument();
+    });
 
-    it.todo('calls onCancel when cancel button is clicked');
+    it('allows user to type in the question text field', async () => {
+        const user = userEvent.setup();
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
 
-    it.todo('navigates back when question is created without callback');
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, 'What is your name?');
 
-    it.todo('prevents submitting when question text is empty');
+        expect(textInput).toHaveValue('What is your name?');
+    });
 
-    it.todo('prevents submitting when question text is only whitespace');
+    it('calls apiCreateQuestion when form is submitted with valid name', async () => {
+        const user = userEvent.setup();
+        const mockQuestion = {
+            id: 1,
+            questionText: 'What is your name?',
+            templateId: mockTemplateId,
+        };
 
-    it.todo('displays error message when API call fails');
+        vi.mocked(apiQuestion.apiCreateQuestion).mockResolvedValue(mockQuestion);
 
-    it.todo('displays generic error message when API throws non-Error');
+        const onQuestionCreated = vi.fn();
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+                onQuestionCreated={onQuestionCreated}
+            />
+        );
 
-    it.todo('clears error message when form is resubmitted');
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, 'What is your name?');
 
-    it.todo('displays error when template ID is missing');
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
 
-    it.todo('disables submit button and input while loading');
+        await waitFor(() => {
+            expect(apiQuestion.apiCreateQuestion).toHaveBeenCalledWith({
+                templateId: mockTemplateId,
+                questionText: 'What is your name?',
+            });
+            expect(onQuestionCreated).toHaveBeenCalledWith(mockQuestion);
+        });
+    });
 
-    it.todo('displays back link when onCancel is not provided');
+    it('calls onCancel when cancel button is clicked', async () => {
+        const user = userEvent.setup();
+        const onCancel = vi.fn();
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+                onCancel={onCancel}
+            />
+        );
+
+        const cancelButton = screen.getByRole('button', { name: /cancel/i });
+        await user.click(cancelButton);
+
+        expect(onCancel).toHaveBeenCalled();
+    });
+
+    it('navigates back when question is created without callback', async () => {
+        const user = userEvent.setup();
+        const mockQuestion = {
+            id: 1,
+            questionText: 'What is your name?',
+            templateId: mockTemplateId,
+        };
+
+        vi.mocked(apiQuestion.apiCreateQuestion).mockResolvedValue(mockQuestion);
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, 'What is your name?');
+
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(apiQuestion.apiCreateQuestion).toHaveBeenCalled();
+        });
+    });
+
+    it('prevents submitting when question text is empty', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
+
+        expect(screen.getByText('Question text cannot be empty')).toBeInTheDocument();
+        expect(apiQuestion.apiCreateQuestion).not.toHaveBeenCalled();
+    });
+
+    it('prevents submitting when question text is only whitespace', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, '   ');
+
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
+
+        expect(screen.getByText('Question text cannot be empty')).toBeInTheDocument();
+        expect(apiQuestion.apiCreateQuestion).not.toHaveBeenCalled();
+    });
+
+    it('displays error message when API call fails', async () => {
+        const user = userEvent.setup();
+        const errorMessage = 'Failed to create question';
+
+        vi.mocked(apiQuestion.apiCreateQuestion).mockRejectedValue(new Error(errorMessage));
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, 'What is your name?');
+
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        });
+    });
+
+    it('displays generic error message when API throws non-Error', async () => {
+        const user = userEvent.setup();
+
+        vi.mocked(apiQuestion.apiCreateQuestion).mockRejectedValue('Unknown error');
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, 'What is your name?');
+
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.getByText('An unknown error occurred')).toBeInTheDocument();
+        });
+    });
+
+    it('clears error message when form is resubmitted', async () => {
+        const user = userEvent.setup();
+        const mockQuestion = {
+            id: 1,
+            questionText: 'What is your name?',
+            templateId: mockTemplateId,
+        };
+
+        vi.mocked(apiQuestion.apiCreateQuestion)
+            .mockRejectedValueOnce(new Error('First attempt failed'))
+            .mockResolvedValueOnce(mockQuestion);
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+
+        // First submission - fails
+        await user.type(textInput, 'What is your name?');
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.getByText('First attempt failed')).toBeInTheDocument();
+        });
+
+        // Clear the input and type again
+        await user.clear(textInput);
+        await user.type(textInput, 'What is your age?');
+
+        // Second submission - succeeds
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.queryByText('First attempt failed')).not.toBeInTheDocument();
+            expect(apiQuestion.apiCreateQuestion).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    it('displays error when template ID is missing', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <QuestionCreate
+                templateId={0}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const textInput = screen.getByPlaceholderText('Enter the question text...');
+        await user.type(textInput, 'What is your name?');
+
+        const submitButton = screen.getByRole('button', { name: /create question/i });
+        await user.click(submitButton);
+
+        expect(screen.getByText('Template ID is missing')).toBeInTheDocument();
+        expect(apiQuestion.apiCreateQuestion).not.toHaveBeenCalled();
+    });
+
+    it('disables submit button and input while loading', async () => {
+        const user = userEvent.setup();
+
+        vi.mocked(apiQuestion.apiCreateQuestion).mockImplementation(
+            () => new Promise(() => {}) // Never resolves
+        );
+
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const textInput = screen.getByPlaceholderText('Enter the question text...') as HTMLTextAreaElement;
+        await user.type(textInput, 'What is your name?');
+
+        const submitButton = screen.getByRole('button', { name: /create question/i }) as HTMLButtonElement;
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(submitButton).toBeDisabled();
+            expect(textInput).toBeDisabled();
+        });
+    });
+
+    it('displays back link when onCancel is not provided', () => {
+        render(
+            <QuestionCreate
+                templateId={mockTemplateId}
+                templateName={mockTemplateName}
+            />
+        );
+
+        const backLink = screen.getByRole('link');
+        expect(backLink).toBeInTheDocument();
+    });
 });
 
 describe.todo('TemplateQuestionItem');

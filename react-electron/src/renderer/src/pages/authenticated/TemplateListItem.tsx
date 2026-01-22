@@ -17,7 +17,6 @@ export default function TemplateListItem(props: ITemplateListItemProps) {
         navigate(`/questionnaire/${questionnaireId}/edit/template/edit/${template.id}`);
     };
 
-    const onDeleteClick = () => {};
     return (
         <Link
             to={`/questionnaire/${questionnaireId}/edit/template/${template.id}/question`}

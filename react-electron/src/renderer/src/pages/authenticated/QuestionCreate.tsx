@@ -42,7 +42,7 @@ export default function QuestionCreate({
 
             const newQuestion = await apiCreateQuestion({
                 templateId,
-                questionText: questionText.trim(),
+                text: questionText.trim(),
             });
 
             if (newQuestion) {

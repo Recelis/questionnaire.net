@@ -4,8 +4,6 @@ import userEvent from '@testing-library/user-event';
 import TemplateQuestions from '../TemplateQuestions';
 import QuestionCreate from '../QuestionCreate';
 import * as apiTemplate from '../../../api/apiTemplate';
-import * as apiQuestionnaire from '../../../api/apiQuestionnaire';
-import * as apiUser from '../../../api/apiUser';
 import * as apiQuestion from '../../../api/apiQuestion';
 
 // Mock the API modules
@@ -62,10 +60,6 @@ vi.mock('react-router', async () => {
     };
 });
 
-// Helper to create a valid JWT token format (header.payload.signature)
-// Payload: {"id":"1"} base64 encoded
-const createMockToken = () => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEifQ.signature';
-
 describe('TemplateQuestions', () => {
     const mockTemplate = {
         id: 1,
@@ -77,12 +71,12 @@ describe('TemplateQuestions', () => {
     const mockQuestions = [
         {
             id: 1,
-            questionText: 'What is your name?',
+            text: 'What is your name?',
             templateId: 1,
         },
         {
             id: 2,
-            questionText: 'What is your age?',
+            text: 'What is your age?',
             templateId: 1,
         },
     ];
@@ -194,7 +188,7 @@ describe('TemplateQuestions', () => {
         const user = userEvent.setup();
         const newQuestion = {
             id: 3,
-            questionText: 'What is your email?',
+            text: 'What is your email?',
             templateId: 1,
         };
 
@@ -290,7 +284,7 @@ describe('QuestionCreate', () => {
         const user = userEvent.setup();
         const mockQuestion = {
             id: 1,
-            questionText: 'What is your name?',
+            text: 'What is your name?',
             templateId: mockTemplateId,
         };
 
@@ -314,7 +308,7 @@ describe('QuestionCreate', () => {
         await waitFor(() => {
             expect(apiQuestion.apiCreateQuestion).toHaveBeenCalledWith({
                 templateId: mockTemplateId,
-                questionText: 'What is your name?',
+                text: 'What is your name?',
             });
             expect(onQuestionCreated).toHaveBeenCalledWith(mockQuestion);
         });
@@ -342,7 +336,7 @@ describe('QuestionCreate', () => {
         const user = userEvent.setup();
         const mockQuestion = {
             id: 1,
-            questionText: 'What is your name?',
+            text: 'What is your name?',
             templateId: mockTemplateId,
         };
 
@@ -454,7 +448,7 @@ describe('QuestionCreate', () => {
         const user = userEvent.setup();
         const mockQuestion = {
             id: 1,
-            questionText: 'What is your name?',
+            text: 'What is your name?',
             templateId: mockTemplateId,
         };
 

@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import Layout from '../../components/Layout';
 import QuestionCreate from './QuestionCreate';
@@ -15,7 +15,6 @@ export default function TemplateQuestions() {
     const [showCreateForm, setShowCreateForm] = useState(false);
 
     const parsedTemplateId = templateId ? parseInt(templateId, 10) : undefined;
-    console.log('Parsed Template ID:', parsedTemplateId);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -60,30 +59,31 @@ export default function TemplateQuestions() {
     // Show create form if explicitly requested or no questions exist
     if (!error && !loading && (showCreateForm || questions.length === 0)) {
         return (
-            <QuestionCreate
-                templateId={parsedTemplateId || 0}
-                templateName={template?.name}
-                onQuestionCreated={handleQuestionCreated}
-                onCancel={() => {
-                    if (questions.length > 0) {
-                        setShowCreateForm(false);
-                    }
-                    else {
-                        // navigate back if no questions exist
-                        navigate(-1);
-                    }
-                    
-                }}
-            />
+            <Layout>
+                <QuestionCreate
+                    templateId={parsedTemplateId || 0}
+                    templateName={template?.name}
+                    onQuestionCreated={handleQuestionCreated}
+                    onCancel={() => {
+                        if (questions.length > 0) {
+                            setShowCreateForm(false);
+                        } else {
+                            // navigate back if no questions exist
+                            navigate(-1);
+                        }
+                    }}
+                />
+            </Layout>
         );
     }
 
     return (
         <Layout>
             <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
+                Parsed template Id {parsedTemplateId}
                 <div style={{ marginBottom: '2rem' }}>
                     <Link
-                        to="/templates"
+                        to={`/questionnaire/${template?.questionnaireId}/edit/template`}
                         style={{
                             color: '#646cff',
                             textDecoration: 'none',
@@ -94,9 +94,7 @@ export default function TemplateQuestions() {
                         ← Back to Templates
                     </Link>
                 </div>
-
                 {loading && <p>Loading questions...</p>}
-
                 {error && (
                     <div
                         style={{
@@ -110,7 +108,6 @@ export default function TemplateQuestions() {
                         {error}
                     </div>
                 )}
-
                 {!loading && !error && (
                     <>
                         <div
@@ -155,12 +152,25 @@ export default function TemplateQuestions() {
                                             backgroundColor: '#f9f9f9',
                                         }}
                                     >
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'start',
+                                            }}
+                                        >
                                             <div style={{ flex: 1 }}>
-                                                <p style={{ margin: '0 0 0.5rem 0', fontWeight: '500' }}>
+                                                <p
+                                                    style={{
+                                                        margin: '0 0 0.5rem 0',
+                                                        fontWeight: '500',
+                                                    }}
+                                                >
                                                     Question {index + 1}
                                                 </p>
-                                                <p style={{ margin: 0, color: '#333' }}>{question.questionText}</p>
+                                                <p style={{ margin: 0, color: '#333' }}>
+                                                    {question.text}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>

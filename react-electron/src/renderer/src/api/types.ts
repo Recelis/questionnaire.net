@@ -31,16 +31,16 @@ export interface IQuestionnaire {
 
   export interface IQuestion {
     id: number;
-    questionText: string;
+    text: string;
     templateId: number;
     points?: number;
   }
 
   export interface ICreateQuestion {
     templateId: number;
-    questionText: string;
+    text: string;
   }
 
   export interface IUpdateQuestion {
-    questionText: string;
+    text: string;
   }

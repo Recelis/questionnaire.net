@@ -80,7 +80,6 @@ export default function TemplateQuestions() {
     return (
         <Layout>
             <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
-                Parsed template Id {parsedTemplateId}
                 <div style={{ marginBottom: '2rem' }}>
                     <Link
                         to={`/questionnaire/${template?.questionnaireId}/edit/template`}

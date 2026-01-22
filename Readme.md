@@ -14,6 +14,9 @@
 - [x] - CRUD Answer
 - [x] - Create User model + add to Questionnaire created_by field.
 - [ ] - Locking templates so cannot have answers until it is 'locked'. Cannot modify after locked.
+- [ ] - - Cannot make submissions if not locked if only one template
+- [ ] - - Submissions are for previous locked template, if latest if unlocked
+- [ ] - - cannot create a new template if latest is unlocked
 - [ ] - duplicating templates
 
 ### Future
@@ -24,7 +27,7 @@
 - - [x] - Users can log in
 - - [x] - Users can create their own Questionnaires
 - - [x] - Users can create their own Templates
-- - [ ] - Users can add questions to their templates
+- - [x] - Users can add questions to their templates
 - - [ ] - Users can duplicate their templates
 - - [ ] - Users can create submissions
 - - [ ] - Users can add answers to their submissions

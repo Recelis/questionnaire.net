@@ -25,11 +25,11 @@ const RouterComponent = () => {
                         <Route path=":id/edit" element={<QuestionnaireEdit />} />
                         <Route path=":id/edit/template" element={<Templates />} />
                         <Route
-                            path=":id/edit/template/edit/:templateid"
+                            path=":id/edit/template/edit/:templateId"
                             element={<TemplateEdit />}
                         />
                         <Route
-                            path=":id/edit/template/:templateid/question"
+                            path=":id/edit/template/:templateId/question"
                             element={<TemplateQuestions />}
                         />
                     </Route>

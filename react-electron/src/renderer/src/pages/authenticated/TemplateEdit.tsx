@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import Layout from '../../components/Layout';
-import { apiGetTemplate, apiUpdateTemplate, apiGetTemplates } from '../../api/apiTemplate';
+import { apiGetTemplate, apiUpdateTemplate } from '../../api/apiTemplate';
 import useAuth from '../../hooks/useAuth';
 
 export default function TemplateEdit() {
-    const { id, templateid } = useParams<{ id: string; templateid: string }>();
-    const templateId = templateid;
+    const { id, templateId } = useParams<{ id: string; templateId: string }>();
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);

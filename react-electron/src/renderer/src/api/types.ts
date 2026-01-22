@@ -28,3 +28,19 @@ export interface IQuestionnaire {
   export interface IUpdateTemplate {
     name: string;
   }
+
+  export interface IQuestion {
+    id: number;
+    text: string;
+    templateId: number;
+    points?: number;
+  }
+
+  export interface ICreateQuestion {
+    templateId: number;
+    text: string;
+  }
+
+  export interface IUpdateQuestion {
+    text: string;
+  }

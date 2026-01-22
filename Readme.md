@@ -33,8 +33,9 @@
 #### Deployments
 
 - [ ] - Setup CI on GitHub Actions
-- [ ] - Put Electron Project onto Lambda
+- [ ] - Put Dotnet Project onto Lambda
 - [ ] - Connect to Postgres Database online
+- [ ] - Connect local running Electron Project to Dotnet Lambda
 - [ ] - Setup CD on GitHub Actions
 
 ## Migrations

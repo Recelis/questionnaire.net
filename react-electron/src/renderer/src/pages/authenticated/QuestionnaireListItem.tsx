@@ -1,6 +1,7 @@
 import React from 'react';
 import DropdownMenu from '../../components/DropdownMenu';
 import type { IQuestionnaire } from '../../api/types';
+import { useNavigate } from 'react-router';
 
 interface IQuestionnaireListItemProps {
     questionnaire: IQuestionnaire;
@@ -11,6 +12,8 @@ interface IQuestionnaireListItemProps {
 
 export default function QuestionnaireListItem(props: IQuestionnaireListItemProps) {
     const { questionnaire, onDeleteClick, onEditClick, onEditTemplatesClick } = props;
+
+    const navigate = useNavigate();
 
     return (
         <div
@@ -29,6 +32,11 @@ export default function QuestionnaireListItem(props: IQuestionnaireListItemProps
             onMouseLeave={e => {
                 e.currentTarget.style.borderColor = '#333';
                 e.currentTarget.style.transform = 'translateY(0)';
+            }}
+            onClick={e => {
+                // Prevent click when clicking on dropdown menu
+                if ((e.target as HTMLElement).closest('button')) return;
+                navigate(`/questionnaire/${questionnaire.id}/submission`);
             }}
         >
             <div

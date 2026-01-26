@@ -34,6 +34,7 @@ vi.mock('react-router', async () => {
     };
 });
 
+
 describe('QuestionnaireCreate', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -355,6 +356,36 @@ describe('QuestionnaireCreate', () => {
         const cancelLink = screen.getByText('Cancel');
         expect(cancelLink).toBeInTheDocument();
         expect(cancelLink.closest('a')).toHaveAttribute('href', '/');
+    });
+});
+
+describe('QuestionnaireListItem navigation', () => {
+    const onEditClick = vi.fn();
+    const onEditTemplatesClick = vi.fn();
+    const onDeleteClick = vi.fn();
+
+    const mockQuestionnaire = {
+        id: 1,
+        name: 'My Test Questionnaire',
+        userId: 1,
+        templates: [],
+    };
+
+    it('navigates to submission page on item click', async () => {
+        const user = userEvent.setup();
+        render(
+            <QuestionnaireListItem
+                questionnaire={mockQuestionnaire}
+                onEditClick={onEditClick}
+                onEditTemplatesClick={onEditTemplatesClick}
+                onDeleteClick={onDeleteClick}
+            />
+        );
+
+        const listItem = screen.getByText('My Test Questionnaire');
+        await user.click(listItem);
+
+        expect(mockNavigate).toHaveBeenCalledWith('/questionnaire/1/submission');
     });
 });
 

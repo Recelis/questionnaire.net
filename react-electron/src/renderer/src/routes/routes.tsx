@@ -9,6 +9,7 @@ import Questionnaires from '../pages/authenticated/Questionnaires';
 import Templates from '../pages/authenticated/Templates';
 import TemplateEdit from '../pages/authenticated/TemplateEdit';
 import TemplateQuestions from '../pages/authenticated/TemplateQuestions';
+import SubmissionCreate from '../pages/authenticated/SubmissionCreate';
 
 const RouterComponent = () => {
     return (
@@ -31,6 +32,10 @@ const RouterComponent = () => {
                         <Route
                             path=":id/edit/template/:templateId/question"
                             element={<TemplateQuestions />}
+                        />
+                        <Route
+                            path=":id/submission"
+                            element={<SubmissionCreate />}
                         />
                     </Route>
                 </Route>

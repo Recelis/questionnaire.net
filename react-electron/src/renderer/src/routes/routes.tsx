@@ -10,6 +10,7 @@ import Templates from '../pages/authenticated/Templates';
 import TemplateEdit from '../pages/authenticated/TemplateEdit';
 import TemplateQuestions from '../pages/authenticated/TemplateQuestions';
 import Submission from '../pages/authenticated/Submission';
+import SubmissionQuestion from '../pages/authenticated/SubmissionQuestion';
 
 const RouterComponent = () => {
     return (
@@ -36,6 +37,10 @@ const RouterComponent = () => {
                         <Route
                             path=":id/submission"
                             element={<Submission />}
+                        />
+                        <Route
+                            path=":id/submission/:submissionId/question"
+                            element={<SubmissionQuestion />}
                         />
                     </Route>
                 </Route>

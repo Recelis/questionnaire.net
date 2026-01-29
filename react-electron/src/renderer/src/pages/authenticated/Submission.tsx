@@ -45,12 +45,11 @@ export default function Submission() {
         return (
             <Layout>
                 <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '2rem' }}>
-                    <p>Loading questionnaire...</p>
+                    <p>Loading submissions...</p>
                 </div>
             </Layout>
         );
     }
-
 
     return (
         <Layout>

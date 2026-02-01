@@ -25,7 +25,7 @@ export default function SubmissionCreate(props: {questionnaire: IQuestionnaire})
                 throw new Error('Failed to create submission');
             }
             // Redirect to the first question for the submission page
-            navigate(`/questionnaire/${questionnaire.id}/submission/${submission.id}/question`);
+            navigate(`/questionnaire/${questionnaire.id}/submission/${submission.id}/question/0`);
 
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to start submission');

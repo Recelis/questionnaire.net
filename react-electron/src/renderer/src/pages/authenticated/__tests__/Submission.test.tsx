@@ -3,7 +3,10 @@ import { render, screen, waitFor } from '../../../test/test-utils';
 import * as apiTemplate from '../../../api/apiTemplate';
 import * as apiQuestionnaire from '../../../api/apiQuestionnaire';
 import * as apiUser from '../../../api/apiUser';
+import * as apiQuestion from '../../../api/apiQuestion';
+import * as apiSubmission from '../../../api/apiSubmission';
 import Submission from '../Submission';
+import SubmissionQuestion from '../SubmissionQuestion';
 
 // Mock the API modules
 vi.mock('../../../api/apiTemplate', () => ({
@@ -20,6 +23,14 @@ vi.mock('../../../api/apiUser', () => ({
     apiGetUser: vi.fn(),
 }));
 
+vi.mock('../../../api/apiQuestion', () => ({
+    apiGetQuestions: vi.fn(),
+}));
+
+vi.mock('../../../api/apiSubmission', () => ({
+    apiGetSubmission: vi.fn(),
+}));
+
 // Mock react-router
 const mockUseParams = vi.fn();
 vi.mock('react-router', async () => {
@@ -33,9 +44,7 @@ vi.mock('react-router', async () => {
 // Helper to create a valid JWT token format (header.payload.signature)
 // Payload: {"id":"1"} base64 encoded
 const createMockToken = () => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEifQ.signature';
-
-describe('Submission', () => {
-    const mockUser = {
+const mockUser = {
         id: 1,
         email: 'test@example.com',
         name: 'Test User',
@@ -56,15 +65,14 @@ describe('Submission', () => {
         },
     ];
 
-    const mockQuestionnaire = {
+const mockQuestionnaire = {
         id: 1,
         name: 'My Test Questionnaire',
         userId: 1,
         templates: mockTemplates,
     };
 
-    
-
+describe('Submission', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
@@ -126,4 +134,74 @@ describe('Submission', () => {
             expect(screen.getByRole('button', { name: /start new submission/i })).toBeInTheDocument();
         });
     });
+});
+
+describe('Submission - Questions', () => {
+        const mockQuestions = [
+            {
+                id: 1,
+                text: 'Question 1',
+                type: 'text',
+                templateId: 1,
+                questionNumber: 1,
+            },
+            {
+                id: 2,
+                text: 'Question 2',
+                type: 'multiple_choice',
+                templateId: 1,
+                questionNumber: 2,
+            },
+        ];
+
+        const mockSubmission = {
+            id: 1,
+            date: new Date().toISOString(),
+            userId: 1,
+            totalPoints: 0,
+            templateId: 1,
+            answers: [],
+        };
+
+        beforeEach(() => {
+            vi.clearAllMocks();
+            localStorage.clear();
+            mockUseParams.mockReturnValue({ id: '1' });
+            localStorage.setItem('user_token', createMockToken());
+        });
+
+        it('It fetches questions for the submission', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(apiSubmission.apiGetSubmission).toHaveBeenCalled();
+            });
+        });
+
+        it.todo('It displays loading state while fetching questions');
+        it.todo('It handles API errors gracefully');
+        
+        it('If there are no questions, it redirects to show no questions page', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue([]);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('No Questions Available')).toBeInTheDocument();
+                expect(screen.getByText(/no questions available for this questionnaire/i)).toBeInTheDocument();
+            });
+        });
+
+        it.todo('It displays the nth question based on submissionId and question index');
+        it.todo('It allows navigation between questions by scrolling or buttons');
+        it.todo('Answering a question will navigate to the next question');
+        it.todo('it shows progress of the questionnaire')
+        it.todo('It shows the end of submission message after the last question');
+        it.todo('It saves answers correctly');
 });

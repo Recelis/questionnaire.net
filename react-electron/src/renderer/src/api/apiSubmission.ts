@@ -26,28 +26,28 @@ const DEFAULT_BASE_URL = 'http://localhost:5283';
 //     }
 // };
 
-// export const apiGetSubmission = async (
-//     templateId: number
-// ): Promise<IQuestion[] | undefined> => {
-//     try {
-//         const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
-//         const res = await fetch(`${baseUrl}/Question/template/${templateId}`, {
-//             method: 'GET',
-//             headers: getAuthHeaders(),
-//         });
+export const apiGetSubmission = async (
+    submissionId: number
+): Promise<ISubmission | undefined> => {
+    try {
+        const baseUrl = import.meta.env.VITE_API_URL ?? DEFAULT_BASE_URL;
+        const res = await fetch(`${baseUrl}/Submission/${submissionId}`, {
+            method: 'GET',
+            headers: getAuthHeaders(),
+        });
 
-//         if (!res.ok) {
-//             const message = await res.text();
-//             throw new Error(`Failed to get questions. Status: ${res.status}: ${message}`);
-//         }
+        if (!res.ok) {
+            const message = await res.text();
+            throw new Error(`Failed to get submissions. Status: ${res.status}: ${message}`);
+        }
 
-//         const data = await res.json();
-//         return data as IQuestion[];
-//     } catch (err) {
-//         console.error(err);
-//         throw err;
-//     }
-// };
+        const data = await res.json();
+        return data as ISubmission;
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+};
 
 export const apiCreateSubmission = async (
     body: ICreateSubmission

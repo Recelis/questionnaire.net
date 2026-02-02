@@ -4,7 +4,7 @@ import Layout from '../../components/Layout'
 
 export default function SubmissionNoQuestions() {
   const navigate = useNavigate()
-  const { questionnaireId, templateId } = useParams()
+  const { id, templateId } = useParams()
 
   return (
     <Layout>
@@ -13,7 +13,7 @@ export default function SubmissionNoQuestions() {
           to="#"
           onClick={(e) => {
             e.preventDefault()
-            navigate(-1)
+            navigate(`/questionnaire/${id}/submission`)
           }}
           style={{
             color: '#646cff',
@@ -25,7 +25,7 @@ export default function SubmissionNoQuestions() {
         <h2>No Questions Available</h2>
         <p>No questions available for this Questionnaire. Please create them in the latest template.</p>
         <Link
-          to={`/questionnaire/${questionnaireId}/edit/template/${templateId}/question`}
+          to={`/questionnaire/${id}/edit/template/${templateId}/question`}
           style={{
             color: '#646cff',
             textDecoration: 'none',

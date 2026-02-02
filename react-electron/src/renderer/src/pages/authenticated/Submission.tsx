@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import type {  IQuestionnaire } from '../../api/types';
+import type { IQuestionnaire } from '../../api/types';
 import Layout from '../../components/Layout';
 import { apiGetQuestionnaire } from '../../api/apiQuestionnaire';
 import SubmissionCreate from './SubmissionCreate';
 
 export default function Submission() {
-    const { id: urlQuestionnaireId} = useParams();
+    const { id: urlQuestionnaireId } = useParams();
     const [error, setError] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState(false);
-    
+
     const [questionnaire, setQuestionnaire] = useState<IQuestionnaire | undefined>();
 
     useEffect(() => {
@@ -39,8 +39,6 @@ export default function Submission() {
 
     const navigate = useNavigate();
 
-    
-
     if (loading || !questionnaire) {
         return (
             <Layout>
@@ -54,11 +52,11 @@ export default function Submission() {
     return (
         <Layout>
             <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '2rem' }}>
-            <Link
+                <Link
                     to="#"
-                    onClick={(e) => {
+                    onClick={e => {
                         e.preventDefault();
-                        navigate(-1);
+                        navigate(`/`);
                     }}
                     style={{
                         color: '#646cff',
@@ -67,10 +65,10 @@ export default function Submission() {
                 >
                     ← Back
                 </Link>
-            <h2>{questionnaire.name}</h2>
-            <SubmissionCreate questionnaire={questionnaire} />
+                <h2>{questionnaire.name}</h2>
+                <SubmissionCreate questionnaire={questionnaire} />
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
             </div>
         </Layout>
     );

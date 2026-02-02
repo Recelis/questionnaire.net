@@ -33,11 +33,13 @@ vi.mock('../../../api/apiSubmission', () => ({
 
 // Mock react-router
 const mockUseParams = vi.fn();
+const mockNavigate = vi.fn();
 vi.mock('react-router', async () => {
     const actual = await vi.importActual('react-router');
     return {
         ...actual,
         useParams: () => mockUseParams(),
+        useNavigate: () => mockNavigate,
     };
 });
 
@@ -166,7 +168,8 @@ describe('Submission - Questions', () => {
         beforeEach(() => {
             vi.clearAllMocks();
             localStorage.clear();
-            mockUseParams.mockReturnValue({ id: '1' });
+            mockUseParams.mockReturnValue({ id: '1', submissionId: '1', questionIndex: '0' });
+            mockNavigate.mockClear();
             localStorage.setItem('user_token', createMockToken());
         });
 
@@ -193,8 +196,7 @@ describe('Submission - Questions', () => {
             render(<SubmissionQuestion />);
 
             await waitFor(() => {
-                expect(screen.getByText('No Questions Available')).toBeInTheDocument();
-                expect(screen.getByText(/no questions available for this questionnaire/i)).toBeInTheDocument();
+                expect(mockNavigate).toHaveBeenCalledWith('/questionnaire/1/submission/1/noquestions');
             });
         });
 

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import { apiGetSubmission } from '../../api/apiSubmission';
 import { apiGetQuestions } from '../../api/apiQuestion';
 import type { IQuestion } from '../../api/types';
+import SubmissionQuestionProgress from './SubmissionQuestionProgress';
 
 export default function SubmissionQuestion() {
     const { id, submissionId, questionIndex } = useParams();
@@ -43,6 +44,18 @@ export default function SubmissionQuestion() {
         };
         fetchQuestionData();
     }, []);
+    if (!submissionId || !id) {
+        return (
+            <Layout>
+                <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '2rem' }}>
+                    <p>Invalid submission or questionnaire ID.</p>
+                </div>
+            </Layout>
+        );
+    }
+    const questionnaireIdNum = parseInt(id, 10);
+    const submissionIdNum = parseInt(submissionId, 10);
+
     if (loading || !questions) {
         return (
             <Layout>
@@ -74,6 +87,12 @@ export default function SubmissionQuestion() {
 
     return (
         <Layout>
+            <SubmissionQuestionProgress
+                questionnaireId={questionnaireIdNum}
+                submissionId={submissionIdNum}
+                totalQuestions={questions.length}
+                currentQuestionIndex={qIndex}
+            />
             <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '2rem' }}>
                 {questions[qIndex] && <p>{questions[qIndex].text}</p>}
             </div>

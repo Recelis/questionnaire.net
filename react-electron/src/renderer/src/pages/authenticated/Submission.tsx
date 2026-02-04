@@ -4,6 +4,7 @@ import type { IQuestionnaire } from '../../api/types';
 import Layout from '../../components/Layout';
 import { apiGetQuestionnaire } from '../../api/apiQuestionnaire';
 import SubmissionCreate from './SubmissionCreate';
+import SubmissionList from './SubmissionList';
 
 export default function Submission() {
     const { id: urlQuestionnaireId } = useParams();
@@ -67,8 +68,9 @@ export default function Submission() {
                 </Link>
                 <h2>{questionnaire.name}</h2>
                 <SubmissionCreate questionnaire={questionnaire} />
-
+                <SubmissionList questionnaire={questionnaire} />
                 {error && <p style={{ color: 'red' }}>{error}</p>}
+
             </div>
         </Layout>
     );

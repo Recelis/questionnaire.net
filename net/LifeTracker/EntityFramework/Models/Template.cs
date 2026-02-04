@@ -15,4 +15,6 @@ public class Template
     public Questionnaire? Questionnaire { get; set; }
 
     public ICollection<TemplateQuestionLink> TemplateQuestionLinks { get; set; } = new List<TemplateQuestionLink>();
+
+    public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }

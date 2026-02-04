@@ -5,7 +5,7 @@ namespace LifeTracker.Services;
 
 public interface ISubmissionService
 {
-    Task<List<Submission>> GetByUserAsync(int userId);
+    Task<List<Submission>> GetByQuestionnaireAsync(int questionnaireId);
     Task<Submission?> GetAsync(int submissionId);
     Task<Submission?> CreateAsync(CreateSubmissionDto newSubmission);
 

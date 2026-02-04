@@ -18,10 +18,10 @@ public class EFSubmissionService : ISubmissionService
         _logger = logger;
     }
 
-    public async Task<List<Submission>> GetByUserAsync(int userId)
+    public async Task<List<Submission>> GetByQuestionnaireAsync(int questionnaireId)
     {
         return await _lifeTrackerContext.Submission
-                .Where(t => t.UserId == userId)
+                .Where(t => t.Template.QuestionnaireId == questionnaireId)
                 .ToListAsync();
     }
 

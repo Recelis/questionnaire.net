@@ -156,6 +156,12 @@ public class LifeTrackerContext : DbContext
 
             entity.Property(t => t.TemplateId)
                   .HasColumnName("template_id");
+
+            entity.HasOne(e => e.Template)
+                .WithMany(e => e.Submissions)
+                .HasForeignKey(e => e.TemplateId)
+                .HasConstraintName("fk_submission_template")
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Answer>(entity =>

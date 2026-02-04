@@ -192,7 +192,7 @@ namespace LifeTracker.Tests.Services
             SetServiceWithUserContext(user0);
             if (_submissionService == null)
                 throw new InvalidOperationException("_submissionService is null");
-            List<Submission> submissionsInDb = await _submissionService.GetByUserAsync(user0.Id);
+            List<Submission> submissionsInDb = await _submissionService.GetByQuestionnaireAsync(questionnaire.Id);
 
             Assert.That(submissionsInDb, Has.Exactly(2).Items);
         }

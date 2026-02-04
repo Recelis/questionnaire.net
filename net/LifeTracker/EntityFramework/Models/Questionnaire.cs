@@ -10,6 +10,5 @@ public class Questionnaire
 
     public required User User { get; set; }
 
-
     public ICollection<Template> Templates { get; set; } = new List<Template>();
 }

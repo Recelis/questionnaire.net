@@ -200,10 +200,55 @@ describe('Submission - Questions', () => {
             });
         });
 
-        it.todo('It displays the nth question based on submissionId and question index');
-        it.todo('It allows navigation between questions by scrolling or buttons');
+        it('It displays the nth question based on submissionId and question index', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 1')).toBeInTheDocument();
+            });
+        });
+
+        it('It displays the correct question when questionIndex changes', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+            mockUseParams.mockReturnValue({ id: '1', submissionId: '1', questionIndex: '1' });
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 2')).toBeInTheDocument();
+            });
+        });
+
+        it('It allows navigation between questions by clicking on the progress indicators', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 1')).toBeInTheDocument();
+            });
+
+            // Find and click the second progress indicator
+            const progressButtons = screen.getAllByRole('button', { name: /Question \d+/ });
+            expect(progressButtons).toHaveLength(2);
+            
+            progressButtons[1].click();
+
+            await waitFor(() => {
+                expect(mockNavigate).toHaveBeenCalledWith('/questionnaire/1/submission/1/question/1');
+            });
+        });
+
         it.todo('Answering a question will navigate to the next question');
-        it.todo('it shows progress of the questionnaire')
+        it.todo('It shows progress of the questionnaire');
         it.todo('It shows the end of submission message after the last question');
         it.todo('It saves answers correctly');
 });

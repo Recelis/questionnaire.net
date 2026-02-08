@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router'
-import Layout from '../../components/Layout'
+import { useNavigate } from 'react-router'
 import type { IQuestionnaire, ISubmission } from '../../api/types'
 
 interface ISubmissionListProps {
@@ -60,7 +59,6 @@ export default function SubmissionList(props: ISubmissionListProps) {
   }
 
   return (
-    <Layout>
       <div style={{ maxWidth: '800px', margin: '2rem auto', padding: '2rem' }}>
         <h2>Submissions</h2>
 
@@ -111,6 +109,5 @@ export default function SubmissionList(props: ISubmissionListProps) {
           </table>
         )}
       </div>
-    </Layout>
   )
 }

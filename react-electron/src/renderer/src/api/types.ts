@@ -65,3 +65,15 @@ export interface IQuestionnaire {
     points: number;
     text: string;
   }
+
+  export interface ICreateAnswer {
+    questionId: number;
+    submissionId: number;
+    text: string;
+    points: number;
+}
+
+export interface IUpdateAnswer {
+    text: string;
+    points: number;
+}

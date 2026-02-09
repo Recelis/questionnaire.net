@@ -5,6 +5,7 @@ import * as apiQuestionnaire from '../../../api/apiQuestionnaire';
 import * as apiUser from '../../../api/apiUser';
 import * as apiQuestion from '../../../api/apiQuestion';
 import * as apiSubmission from '../../../api/apiSubmission';
+import * as apiAnswer from '../../../api/apiAnswer';
 import Submission from '../Submission';
 import SubmissionQuestion from '../SubmissionQuestion';
 
@@ -29,6 +30,12 @@ vi.mock('../../../api/apiQuestion', () => ({
 
 vi.mock('../../../api/apiSubmission', () => ({
     apiGetSubmission: vi.fn(),
+}));
+
+vi.mock('../../../api/apiAnswer', () => ({
+    apiGetAnswerBySubmissionQuestion: vi.fn(),
+    apiCreateAnswer: vi.fn(),
+    apiUpdateAnswer: vi.fn(),
 }));
 
 // Mock react-router
@@ -247,8 +254,171 @@ describe('Submission - Questions', () => {
             });
         });
 
-        it.todo('Answering a question will navigate to the next question');
-        it.todo('It shows progress of the questionnaire');
-        it.todo('It shows the end of submission message after the last question');
-        it.todo('It saves answers correctly');
+        it('It shows progress of the questionnaire', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 1')).toBeInTheDocument();
+            });
+
+            // Check that progress indicators are displayed
+            const progressButtons = screen.getAllByRole('button', { name: /Question \d+/ });
+            expect(progressButtons).toHaveLength(2);
+
+            // Both progress indicators should be present
+            expect(progressButtons[0]).toBeInTheDocument();
+            expect(progressButtons[1]).toBeInTheDocument();
+        });
+        
+        it('It saves answers correctly - creates new answer when none exists', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+            vi.mocked(apiAnswer.apiGetAnswerBySubmissionQuestion).mockResolvedValue(null);
+            vi.mocked(apiAnswer.apiCreateAnswer).mockResolvedValue({ id: 1, submissionId: 1, questionId: 1, text: '5', points: 0 });
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 1')).toBeInTheDocument();
+            });
+
+            const input = screen.getByPlaceholderText(/answer with a number/i);
+            const saveButton = screen.getByRole('button', { name: /save/i });
+
+            // Type an answer
+            input.focus();
+            input.blur();
+            input.focus();
+            await waitFor(() => {
+                input.setAttribute('value', '5');
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+
+            // Click save button
+            saveButton.click();
+
+            await waitFor(() => {
+                expect(apiAnswer.apiCreateAnswer).toHaveBeenCalledWith({
+                    submissionId: 1,
+                    questionId: 1,
+                    text: '5',
+                    points: 0,
+                });
+            });
+        });
+
+        it('It saves answers correctly - updates existing answer', async () => {
+            const existingAnswer = { id: 10, submissionId: 1, questionId: 1, text: '3', points: 0 };
+            
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+            vi.mocked(apiAnswer.apiGetAnswerBySubmissionQuestion).mockResolvedValue(existingAnswer);
+            vi.mocked(apiAnswer.apiUpdateAnswer).mockResolvedValue({ ...existingAnswer, text: '7' });
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 1')).toBeInTheDocument();
+            });
+
+            // The existing answer should be loaded
+            await waitFor(() => {
+                const input = screen.getByPlaceholderText(/answer with a number/i);
+                expect(input).toHaveValue('3');
+            });
+
+            // Update the answer
+            const input = screen.getByPlaceholderText(/answer with a number/i);
+            const saveButton = screen.getByRole('button', { name: /save/i });
+
+            input.focus();
+            input.blur();
+            input.focus();
+            await waitFor(() => {
+                input.setAttribute('value', '7');
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+
+            saveButton.click();
+
+            await waitFor(() => {
+                expect(apiAnswer.apiUpdateAnswer).toHaveBeenCalledWith(10, {
+                    text: '7',
+                    points: 0,
+                });
+            });
+        });
+
+        it('Answering a question will navigate to the next question', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+            vi.mocked(apiAnswer.apiGetAnswerBySubmissionQuestion).mockResolvedValue(null);
+            vi.mocked(apiAnswer.apiCreateAnswer).mockResolvedValue({ id: 1, submissionId: 1, questionId: 1, text: '5', points: 0 });
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 1')).toBeInTheDocument();
+            });
+
+            const input = screen.getByPlaceholderText(/answer with a number/i);
+            const saveButton = screen.getByRole('button', { name: /save/i });
+
+            // Type an answer
+            input.focus();
+            input.blur();
+            input.focus();
+            await waitFor(() => {
+                input.setAttribute('value', '5');
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+
+            saveButton.click();
+
+            await waitFor(() => {
+                expect(mockNavigate).toHaveBeenCalledWith('/questionnaire/1/submission/1/question/1');
+            });
+        });
+
+        it('It shows the end of submission message after the last question', async () => {
+            vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
+            vi.mocked(apiQuestion.apiGetQuestions).mockResolvedValue(mockQuestions);
+            vi.mocked(apiSubmission.apiGetSubmission).mockResolvedValue(mockSubmission);
+            vi.mocked(apiAnswer.apiGetAnswerBySubmissionQuestion).mockResolvedValue(null);
+            vi.mocked(apiAnswer.apiCreateAnswer).mockResolvedValue({ id: 2, submissionId: 1, questionId: 2, text: '8', points: 0 });
+            
+            // Set to last question
+            mockUseParams.mockReturnValue({ id: '1', submissionId: '1', questionIndex: '1' });
+
+            render(<SubmissionQuestion />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Question 2')).toBeInTheDocument();
+            });
+
+            const input = screen.getByPlaceholderText(/answer with a number/i);
+            const saveButton = screen.getByRole('button', { name: /save/i });
+
+            // Type an answer
+            input.focus();
+            input.blur();
+            input.focus();
+            await waitFor(() => {
+                input.setAttribute('value', '8');
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+
+            saveButton.click();
+
+            await waitFor(() => {
+                expect(mockNavigate).toHaveBeenCalledWith('/questionnaire/1/submission/1/complete');
+            });
+        });
 });

@@ -12,6 +12,7 @@ import TemplateQuestions from '../pages/authenticated/TemplateQuestions';
 import Submission from '../pages/authenticated/Submission';
 import SubmissionNoQuestions from '../pages/authenticated/SubmissionNoQuestions';
 import SubmissionQuestion from '../pages/authenticated/SubmissionQuestion';
+import SubmissionComplete from '../pages/authenticated/SubmissionComplete';
 
 const RouterComponent = () => {
     return (
@@ -46,6 +47,10 @@ const RouterComponent = () => {
                         <Route
                             path=":id/submission/:submissionId/question/:questionIndex"
                             element={<SubmissionQuestion />}
+                        />
+                        <Route
+                            path=":id/submission/:submissionId/complete"
+                            element={<SubmissionComplete />}
                         />
                     </Route>
                 </Route>

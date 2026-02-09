@@ -44,3 +44,36 @@ export interface IQuestionnaire {
   export interface IUpdateQuestion {
     text: string;
   }
+
+  export interface ISubmission {
+    id: number;
+    date: string;
+    userId: number;
+    totalPoints: number;
+    templateId: number;
+    answers: IAnswer[];
+  }
+
+  export interface ICreateSubmission {
+    templateId: number;
+  }
+
+  export interface IAnswer {
+    id: number;
+    questionId: number;
+    submissionId: number;
+    points: number;
+    text: string;
+  }
+
+  export interface ICreateAnswer {
+    questionId: number;
+    submissionId: number;
+    text: string;
+    points: number;
+}
+
+export interface IUpdateAnswer {
+    text: string;
+    points: number;
+}

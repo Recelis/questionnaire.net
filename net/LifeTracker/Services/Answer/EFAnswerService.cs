@@ -16,11 +16,11 @@ public class EFAnswerService : IAnswerService
         _logger = logger;
     }
 
-    public async Task<List<Answer>> GetBySubmissionAsync(int submissionId)
+    public async Task<Answer?> GetBySubmissionQuestionAsync(int submissionId, int questionId)
     {
         return await _lifeTrackerContext.Answer
-                .Where(t => t.SubmissionId == submissionId)
-                .ToListAsync();
+                .Where(t => t.SubmissionId == submissionId && t.QuestionId == questionId)
+                .FirstOrDefaultAsync();
     }
 
     public async Task<Answer?> GetAsync(int answerId)

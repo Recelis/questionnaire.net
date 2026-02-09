@@ -17,7 +17,7 @@ vi.mock('../../../api/apiTemplate', () => ({
 }));
 
 vi.mock('../../../api/apiQuestionnaire', () => ({
-    apiGetQuestionnaires: vi.fn(),
+    apiGetQuestionnaire: vi.fn()
 }));
 
 vi.mock('../../../api/apiUser', () => ({
@@ -68,13 +68,6 @@ describe('Templates', () => {
         name: 'Test User',
     };
 
-    const mockQuestionnaire = {
-        id: 1,
-        name: 'My Test Questionnaire',
-        userId: 1,
-        templates: [],
-    };
-
     const mockTemplates = [
         {
             id: 1,
@@ -90,6 +83,13 @@ describe('Templates', () => {
         },
     ];
 
+    const mockQuestionnaire = {
+        id: 1,
+        name: 'My Test Questionnaire',
+        userId: 1,
+        templates: mockTemplates,
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
@@ -99,7 +99,7 @@ describe('Templates', () => {
     });
 
     it('renders loading state initially', async () => {
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockImplementation(
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockImplementation(
             () => new Promise(() => {}) // Never resolves
         );
         vi.mocked(apiTemplate.apiGetTemplates).mockImplementation(
@@ -121,7 +121,7 @@ describe('Templates', () => {
     });
 
     it('displays templates for the questionnaire', async () => {
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
         vi.mocked(apiTemplate.apiGetTemplates).mockResolvedValue(mockTemplates);
 
         render(<Templates />);
@@ -141,7 +141,7 @@ describe('Templates', () => {
     });
 
     it('displays create form when there are no templates', async () => {
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
         vi.mocked(apiTemplate.apiGetTemplates).mockResolvedValue([]);
 
         render(<Templates />);
@@ -157,7 +157,7 @@ describe('Templates', () => {
     });
 
     it('displays button for adding a new template when templates exist', async () => {
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
         vi.mocked(apiTemplate.apiGetTemplates).mockResolvedValue(mockTemplates);
 
         render(<Templates />);
@@ -169,7 +169,7 @@ describe('Templates', () => {
 
     it('shows create form when create button is clicked', async () => {
         const user = userEvent.setup();
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
         vi.mocked(apiTemplate.apiGetTemplates).mockResolvedValue(mockTemplates);
 
         render(<Templates />);
@@ -187,7 +187,7 @@ describe('Templates', () => {
     });
 
     it('displays error message when API call fails', async () => {
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockRejectedValue(
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockRejectedValue(
             new Error('Failed to load templates')
         );
 
@@ -202,7 +202,7 @@ describe('Templates', () => {
     });
 
     it('displays back link to questionnaires', async () => {
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
         vi.mocked(apiTemplate.apiGetTemplates).mockResolvedValue(mockTemplates);
 
         render(<Templates />);
@@ -224,7 +224,7 @@ describe('Templates', () => {
             questionnaireId: 1,
         };
 
-        vi.mocked(apiQuestionnaire.apiGetQuestionnaires).mockResolvedValue([mockQuestionnaire]);
+        vi.mocked(apiQuestionnaire.apiGetQuestionnaire).mockResolvedValue(mockQuestionnaire);
         vi.mocked(apiTemplate.apiGetTemplates)
             .mockResolvedValueOnce(mockTemplates)
             .mockResolvedValueOnce([...mockTemplates, newTemplate]);

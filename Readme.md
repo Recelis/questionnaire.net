@@ -18,20 +18,24 @@
 - [ ] - - Submissions are for previous locked template, if latest if unlocked
 - [ ] - - cannot create a new template if latest is unlocked
 - [ ] - duplicating templates
+- [ ] - Submission points are added up over week/month/year dashboards
 
 ### Future
 
 #### Electron Project
 
-- - [x] - Setup Electron project
-- - [x] - Users can log in
-- - [x] - Users can create their own Questionnaires
-- - [x] - Users can create their own Templates
-- - [x] - Users can add questions to their templates
-- - [ ] - Users can duplicate their templates
-- - [ ] - Users can create submissions
-- - [ ] - Users can add answers to their submissions
-- - [ ] - Export electron project
+- [x] - Setup Electron project
+- [x] - Users can log in
+- [x] - Users can create their own Questionnaires
+- [x] - Users can create their own Templates
+- [x] - Users can add questions to their templates
+- [ ] - Users can duplicate their templates
+- [x] - Users can create submissions
+- [x] - Users can add answers to their submissions
+- [ ] - Export electron project
+- [ ] - Dashboard page for week
+- [ ] - Dashboard for month
+- [ ] - Dashboard for year
 
 #### Deployments
 

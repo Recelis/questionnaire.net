@@ -248,7 +248,7 @@ namespace LifeTracker.Tests.Services
         }
 
         // [Test]
-        public async Task GetByUserAsync_ShouldGetOnlySubmissionAnswers()
+        public async Task GetByUserAsync_ShouldGetOnlySubmissionQuestionAnswer()
         {
             User user = await CreateTestUser();
             SetServiceWithUserContext(user);
@@ -295,9 +295,9 @@ namespace LifeTracker.Tests.Services
 
             if (_answerService == null)
                 throw new InvalidOperationException("_answerService is null");
-            List<Answer> answersInDb = await _answerService.GetBySubmissionAsync(submission0.Id);
+            Answer? answerInDb = await _answerService.GetBySubmissionQuestionAsync(submission0.Id, question0.Id);
 
-            Assert.That(answersInDb, Has.Exactly(1).Items);
+            Assert.That(answerInDb, Is.Not.Null);
         }
 
         [Test]

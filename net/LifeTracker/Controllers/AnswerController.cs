@@ -21,22 +21,27 @@ public class AnswerController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the answers by submissionId.
+    /// Gets the answers by submissionId and questionId.
     /// </summary>
-    /// <param name="answerId">The ID of the submission</param>
+    /// <param name="submissionId">The ID of the submission</param>
+    /// <param name="questionId">The ID of the question</param>
     /// <returns>A list of answers.</returns>
     /// <response code="200">Returns a list of answers</response>
     [Authorize]
-    [HttpGet("submission/{submissionId:int}")]
+    [HttpGet("submission/{submissionId:int}/question/{questionId:int}")]
     [ProducesResponseType(typeof(List<Answer>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json")]
-    public async Task<ActionResult<IEnumerable<Answer>>> GetBySubmission(int submissionId)
+    public async Task<ActionResult<Answer>> GetBySubmissionQuestion(int submissionId, int questionId)
     {
-        _logger.LogInformation("Getting answers by submission: {Id}", submissionId);
-        List<Answer> answers = await _answerService.GetBySubmissionAsync(submissionId);
+        _logger.LogInformation("Getting answers by submission: {Id} and question: {QuestionId}", submissionId, questionId);
+        Answer? answer = await _answerService.GetBySubmissionQuestionAsync(submissionId, questionId);
+        if (answer == null)
+        {
+            return NotFound();
+        }
 
-        return Ok(answers);
+        return Ok(answer);
     }
 
     /// <summary>

@@ -5,7 +5,7 @@ namespace LifeTracker.Services;
 
 public interface IAnswerService
 {
-    Task<List<Answer>> GetBySubmissionAsync(int submissionId);
+    Task<Answer?> GetBySubmissionQuestionAsync(int submissionId, int questionId);
     Task<Answer?> GetAsync(int answerId);
     Task<Answer> CreateAsync(CreateAnswerDto newAnswer);
     Task<Answer?> UpdateAsync(int id, UpdateAnswerDto newAnswer);

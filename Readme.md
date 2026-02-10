@@ -32,6 +32,7 @@
 - [ ] - Users can duplicate their templates
 - [x] - Users can create submissions
 - [x] - Users can add answers to their submissions
+- [ ] - User can view submission + points in a page table
 - [ ] - Export electron project
 - [ ] - Dashboard page for week
 - [ ] - Dashboard for month

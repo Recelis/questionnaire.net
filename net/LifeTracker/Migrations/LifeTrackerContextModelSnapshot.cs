@@ -4,7 +4,6 @@ using LifeTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,246 +15,194 @@ namespace LifeTracker.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("LifeTracker.Models.Answer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Points")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("points");
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<int>("QuestionId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("question_id");
 
                     b.Property<int>("SubmissionId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("submission_id");
 
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("text");
+                        .HasColumnType("TEXT");
 
-                    b.HasKey("Id")
-                        .HasName("pk_answer");
+                    b.HasKey("Id");
 
-                    b.HasIndex("SubmissionId")
-                        .HasDatabaseName("ix_answer_submission_id");
+                    b.HasIndex("SubmissionId");
 
-                    b.ToTable("answer", (string)null);
+                    b.ToTable("Answer");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.Question", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Points")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("points");
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("text");
+                        .HasColumnType("TEXT");
 
-                    b.HasKey("Id")
-                        .HasName("pk_question");
+                    b.HasKey("Id");
 
-                    b.ToTable("question", (string)null);
+                    b.ToTable("Question");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.Questionnaire", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("name");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id")
-                        .HasName("pk_questionnaire");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_questionnaire_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("questionnaire", (string)null);
+                    b.ToTable("Questionnaire");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.Submission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Date")
                         .HasMaxLength(250)
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("TemplateId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("template_id");
 
                     b.Property<int>("TotalPoints")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("total_points");
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id")
-                        .HasName("pk_submission");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_submission_user_id");
+                    b.HasIndex("TemplateId");
 
-                    b.ToTable("submission", (string)null);
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Submission");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.Template", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("name");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("QuestionnaireId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("questionnaire_id");
 
                     b.Property<int>("Version")
-                        .HasColumnType("integer")
-                        .HasColumnName("version");
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("Id")
-                        .HasName("pk_template");
+                    b.HasKey("Id");
 
                     b.HasIndex("QuestionnaireId", "Version")
-                        .IsUnique()
-                        .HasDatabaseName("ix_template_questionnaire_id_version");
+                        .IsUnique();
 
-                    b.ToTable("template", (string)null);
+                    b.ToTable("Template");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.TemplateQuestionLink", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("QuestionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("question_id");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("QuestionNumber")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("question_number");
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<int>("TemplateId")
-                        .HasColumnType("integer")
-                        .HasColumnName("template_id");
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("Id")
-                        .HasName("pk_template_question_link");
+                    b.HasKey("Id");
 
-                    b.HasIndex("QuestionId")
-                        .HasDatabaseName("ix_template_question_link_question_id");
+                    b.HasIndex("QuestionId");
 
                     b.HasIndex("TemplateId", "QuestionId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_template_question_link_template_id_question_id");
+                        .IsUnique();
 
-                    b.ToTable("template_question_link", (string)null);
+                    b.ToTable("TemplateQuestionLink");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("email");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("name");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("password_hash");
+                        .HasColumnType("TEXT");
 
-                    b.HasKey("Id")
-                        .HasName("pk_user");
+                    b.HasKey("Id");
 
                     b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_email");
+                        .IsUnique();
 
-                    b.ToTable("user", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("LifeTracker.Models.Answer", b =>
@@ -282,12 +229,21 @@ namespace LifeTracker.Migrations
 
             modelBuilder.Entity("LifeTracker.Models.Submission", b =>
                 {
+                    b.HasOne("LifeTracker.Models.Template", "Template")
+                        .WithMany("Submissions")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_submission_template");
+
                     b.HasOne("LifeTracker.Models.User", "User")
                         .WithMany("Submissions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_submission");
+
+                    b.Navigation("Template");
 
                     b.Navigation("User");
                 });
@@ -335,6 +291,8 @@ namespace LifeTracker.Migrations
 
             modelBuilder.Entity("LifeTracker.Models.Template", b =>
                 {
+                    b.Navigation("Submissions");
+
                     b.Navigation("TemplateQuestionLinks");
                 });
 

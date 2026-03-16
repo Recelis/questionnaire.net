@@ -52,8 +52,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<LifeTrackerContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-    .UseSnakeCaseNamingConvention());
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUserService, EFUserService>();
 builder.Services.AddScoped<IQuestionnaireService, EFQuestionnaireService>();
@@ -77,14 +76,15 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<LifeTrackerContext>();
-
-    if (await dbContext.Database.CanConnectAsync())
+    ILogger logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
     {
-        Console.WriteLine("✅ Successfully connected to Postgres.");
+        await dbContext.Database.CanConnectAsync();
+        logger.LogInformation("✅ Successfully connected to the database.");
     }
-    else
+    catch (Exception ex)
     {
-        Console.WriteLine("❌ Failed to connect to Postgres.");
+        logger.LogError(ex, "❌ Database connection error. Please check your connection string and database server.");
     }
 }
 

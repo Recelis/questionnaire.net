@@ -19,7 +19,7 @@
 - [ ] - - cannot create a new template if latest is unlocked
 - [ ] - duplicating templates
 - [ ] - Submission points are added up over week/month/year dashboards
-
+- [x] - convert to sqlite for personal use
 ### Future
 
 #### Electron Project

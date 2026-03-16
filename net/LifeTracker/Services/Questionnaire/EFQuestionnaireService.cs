@@ -2,7 +2,6 @@ using LifeTracker.Data;
 using LifeTracker.Dto;
 using LifeTracker.Models;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace LifeTracker.Services;
 

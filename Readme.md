@@ -138,3 +138,24 @@ For running just one test:
 ```bash
 dotnet test --filter "FullyQualifiedName=LifeTracker.Tests.Services.AnswerTests.CreateAsync_ShouldAddAnswerToDb"
 ```
+
+## Start API + Electron Together
+
+From the workspace root:
+
+```bash
+./start-dev.sh
+```
+
+This starts:
+
+- Dotnet API from `net/LifeTracker`
+- Electron app in dev mode from `react-electron`
+
+Use `Ctrl+C` once to stop both.
+
+This needs to be executable before running:
+
+```bash
+chmod +x start-dev.sh && bash -n start-dev.sh # the second part is a dry run
+```

@@ -37,12 +37,14 @@ export const apiGetAnswerBySubmissionQuestion = async (
             headers: getAuthHeaders(),
         });
 
-        if (!res.ok) {
+        if (res.status === 404) {
+            // No existing answer found, return undefined
+            return undefined;
+        }
+
+        else if (!res.ok) {
             const message = await res.text();
             throw new Error(`Failed to get answer. Status: ${res.status}: ${message}`);
-        }
-        if (res.status === 204) {
-            return undefined; // No content, return undefined
         }
 
         const data = await res.json();

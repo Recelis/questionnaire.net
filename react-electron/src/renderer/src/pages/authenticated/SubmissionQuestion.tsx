@@ -160,7 +160,8 @@ export default function SubmissionQuestion() {
                 currentQuestionIndex={qIndex}
             />
             <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '2rem' }}>
-                {questions[qIndex] && <p>{questions[qIndex].text}</p>}
+                <h1 style={{ marginBottom: '1rem', fontSize: '1.5rem' }}>Question {qIndex + 1}</h1>
+                {questions[qIndex] && <p style={{ whiteSpace: 'pre-wrap' }}>{questions[qIndex].text}</p>}
                 <input
                     type="text"
                     placeholder="Answer with a number..."

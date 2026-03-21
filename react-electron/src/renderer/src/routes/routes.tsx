@@ -13,6 +13,7 @@ import Submission from '../pages/authenticated/Submission';
 import SubmissionNoQuestions from '../pages/authenticated/SubmissionNoQuestions';
 import SubmissionQuestion from '../pages/authenticated/SubmissionQuestion';
 import SubmissionComplete from '../pages/authenticated/SubmissionComplete';
+import QuestionUpdate from '../pages/authenticated/QuestionUpdate';
 
 const RouterComponent = () => {
     return (
@@ -35,6 +36,10 @@ const RouterComponent = () => {
                         <Route
                             path=":id/edit/template/:templateId/question"
                             element={<TemplateQuestions />}
+                        />
+                        <Route
+                            path=":id/edit/template/:templateId/question/:questionId/edit"
+                            element={<QuestionUpdate />}
                         />
                         <Route
                             path=":id/submission"

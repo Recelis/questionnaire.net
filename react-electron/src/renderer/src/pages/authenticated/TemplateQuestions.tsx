@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import Layout from '../../components/Layout';
 import QuestionCreate from './QuestionCreate';
@@ -7,15 +7,27 @@ import { apiGetTemplate } from '../../api/apiTemplate';
 import type { IQuestion, ITemplate } from '../../api/types';
 
 export default function TemplateQuestions() {
-    const { templateId } = useParams<{ templateId: string }>();
+    const { id, templateId } = useParams<{ id: string; templateId: string }>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | undefined>(undefined);
     const [questions, setQuestions] = useState<IQuestion[]>([]);
     const [template, setTemplate] = useState<ITemplate | undefined>(undefined);
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const parsedTemplateId = templateId ? parseInt(templateId, 10) : undefined;
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setOpenMenuId(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -148,7 +160,6 @@ export default function TemplateQuestions() {
                                             padding: '1.5rem',
                                             border: '1px solid #ddd',
                                             borderRadius: '4px',
-                                            backgroundColor: '#f9f9f9',
                                         }}
                                     >
                                         <div
@@ -167,9 +178,64 @@ export default function TemplateQuestions() {
                                                 >
                                                     Question {index + 1}
                                                 </p>
-                                                <p style={{ margin: 0, color: '#333' }}>
+                                                <p style={{ margin: 0, color: '#666666', whiteSpace: 'pre-wrap' }}>
                                                     {question.text}
                                                 </p>
+                                            </div>
+                                            <div ref={openMenuId === question.id ? menuRef : null} style={{ position: 'relative' }}>
+                                                <button
+                                                    onClick={() => setOpenMenuId(openMenuId === question.id ? null : question.id)}
+                                                    style={{
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        fontSize: '1.25rem',
+                                                        lineHeight: 1,
+                                                        padding: '0.25rem 0.5rem',
+                                                        color: '#666',
+                                                    }}
+                                                    aria-label="Question options"
+                                                >
+                                                    &#8942;
+                                                </button>
+                                                {openMenuId === question.id && (
+                                                    <div
+                                                        style={{
+                                                            position: 'absolute',
+                                                            right: 0,
+                                                            top: '100%',
+                                                            backgroundColor: 'rgb(36, 36, 36)',
+                                                            border: '1px solid #ddd',
+                                                            color: '#333',
+                                                            borderRadius: '4px',
+                                                            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                                                            zIndex: 10,
+                                                            minWidth: '140px',
+                                                        }}
+                                                    >
+                                                        <button
+                                                            onClick={() => {
+                                                                setOpenMenuId(null);
+                                                                navigate(
+                                                                    `/questionnaire/${id}/edit/template/${templateId}/question/${question.id}/edit`,
+                                                                    { state: { question } }
+                                                                );
+                                                            }}
+                                                            style={{
+                                                                display: 'block',
+                                                                width: '100%',
+                                                                padding: '0.6rem 1rem',
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                textAlign: 'left',
+                                                                cursor: 'pointer',
+                                                                fontSize: '0.9rem',
+                                                            }}
+                                                        >
+                                                            Edit Question
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

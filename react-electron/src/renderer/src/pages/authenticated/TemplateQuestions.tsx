@@ -160,7 +160,7 @@ export default function TemplateQuestions() {
                                             padding: '1.5rem',
                                             border: '1px solid #ddd',
                                             borderRadius: '4px',
-                                            backgroundColor: '#f9f9f9',
+                                            // backgroundColor: '#f9f9f9',
                                         }}
                                     >
                                         <div
@@ -179,7 +179,7 @@ export default function TemplateQuestions() {
                                                 >
                                                     Question {index + 1}
                                                 </p>
-                                                <p style={{ margin: 0, color: '#333' }}>
+                                                <p style={{ margin: 0, color: '#666666' }}>
                                                     {question.text}
                                                 </p>
                                             </div>
@@ -205,8 +205,9 @@ export default function TemplateQuestions() {
                                                             position: 'absolute',
                                                             right: 0,
                                                             top: '100%',
-                                                            backgroundColor: '#fff',
+                                                            backgroundColor: 'rgb(36, 36, 36)',
                                                             border: '1px solid #ddd',
+                                                            color: '#333',
                                                             borderRadius: '4px',
                                                             boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
                                                             zIndex: 10,

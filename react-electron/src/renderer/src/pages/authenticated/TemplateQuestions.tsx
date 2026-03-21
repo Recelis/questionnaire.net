@@ -160,7 +160,6 @@ export default function TemplateQuestions() {
                                             padding: '1.5rem',
                                             border: '1px solid #ddd',
                                             borderRadius: '4px',
-                                            // backgroundColor: '#f9f9f9',
                                         }}
                                     >
                                         <div

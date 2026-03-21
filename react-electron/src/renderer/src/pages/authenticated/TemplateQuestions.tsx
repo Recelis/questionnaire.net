@@ -179,7 +179,7 @@ export default function TemplateQuestions() {
                                                 >
                                                     Question {index + 1}
                                                 </p>
-                                                <p style={{ margin: 0, color: '#666666' }}>
+                                                <p style={{ margin: 0, color: '#666666', whiteSpace: 'pre-wrap' }}>
                                                     {question.text}
                                                 </p>
                                             </div>

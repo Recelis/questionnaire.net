@@ -1,0 +1,60 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  test-backend:
+    name: Test .NET Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          # Using 8.0.x as test project targets net8.0
+          # If main project requires 10.0, update this to '10.0.x' when available
+          dotnet-version: '10.0.x'
+      
+      - name: Restore dependencies
+        working-directory: net
+        run: dotnet restore
+      
+      - name: Build solution
+        working-directory: net
+        run: dotnet build --no-restore
+      
+      - name: Run tests
+        working-directory: net
+        run: dotnet test --no-build --verbosity normal
+
+  test-frontend:
+    name: Test React Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: react-electron/src/renderer/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: react-electron/src/renderer
+        run: npm ci
+      
+      - name: Run tests
+        working-directory: react-electron/src/renderer
+        run: npm run test:run
+

@@ -1,4 +1,5 @@
 using LifeTracker.Data;
+using LifeTracker.Configuration;
 using LifeTracker.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<LifeTrackerContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.Configure<MetricsOptions>(
+    builder.Configuration.GetSection(MetricsOptions.SectionName));
 
 builder.Services.AddScoped<IUserService, EFUserService>();
 builder.Services.AddScoped<IQuestionnaireService, EFQuestionnaireService>();

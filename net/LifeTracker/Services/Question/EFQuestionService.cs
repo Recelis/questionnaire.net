@@ -52,6 +52,7 @@ public class EFQuestionService : IQuestionService
 
         Question newQuestion = new Question
         {
+            Title = createQuestionDto.Text,
             Text = createQuestionDto.Text,
         };
 
